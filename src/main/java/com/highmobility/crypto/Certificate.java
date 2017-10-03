@@ -1,5 +1,7 @@
 package com.highmobility.crypto;
 
+import com.highmobility.utils.Base64;
+
 import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
@@ -37,18 +39,23 @@ public class Certificate {
         return bytes;
     }
 
-    static Date dateFromBytes(byte[] bytes) {
+    /**
+     *
+     * @return The raw bytes encoded in base64.
+     */
+    public String getBase64() { return Base64.encode(bytes); }
+
+    static Calendar dateFromBytes(byte[] bytes) {
         Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
         cal.setTimeInMillis(0);
         cal.set(2000 + bytes[0], bytes[1] - 1, bytes[2], bytes[3], bytes[4]);
-
-        return cal.getTime(); // get back a Date object
+        return cal; // get back a Date object
     }
 
-    static byte[] bytesFromDate(Date date) {
+    static byte[] bytesFromDate(Calendar calendar) {
         byte [] bytes = new byte[5];
-        Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
-        calendar.setTime(date);
+
+        calendar.setTimeZone(TimeZone.getTimeZone("UTC"));
 
         bytes[0] = (byte)(calendar.get(Calendar.YEAR) - 2000);
         bytes[1] = (byte)(calendar.get(Calendar.MONTH) + 1);

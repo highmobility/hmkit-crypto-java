@@ -1,6 +1,7 @@
 package com.highmobility.crypto;
 
 
+import com.highmobility.utils.Base64;
 import com.highmobility.utils.Bytes;
 
 /**
@@ -104,14 +105,23 @@ public class DeviceCertificate extends Certificate {
      * Initialise the device certificate with raw bytes.
      *
      * @param bytes The bytes making up the certificate (89 bytes are expected).
-     * @throws IllegalArgumentException When bytes length is not correct.
+     * @throws IllegalArgumentException When bytes length is incorrect.
      */
     public DeviceCertificate(byte[] bytes) throws IllegalArgumentException {
         super(bytes);
+        validateBytes();
+    }
 
-        if (bytes.length < 89) {
-            throw new IllegalArgumentException();
-        }
+    /**
+     * Initialize the device certificate with raw bytes encoded in Base64.
+     *
+     * For manual initialization see the alternative constructors.
+     *
+     * @param base64Bytes The Base64 encoded bytes making up the certificate.
+     * @throws IllegalArgumentException When byte count is incorrect.
+     */
+    public DeviceCertificate(String base64Bytes) throws IllegalArgumentException {
+        this(Base64.decode(base64Bytes));
     }
 
     /**
@@ -142,5 +152,11 @@ public class DeviceCertificate extends Certificate {
         bytes = Bytes.concatBytes(bytes, publicKey);
 
         this.bytes = bytes;
+    }
+
+    private void validateBytes() throws IllegalArgumentException {
+        if (bytes.length < 89) {
+            throw new IllegalArgumentException();
+        }
     }
 }
