@@ -155,7 +155,7 @@ public class DeviceCertificate extends Certificate {
     }
 
     private void validateBytes() throws IllegalArgumentException {
-        if (bytes.length < 89) {
+        if (bytes == null || bytes.length < 89) {
             throw new IllegalArgumentException();
         }
     }

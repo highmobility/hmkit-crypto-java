@@ -290,7 +290,7 @@ public class AccessCertificate extends Certificate {
     }
 
     private void validateBytes() throws IllegalArgumentException {
-        if (bytes.length < 98) {
+        if (bytes == null || bytes.length < 98) {
             throw new IllegalArgumentException();
         }
     }
