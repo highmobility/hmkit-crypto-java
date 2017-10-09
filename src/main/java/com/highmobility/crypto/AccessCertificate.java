@@ -208,9 +208,7 @@ public class AccessCertificate extends Certificate {
      * @throws IllegalArgumentException When byte count is not correct.
      */
     public AccessCertificate(String base64Bytes) throws IllegalAccessException {
-        super();
-        this.bytes = Base64.decode(base64Bytes);
-        validateBytes();
+        this(Base64.decode(base64Bytes));
     }
 
     /**
@@ -274,7 +272,7 @@ public class AccessCertificate extends Certificate {
     }
 
     private void validateBytes() throws IllegalArgumentException {
-        if (bytes.length < 93) {
+        if (bytes == null || bytes.length < 93) {
             throw new IllegalArgumentException();
         }
     }
