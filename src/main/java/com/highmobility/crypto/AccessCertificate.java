@@ -4,7 +4,6 @@ import com.highmobility.utils.Bytes;
 import com.highmobility.utils.Base64;
 
 import java.util.Calendar;
-import java.util.Date;
 import java.util.TimeZone;
 
 /**
@@ -12,36 +11,27 @@ import java.util.TimeZone;
  *
  * Access Certificate is used to recognise and authorise two HM SDK-enabled devices.
  *
- * Certificate binary format:
- *
- * Cert Data[0]: certificate version
- * Cert Data[1 to 4]: issuer ( 4 bytes )
- * Cert Data[5 to 13]: Access Gaining Serial number ( 9 bytes )
- * Cert Data[14 to 77]: Access Gaining Public Key ( 64 bytes )
- * Cert Data[78 to 86]: Access Providing Serial number (9 bytes)
- * Cert Data[87 to 91]: Start date ( 5 bytes)
- * Cert Data[92 to 96]: End date ( 5 bytes)
- * Cert Data[97]: Permissions Size ( 1 byte )
- * Cert Data[98 to A]: Permissions ( 0 - 16 bytes )
- * Cert Data[A to B]: Certificate Authority Signature ( 64 bytes Only for Certificate data )
- *
- * Date binary format
- * Data[0]: Year ( 00 to 99, means year from 2000 to 2099)
- * Data[1]: month ( 1 to 12 )
- * Data[2]: day ( 1 to 31)
- * Data[4]: Hours ( 0 to 23 )
- * Data[5]: Minutes ( 0 to 59 )
+ * This class handles both the v0 and v1 certificate types. The getters are the same for both versions,
+ * for initialization with specific parameters use the appropriate constructors(that have your required
+ * fields and not anything else)
  *
  */
 public class AccessCertificate extends Certificate {
+    int version = 0;
+    static int v0Length = 93;
+    static int v1Length = 98;
     /**
      *
      * @return The certificate's issuer
      */
     public byte[] getIssuer() {
-        byte[] bytes = new byte[4];
-        System.arraycopy(this.bytes, 1, bytes, 0, 4);
-        return bytes;
+        if (version == 1) {
+            byte[] bytes = new byte[4];
+            System.arraycopy(this.bytes, 1, bytes, 0, 4);
+            return bytes;
+        }
+
+        return null;
     }
 
     /**
@@ -49,7 +39,14 @@ public class AccessCertificate extends Certificate {
      */
     public byte[] getProviderSerial() {
         byte[] bytes = new byte[9];
-        System.arraycopy(this.bytes, 5, bytes, 0, 9);
+
+        if (version == 1) {
+            System.arraycopy(this.bytes, 5, bytes, 0, 9);
+        }
+        else {
+            System.arraycopy(this.bytes, 73, bytes, 0, 9);
+        }
+
         return bytes;
     }
 
@@ -58,7 +55,13 @@ public class AccessCertificate extends Certificate {
      */
     public byte[] getGainerSerial() {
         byte[] bytes = new byte[9];
-        System.arraycopy(this.bytes, 14, bytes, 0, 9);
+        if (version == 1) {
+            System.arraycopy(this.bytes, 14, bytes, 0, 9);
+        }
+        else {
+            System.arraycopy(this.bytes, 0, bytes, 0, 9);
+        }
+        
         return bytes;
     }
 
@@ -67,7 +70,14 @@ public class AccessCertificate extends Certificate {
      */
     public byte[] getGainerPublicKey() {
         byte[] bytes = new byte[64];
-        System.arraycopy(this.bytes, 23, bytes, 0, 64);
+
+        if (version == 1) {
+            System.arraycopy(this.bytes, 23, bytes, 0, 64);
+        }
+        else {
+            System.arraycopy(this.bytes, 9, bytes, 0, 64);
+        }
+
         return bytes;
     }
 
@@ -83,7 +93,14 @@ public class AccessCertificate extends Certificate {
      */
     public byte[] getStartDateBytes() {
         byte[] bytes = new byte[5];
-        System.arraycopy(this.bytes, 87, bytes, 0, 5);
+
+        if (version == 1) {
+            System.arraycopy(this.bytes, 87, bytes, 0, 5);
+        }
+        else {
+            System.arraycopy(this.bytes, 82, bytes, 0, 5);
+        }
+
         return bytes;
     }
 
@@ -100,7 +117,13 @@ public class AccessCertificate extends Certificate {
      */
     public byte[] getEndDateBytes() {
         byte[] bytes = new byte[5];
-        System.arraycopy(this.bytes, 92, bytes, 0, 5);
+        if (version == 1) {
+            System.arraycopy(this.bytes, 92, bytes, 0, 5);
+        }
+        else {
+            System.arraycopy(this.bytes, 87, bytes, 0, 5);
+        }
+
         return bytes;
     }
 
@@ -109,13 +132,14 @@ public class AccessCertificate extends Certificate {
      *          arbitrary data as well as permission bytes that correspond to the General API.
      */
     public byte[] getPermissions() {
-        int length = bytes[97];
+        int lengthLocation = version == 0 ? 92 : 97;
+        int length = bytes[lengthLocation];
+
         if (length > 0) {
             byte[] bytes = new byte[length];
-            System.arraycopy(this.bytes, 98, bytes, 0, length);
+            System.arraycopy(this.bytes, lengthLocation + 1, bytes, 0, length);
             return bytes;
-        }
-        else {
+        } else {
             return new byte[0];
         }
     }
@@ -125,19 +149,22 @@ public class AccessCertificate extends Certificate {
      * @param permissions The new permissions, up to 16 bytes.
      */
     public void setPermissions(byte[] permissions) {
+        int lengthLocation = version == 0 ? 92 : 97;
+
         byte length = 0x00;
         byte[] newBytes;
+
         if (permissions != null && permissions.length > 0) {
-            length = (byte)permissions.length;
+            length = (byte) permissions.length;
         }
 
-        newBytes = new byte[98 + length];
-        System.arraycopy(this.bytes, 0, newBytes, 0, 97);
+        newBytes = new byte[lengthLocation + 1 + length];
+        System.arraycopy(this.bytes, 0, newBytes, 0, lengthLocation);
 
-        newBytes[97] = length;
+        newBytes[lengthLocation] = length;
 
         if (length > 0) {
-            System.arraycopy(newBytes, 98, permissions, 0, length);
+            System.arraycopy(newBytes, lengthLocation + 1, permissions, 0, length);
         }
 
         this.bytes = newBytes;
@@ -153,10 +180,11 @@ public class AccessCertificate extends Certificate {
 
     @Override
     public byte[] getCertificateData() {
-        int dataLength = 98;
+        int dataLength = version == 1 ? v1Length : v0Length;
+        int permissionsLengthPosition = version == 1 ? 97 : 92;
 
-        if (bytes[97] > 0) {
-            dataLength += bytes[97];
+        if (bytes[permissionsLengthPosition] > 0) {
+            dataLength += bytes[permissionsLengthPosition];
         }
 
         byte[] bytes = new byte[dataLength];
@@ -166,14 +194,14 @@ public class AccessCertificate extends Certificate {
 
     @Override
     public byte[] getSignature() {
-        int permissionsSize = bytes[97];
+        int permissionsLengthPosition = version == 1 ? 97 : 92;
+        int permissionsSize = bytes[permissionsLengthPosition];
 
-        if (bytes.length == 98 + permissionsSize) {
+        if (bytes.length == permissionsLengthPosition + 1 + permissionsSize) {
             return null; // no sig
-        }
-        else {
+        } else {
             byte[] bytes = new byte[64];
-            System.arraycopy(this.bytes, 98 + permissionsSize, bytes, 0, 64);
+            System.arraycopy(this.bytes, permissionsLengthPosition + 1 + permissionsSize, bytes, 0, 64);
             return bytes;
         }
     }
@@ -191,9 +219,11 @@ public class AccessCertificate extends Certificate {
     public String toString() {
         String description = "";
 
+        byte[] issuer = getIssuer();
+        description += "\nissuer: " + issuer != null ? Bytes.hexFromBytes(issuer) : "null";
+        description += "\nprovidingSerial: " + Bytes.hexFromBytes(getProviderSerial());
         description += "\ngainingSerial: " + Bytes.hexFromBytes(getGainerSerial());
         description += "\ngainingPublicKey: " + Bytes.hexFromBytes(getGainerPublicKey());
-        description += "\nprovidingSerial: " + Bytes.hexFromBytes(getProviderSerial());
         description += "\nvalid from: : " + getStartDate() + " to: " + getEndDate();
         description += "\npermissions: " + Bytes.hexFromBytes(getPermissions());
         description += "\nsignature: " + Bytes.hexFromBytes(getSignature()) + "\n";
@@ -204,15 +234,15 @@ public class AccessCertificate extends Certificate {
     /**
      * Initialize the access certificate with raw bytes.
      *
-     * This method requires at least 93 bytes to succeed.
+     * Signature is not required, but all of the other data is.
      * For manual initialization see the alternative constructors.
      *
-     * @param bytes The bytes making up the certificate (at least 93 bytes are expected).
+     * @param bytes The bytes making up the certificate.
      * @throws IllegalArgumentException When bytes length is not correct.
      */
     public AccessCertificate(byte[] bytes) throws IllegalArgumentException {
         super(bytes);
-        validateBytes();
+        testVersion(bytes);
     }
 
     /**
@@ -228,7 +258,77 @@ public class AccessCertificate extends Certificate {
     }
 
     /**
-     * Initialize the access certificate with all its attributes except Certificate Authority signature.
+     * Initialize the v1 access certificate with all its attributes except Certificate Authority signature.
+     *
+     * @param issuer            The 4-byte identifier of the issuer of this certificate.
+     * @param providingSerial   9-byte serial number of the device providing access to itself.
+     * @param gainerSerial      9-byte serial number of the device that's gaining access.
+     * @param gainingPublicKey  64-byte public key of the device gaining access.
+     * @param startDate         The start time (and date) of the certificate.
+     * @param endDate           The expiration time of the certificate.
+     * @param permissions       Permissions supplied with the certificate (up to 16 bytes).
+     * @throws IllegalArgumentException When parameters are not in correct size according to the table on top.
+     */
+    public AccessCertificate(byte[] issuer,
+                             byte[] providingSerial,
+                             byte[] gainerSerial,
+                             byte[] gainingPublicKey,
+                             byte[] startDate,
+                             byte[] endDate,
+                             byte[] permissions) throws IllegalArgumentException {
+        super();
+
+        byte[] bytes = new byte[] { 0x01 };
+        bytes = Bytes.concatBytes(bytes, issuer);
+        bytes = Bytes.concatBytes(bytes, providingSerial);
+        bytes = Bytes.concatBytes(bytes, gainerSerial);
+        bytes = Bytes.concatBytes(bytes, gainingPublicKey);
+        bytes = Bytes.concatBytes(bytes, startDate);
+        bytes = Bytes.concatBytes(bytes, endDate);
+
+        if (permissions != null && permissions.length > 0) {
+            bytes = Bytes.concatBytes(bytes, new byte[] {(byte)permissions.length});
+            bytes = Bytes.concatBytes(bytes, permissions);
+        }
+        else {
+            bytes = Bytes.concatBytes(bytes, new byte[] {0x00});
+        }
+
+        this.bytes = bytes;
+        validateBytes();
+    }
+
+
+    /**
+     * Initialize the v1 access certificate with all its attributes except Certificate Authority signature.
+     *
+     * @param issuer            The 4-byte identifier of the issuer of this certificate.
+     * @param gainerSerial      9-byte serial number of the device that's gaining access.
+     * @param gainingPublicKey  64-byte public key of the device gaining access.
+     * @param providingSerial   9-byte serial number of the device providing access to itself.
+     * @param startDate         The start time (and date) of the certificate.
+     * @param endDate           The expiration date of the certificate.
+     * @param permissions       Permissions supplied with the certificate (up to 16 bytes).
+     * @throws IllegalArgumentException When parameters are not in correct size according to the table on top.
+     */
+    public AccessCertificate(byte[] issuer,
+                             byte[] providingSerial,
+                             byte[] gainerSerial,
+                             byte[] gainingPublicKey,
+                             Calendar startDate,
+                             Calendar endDate,
+                             byte[] permissions) throws IllegalArgumentException {
+        this(issuer,
+            gainerSerial,
+            gainingPublicKey,
+            providingSerial,
+            bytesFromDate(startDate),
+            bytesFromDate(endDate),
+            permissions);
+    }
+
+    /**
+     * Initialize the v0 access certificate with all its attributes except Certificate Authority signature.
      *
      * @param gainerSerial      9-byte serial number of the device that's gaining access.
      * @param gainingPublicKey  64-byte public key of the device gaining access.
@@ -238,8 +338,7 @@ public class AccessCertificate extends Certificate {
      * @param permissions       Permissions supplied with the certificate (up to 16 bytes).
      * @throws IllegalArgumentException When parameters are not in correct size according to the table on top.
      */
-    public AccessCertificate(byte[] issuer,
-                             byte[] gainerSerial,
+    public AccessCertificate(byte[] gainerSerial,
                              byte[] gainingPublicKey,
                              byte[] providingSerial,
                              byte[] startDate,
@@ -247,8 +346,7 @@ public class AccessCertificate extends Certificate {
                              byte[] permissions) throws IllegalArgumentException {
         super();
 
-        byte[] bytes = new byte[] { 0x01 };
-        bytes = Bytes.concatBytes(bytes, issuer);
+        byte[] bytes = new byte[0];
         bytes = Bytes.concatBytes(bytes, gainerSerial);
         bytes = Bytes.concatBytes(bytes, gainingPublicKey);
         bytes = Bytes.concatBytes(bytes, providingSerial);
@@ -269,7 +367,7 @@ public class AccessCertificate extends Certificate {
 
 
     /**
-     * Initialize the access certificate with all its attributes except Certificate Authority signature.
+     * Initialize the v0 access certificate with all its attributes except Certificate Authority signature.
      *
      * @param gainerSerial      9-byte serial number of the device that's gaining access.
      * @param gainingPublicKey  64-byte public key of the device gaining access.
@@ -279,19 +377,51 @@ public class AccessCertificate extends Certificate {
      * @param permissions       Permissions supplied with the certificate (up to 16 bytes).
      * @throws IllegalArgumentException When parameters are not in correct size according to the table on top.
      */
-    public AccessCertificate(byte[] issuer,
-                             byte[] gainerSerial,
+    public AccessCertificate(byte[] gainerSerial,
                              byte[] gainingPublicKey,
                              byte[] providingSerial,
                              Calendar startDate,
                              Calendar endDate,
                              byte[] permissions) throws IllegalArgumentException {
-        this(issuer, gainerSerial, gainingPublicKey, providingSerial, bytesFromDate(startDate), bytesFromDate(endDate), permissions);
+        this(gainerSerial, gainingPublicKey, providingSerial, bytesFromDate(startDate), bytesFromDate(endDate), permissions);
     }
 
     private void validateBytes() throws IllegalArgumentException {
-        if (bytes == null || bytes.length < 98) {
+        int expectedLength = version == 1 ? v1Length : v0Length;
+
+        if (bytes == null || bytes.length < expectedLength) {
             throw new IllegalArgumentException();
+        }
+    }
+
+    /**
+     * Tests whether bytes are v0 or v1, according to permissions length. If the permissions
+     * length(at v0 or v1 location) tests ok for the total length of the bytes, that version is used.
+     */
+    void testVersion(byte[] bytes) throws IllegalArgumentException {
+        int permissionsLengthPosition, permissionsLength, withoutSignatureLength;
+
+        if (bytes[0] == 1) {
+            // try to verify v1
+            permissionsLengthPosition = 97;
+            if (bytes.length < permissionsLengthPosition + 1) throw new IllegalArgumentException();
+
+            permissionsLength = bytes[permissionsLengthPosition];
+            withoutSignatureLength = v1Length + permissionsLength;
+            if (bytes.length == withoutSignatureLength || bytes.length == withoutSignatureLength + 64) {
+                version = 1;
+                return; // is version 1
+            }
+        }
+
+        // try to verify v0
+        permissionsLengthPosition = 92;
+        if (bytes.length < permissionsLengthPosition + 1) throw new IllegalArgumentException();
+
+        permissionsLength = bytes[permissionsLengthPosition];
+        withoutSignatureLength = v0Length + permissionsLength;
+        if (bytes.length != withoutSignatureLength && bytes.length != withoutSignatureLength + 64) {
+            throw new IllegalArgumentException(); // bytes are not v0 or v1
         }
     }
 }
