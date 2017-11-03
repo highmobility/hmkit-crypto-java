@@ -31,7 +31,7 @@ public class AccessCertificate extends Certificate {
             return bytes;
         }
 
-        return null;
+        return new byte[] { 0x74, 0x6D, 0x63, 0x73 };
     }
 
     /**
