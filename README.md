@@ -1,15 +1,15 @@
-### What is this repository for? ###
+# What is this repository for? #
 
 * This repository has the Certificate classes and public Crypto methods(sign, keygen) from the core.
 * It uses HMBTCore for the Crypto methods. The core is expected to be imported from somewhere else(hmkit-cloud.jar or hmkit-android.aar).
 
-### Certificates ###
+## Certificates ##
 
 Access Certificate and Device Certificate are represented in this library. The certificates will always be converted to raw bytes that are accessible with `byte[] getBytes()` method.
 You can always add a signature later with `setSignature(byte[])`. You can get the certificate data without 
 the signature with getCertificateData().
 
-# AccessCertificate: #
+### AccessCertificate: ###
 Use one of the designated initializers to create the object. For example:
 
 ```java
@@ -24,13 +24,10 @@ public AccessCertificate(byte[] gainerSerial,
 See public getters for certificate info, for example
 
 ```java
-/**
-* @return The certificate issuer's identifier.
-*/
 public byte[] getIssuer()
 ```
 
-# DeviceCertificate #
+### DeviceCertificate ###
 Use one of the designated initializers to create the object. For example:
 
 ```java
@@ -46,7 +43,7 @@ See public getters for certificate info, for example
 public byte[] getPublicKey()
 ```
 
-# Crypto #
+## Crypto ##
 Use Crypto.java static methods to
 
 create a key pair
@@ -66,7 +63,7 @@ public static byte[] sign(byte[] bytes, byte[] privateKey)
 ```
 
 
-### Dependencies ###
+# Dependencies #
 
 * HMBTCore (hmkit-cloud.jar or hmkit-android.aar)
 * hmkit-utils.jar
