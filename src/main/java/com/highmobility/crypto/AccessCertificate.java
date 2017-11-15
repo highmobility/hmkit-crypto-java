@@ -11,8 +11,8 @@ import java.util.TimeZone;
  *
  * Access Certificate is used to recognise and authorise two HM SDK-enabled devices.
  *
- * This class handles both the v0 and v1 certificate types. The getters are the same for both versions,
- * for initialization with specific parameters use the appropriate constructors(that have your required
+ * This class handles both the v0 and v1 certificate types. The getters are the same for both versions.
+ * For initialization with specific parameters use the appropriate constructors(that have your required
  * fields and not anything else)
  *
  */
@@ -20,6 +20,8 @@ public class AccessCertificate extends Certificate {
     int version = 0;
     static int v0Length = 93;
     static int v1Length = 98;
+    static byte[] v0Issuer = new byte[] { 0x74, 0x6D, 0x63, 0x73 };
+
     /**
      *
      * @return The certificate's issuer
@@ -31,7 +33,7 @@ public class AccessCertificate extends Certificate {
             return bytes;
         }
 
-        return new byte[] { 0x74, 0x6D, 0x63, 0x73 };
+        return v0Issuer;
     }
 
     /**
@@ -178,6 +180,15 @@ public class AccessCertificate extends Certificate {
         return endDate.before(Calendar.getInstance(TimeZone.getTimeZone("UTC")));
     }
 
+    /**
+     *
+     * @return A boolean indicating if the certificate is not valid yet, but will be in the future
+     */
+    public boolean isNotValidYet() {
+        Calendar startDate = getStartDate();
+        return startDate.after(Calendar.getInstance(TimeZone.getTimeZone("UTC")));
+    }
+
     @Override
     public byte[] getCertificateData() {
         int dataLength = version == 1 ? v1Length : v0Length;
@@ -242,7 +253,8 @@ public class AccessCertificate extends Certificate {
      */
     public AccessCertificate(byte[] bytes) throws IllegalArgumentException {
         super(bytes);
-        testVersion(bytes);
+        testVersion();
+        validateBytes();
     }
 
     /**
@@ -260,14 +272,14 @@ public class AccessCertificate extends Certificate {
     /**
      * Initialize the v1 access certificate with all its attributes except Certificate Authority signature.
      *
-     * @param issuer            The 4-byte identifier of the issuer of this certificate.
+     * @param issuer            The 4-byte identifier of the issuer of this certificate. Set to null if v0 certificate.
      * @param providingSerial   9-byte serial number of the device providing access to itself.
      * @param gainerSerial      9-byte serial number of the device that's gaining access.
      * @param gainingPublicKey  64-byte public key of the device gaining access.
      * @param startDate         The start time (and date) of the certificate.
      * @param endDate           The expiration time of the certificate.
      * @param permissions       Permissions supplied with the certificate (up to 16 bytes).
-     * @throws IllegalArgumentException When parameters are not in correct size according to the table on top.
+     * @throws IllegalArgumentException When parameters are invalid or not in correct size according to the table on top.
      */
     public AccessCertificate(byte[] issuer,
                              byte[] providingSerial,
@@ -278,11 +290,22 @@ public class AccessCertificate extends Certificate {
                              byte[] permissions) throws IllegalArgumentException {
         super();
 
-        byte[] bytes = new byte[] { 0x01 };
-        bytes = Bytes.concatBytes(bytes, issuer);
-        bytes = Bytes.concatBytes(bytes, providingSerial);
-        bytes = Bytes.concatBytes(bytes, gainerSerial);
-        bytes = Bytes.concatBytes(bytes, gainingPublicKey);
+        byte[] bytes;
+
+        if (issuer == null) {
+            bytes = gainerSerial;
+            bytes = Bytes.concatBytes(bytes, gainingPublicKey);
+            bytes = Bytes.concatBytes(bytes, providingSerial);
+        }
+        else {
+            version = 1;
+            bytes = new byte[] { 0x01 };
+            bytes = Bytes.concatBytes(bytes, issuer);
+            bytes = Bytes.concatBytes(bytes, providingSerial);
+            bytes = Bytes.concatBytes(bytes, gainerSerial);
+            bytes = Bytes.concatBytes(bytes, gainingPublicKey);
+        }
+
         bytes = Bytes.concatBytes(bytes, startDate);
         bytes = Bytes.concatBytes(bytes, endDate);
 
@@ -300,16 +323,16 @@ public class AccessCertificate extends Certificate {
 
 
     /**
-     * Initialize the v1 access certificate with all its attributes except Certificate Authority signature.
+     * Initialize the access certificate with all its attributes except Certificate Authority signature.
      *
-     * @param issuer            The 4-byte identifier of the issuer of this certificate.
+     * @param issuer            The 4-byte identifier of the issuer of this certificate. Set to null if v0 certificate.
      * @param gainerSerial      9-byte serial number of the device that's gaining access.
      * @param gainingPublicKey  64-byte public key of the device gaining access.
      * @param providingSerial   9-byte serial number of the device providing access to itself.
      * @param startDate         The start time (and date) of the certificate.
      * @param endDate           The expiration date of the certificate.
      * @param permissions       Permissions supplied with the certificate (up to 16 bytes).
-     * @throws IllegalArgumentException When parameters are not in correct size according to the table on top.
+     * @throws IllegalArgumentException When parameters are invalid or not in correct size according to the table on top.
      */
     public AccessCertificate(byte[] issuer,
                              byte[] providingSerial,
@@ -327,78 +350,21 @@ public class AccessCertificate extends Certificate {
             permissions);
     }
 
-    /**
-     * Initialize the v0 access certificate with all its attributes except Certificate Authority signature.
-     *
-     * @param gainerSerial      9-byte serial number of the device that's gaining access.
-     * @param gainingPublicKey  64-byte public key of the device gaining access.
-     * @param providingSerial   9-byte serial number of the device providing access to itself.
-     * @param startDate         The start time (and date) of the certificate.
-     * @param endDate           The expiration time of the certificate.
-     * @param permissions       Permissions supplied with the certificate (up to 16 bytes).
-     * @throws IllegalArgumentException When parameters are not in correct size according to the table on top.
-     */
-    public AccessCertificate(byte[] gainerSerial,
-                             byte[] gainingPublicKey,
-                             byte[] providingSerial,
-                             byte[] startDate,
-                             byte[] endDate,
-                             byte[] permissions) throws IllegalArgumentException {
-        super();
-
-        byte[] bytes = new byte[0];
-        bytes = Bytes.concatBytes(bytes, gainerSerial);
-        bytes = Bytes.concatBytes(bytes, gainingPublicKey);
-        bytes = Bytes.concatBytes(bytes, providingSerial);
-        bytes = Bytes.concatBytes(bytes, startDate);
-        bytes = Bytes.concatBytes(bytes, endDate);
-
-        if (permissions != null && permissions.length > 0) {
-            bytes = Bytes.concatBytes(bytes, new byte[] {(byte)permissions.length});
-            bytes = Bytes.concatBytes(bytes, permissions);
-        }
-        else {
-            bytes = Bytes.concatBytes(bytes, new byte[] {0x00});
-        }
-
-        this.bytes = bytes;
-        validateBytes();
-    }
-
-
-    /**
-     * Initialize the v0 access certificate with all its attributes except Certificate Authority signature.
-     *
-     * @param gainerSerial      9-byte serial number of the device that's gaining access.
-     * @param gainingPublicKey  64-byte public key of the device gaining access.
-     * @param providingSerial   9-byte serial number of the device providing access to itself.
-     * @param startDate         The start time (and date) of the certificate.
-     * @param endDate           The expiration date of the certificate.
-     * @param permissions       Permissions supplied with the certificate (up to 16 bytes).
-     * @throws IllegalArgumentException When parameters are not in correct size according to the table on top.
-     */
-    public AccessCertificate(byte[] gainerSerial,
-                             byte[] gainingPublicKey,
-                             byte[] providingSerial,
-                             Calendar startDate,
-                             Calendar endDate,
-                             byte[] permissions) throws IllegalArgumentException {
-        this(gainerSerial, gainingPublicKey, providingSerial, bytesFromDate(startDate), bytesFromDate(endDate), permissions);
-    }
-
     private void validateBytes() throws IllegalArgumentException {
         int expectedLength = version == 1 ? v1Length : v0Length;
 
         if (bytes == null || bytes.length < expectedLength) {
             throw new IllegalArgumentException();
         }
+
+        if (getEndDate().before(getStartDate())) throw new IllegalArgumentException();
     }
 
     /**
      * Tests whether bytes are v0 or v1, according to permissions length. If the permissions
      * length(at v0 or v1 location) tests ok for the total length of the bytes, that version is used.
      */
-    void testVersion(byte[] bytes) throws IllegalArgumentException {
+    void testVersion() throws IllegalArgumentException {
         int permissionsLengthPosition, permissionsLength, withoutSignatureLength;
 
         if (bytes[0] == 1) {
