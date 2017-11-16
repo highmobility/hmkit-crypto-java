@@ -230,8 +230,7 @@ public class AccessCertificate extends Certificate {
     public String toString() {
         String description = "";
 
-        byte[] issuer = getIssuer();
-        description += "\nissuer: " + issuer != null ? Bytes.hexFromBytes(issuer) : "null";
+        description += "\nissuer: " + Bytes.hexFromBytes(getIssuer());
         description += "\nprovidingSerial: " + Bytes.hexFromBytes(getProviderSerial());
         description += "\ngainingSerial: " + Bytes.hexFromBytes(getGainerSerial());
         description += "\ngainingPublicKey: " + Bytes.hexFromBytes(getGainerPublicKey());
@@ -291,6 +290,13 @@ public class AccessCertificate extends Certificate {
         super();
 
         byte[] bytes;
+
+        if (providingSerial.length != 9
+            || gainerSerial.length != 9
+            || gainingPublicKey.length != 64
+            || startDate.length != 5
+            || endDate.length != 5) throw new IllegalArgumentException();
+
 
         if (issuer == null) {
             bytes = gainerSerial;
