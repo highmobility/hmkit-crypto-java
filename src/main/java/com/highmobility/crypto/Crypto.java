@@ -8,9 +8,10 @@ import java.util.Random;
  * Created by ttiganik on 26/05/16.
  */
 public class Crypto {
-    public static KeyPair createKeypair() {
-        HMBTCore core = new HMBTCore();
 
+    private static final HMBTCore core = new HMBTCore();
+
+    public static KeyPair createKeypair() {
         byte[] privateKey = new byte[32];
         byte[] publicKey = new byte[64];
 
@@ -24,8 +25,11 @@ public class Crypto {
         return serialBytes;
     }
 
+    public static byte[] sign(byte[] bytes, HMKeyPair keyPair) {
+        return sign(bytes, keyPair.getPrivateKey());
+    }
+
     public static byte[] sign(byte[] bytes, byte[] privateKey) {
-        HMBTCore core = new HMBTCore();
         byte[] signature = new byte[64];
         core.HMBTCoreCryptoAddSignature(bytes, bytes.length, privateKey, signature);
         return signature;
