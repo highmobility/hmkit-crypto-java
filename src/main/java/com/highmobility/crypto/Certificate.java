@@ -33,7 +33,7 @@ public class Certificate {
     }
 
     /**
-     * @return The full certificate bytes, with the signature if it exists.
+     * @return The full certificate bytes. This includes the signature, if it exists.
      */
     public byte[] getBytes() {
         return bytes;
