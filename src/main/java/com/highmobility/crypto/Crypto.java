@@ -1,6 +1,7 @@
 package com.highmobility.crypto;
 
 import com.highmobility.btcore.HMBTCore;
+import com.highmobility.utils.Base64;
 
 import java.util.Random;
 
@@ -23,6 +24,14 @@ public class Crypto {
         byte[] serialBytes = new byte[9];
         new Random().nextBytes(serialBytes);
         return serialBytes;
+    }
+
+    public static byte[] sign(AccessCertificate unsignedCert, String privateKeyBase64) {
+        return sign(unsignedCert, Base64.decode(privateKeyBase64));
+    }
+
+    public static byte[] sign(AccessCertificate unsignedCert, byte[] privateKeyBytes) {
+        return sign(unsignedCert.getBytes(), privateKeyBytes);
     }
 
     public static byte[] sign(byte[] bytes, HMKeyPair keyPair) {
