@@ -47,7 +47,7 @@ Use Crypto.java static methods to
 
 create a key pair
 ```java
-public static KeyPair createKeypair()
+public static HMKeyPair createKeypair()
 ```
 
 create a random serial number
