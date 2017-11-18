@@ -26,12 +26,13 @@ public class Crypto {
         return serialBytes;
     }
 
-    public static byte[] sign(AccessCertificate unsignedCert, String privateKeyBase64) {
-        return sign(unsignedCert, Base64.decode(privateKeyBase64));
+    public static void sign(AccessCertificate unsignedCert, String privateKeyBase64) {
+        sign(unsignedCert, Base64.decode(privateKeyBase64));
     }
 
-    public static byte[] sign(AccessCertificate unsignedCert, byte[] privateKeyBytes) {
-        return sign(unsignedCert.getBytes(), privateKeyBytes);
+    public static void sign(AccessCertificate unsignedCert, byte[] privateKeyBytes) {
+        byte[] signature = sign(unsignedCert.getBytes(), privateKeyBytes);
+        unsignedCert.setSignature(signature);
     }
 
     public static byte[] sign(byte[] bytes, HMKeyPair keyPair) {
@@ -41,6 +42,7 @@ public class Crypto {
     public static byte[] sign(byte[] bytes, byte[] privateKey) {
         byte[] signature = new byte[64];
         core.HMBTCoreCryptoAddSignature(bytes, bytes.length, privateKey, signature);
+
         return signature;
     }
 }
