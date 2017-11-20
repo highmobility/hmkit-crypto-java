@@ -348,9 +348,9 @@ public class AccessCertificate extends Certificate {
                              Calendar endDate,
                              byte[] permissions) throws IllegalArgumentException {
         this(issuer,
+            providingSerial,
             gainerSerial,
             gainingPublicKey,
-            providingSerial,
             bytesFromDate(startDate),
             bytesFromDate(endDate),
             permissions);
