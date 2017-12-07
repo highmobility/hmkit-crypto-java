@@ -64,5 +64,5 @@ public static byte[] sign(byte[] bytes, byte[] privateKey)
 
 # Dependencies #
 
-* HMBTCore (hmkit-cloud.jar or hmkit-android.aar)
+* HMBTCore (hmkit-oem.jar or hmkit-android.aar)
 * hmkit-utils.jar
