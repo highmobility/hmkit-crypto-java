@@ -42,7 +42,11 @@ public class Crypto {
     public static byte[] sign(byte[] bytes, byte[] privateKey) {
         byte[] signature = new byte[64];
         core.HMBTCoreCryptoAddSignature(bytes, bytes.length, privateKey, signature);
-
         return signature;
+    }
+
+    public static boolean verify(byte[] data, byte[] signature, byte[] publicKey) {
+        int result = core.HMBTCoreCryptoValidateSignature(data, data.length, publicKey, signature);
+        return result == 0;
     }
 }
