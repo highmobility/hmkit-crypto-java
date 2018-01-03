@@ -19,6 +19,9 @@ buildscript {
 
 repositories {
     jcenter()
+    maven {
+        url "http://jfrog.high-mobility.com/artifactory/gradle-release-local/"
+    }
 }
 
 artifactory {
@@ -26,7 +29,7 @@ artifactory {
     //The base Artifactory URL if not overridden by the publisher/resolver
     publish {
         repository {
-            repoKey = 'gradle-dev-local'
+            repoKey = 'gradle-release-local'
             username = "${artifactory_publisheruser}"
             password = "${artifactory_publisherpassword}"
             maven = true

@@ -1,5 +1,6 @@
-package com.highmobility.crypto;
+package com.highmobility.test;
 
+import com.highmobility.crypto.AccessCertificate;
 import com.highmobility.utils.Bytes;
 
 import org.junit.Before;
@@ -8,7 +9,7 @@ import org.junit.Test;
 import java.util.Arrays;
 import java.util.Calendar;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 
 public class AccessCertificateTest {
     AccessCertificate v1certificate;
