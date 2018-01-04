@@ -3,6 +3,8 @@ package com.highmobility.crypto;
 import com.highmobility.utils.Bytes;
 import com.highmobility.utils.Base64;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.TimeZone;
 
@@ -17,6 +19,8 @@ import java.util.TimeZone;
  *
  */
 public class AccessCertificate extends Certificate {
+    static DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+
     int version = 0;
     static int v0Length = 93;
     static int v1Length = 98;
@@ -234,7 +238,7 @@ public class AccessCertificate extends Certificate {
         description += "\nprovidingSerial: " + Bytes.hexFromBytes(getProviderSerial());
         description += "\ngainingSerial: " + Bytes.hexFromBytes(getGainerSerial());
         description += "\ngainingPublicKey: " + Bytes.hexFromBytes(getGainerPublicKey());
-        description += "\nvalid from: : " + getStartDate() + " to: " + getEndDate();
+        description += "\nvalid from: : " + dateFormat.format(getStartDate().getTime()) + " to: " + dateFormat.format(getEndDate().getTime());
         description += "\npermissions: " + Bytes.hexFromBytes(getPermissions());
         description += "\nsignature: " + Bytes.hexFromBytes(getSignature()) + "\n";
 
@@ -264,7 +268,7 @@ public class AccessCertificate extends Certificate {
      * @param base64Bytes The Base64 encoded bytes making up the certificate.
      * @throws IllegalArgumentException When byte count is not correct.
      */
-    public AccessCertificate(String base64Bytes) throws IllegalAccessException {
+    public AccessCertificate(String base64Bytes) throws IllegalArgumentException {
         this(Base64.decode(base64Bytes));
     }
 
