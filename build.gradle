@@ -6,7 +6,7 @@ apply plugin: 'maven'
 apply plugin: 'idea'
 apply plugin: "com.jfrog.artifactory"
 
-sourceCompatibility = 1.7
+sourceCompatibility = 1.8
 
 buildscript {
     repositories {
@@ -54,7 +54,7 @@ artifactory {
 
 dependencies {
     testImplementation 'junit:junit:4.12'
-    implementation('com.highmobility:hmkit-utils:1.+')
+    implementation('com.highmobility:hmkit-utils:1.1.+')
 }
 
 // exclude c files from jar
