@@ -3,7 +3,6 @@ package com.highmobility.crypto;
 import com.highmobility.utils.Base64;
 
 import java.util.Calendar;
-import java.util.Date;
 import java.util.TimeZone;
 
 /**
