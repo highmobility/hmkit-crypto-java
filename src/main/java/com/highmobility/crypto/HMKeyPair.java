@@ -18,6 +18,9 @@ public class HMKeyPair {
      * @param publicKey The 64 bytes of the public key.
      * @throws IllegalArgumentException When the keys are invalid.
      */
+    public HMKeyPair(byte[] privateKey, byte[] publicKey) throws IllegalArgumentException {
+        if (privateKey.length != 32 || publicKey.length != 64)
+            throw new IllegalArgumentException("Invalid key length");
         this.privateKey = privateKey;
         this.publicKey = publicKey;
     }
