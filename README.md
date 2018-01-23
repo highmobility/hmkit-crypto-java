@@ -1,14 +1,34 @@
-# What is this repository for? #
+# HMKit Crypto
 
-This repository has the Certificate classes and public Crypto methods(sign, keygen) from the core. It uses HMBTCore for the Crypto methods. The core is expected to be imported from somewhere else(hmkit-cloud.jar or hmkit-android.aar).
+This repository has the Certificate classes and public Crypto methods(sign, keygen) from the core. It uses HMBTCore for the Crypto methods. The core is expected to be imported from somewhere else(hmkit-oem.jar or hmkit-android.aar).
 
-## Certificates ##
+### Dependencies
+
+HMBTCore (from hmkit-oem.jar or hmkit-android.aar), hmkit-utils
+
+### Install
+
+Releases are pushed to jcenter. To include hmkit-crypto in your project, add to build.gradle:
+
+```
+repositories {
+  jcenter()
+}
+
+dependencies {
+  implementation('com.highmobility:hmkit-crypto:1.1.9')
+}
+```
+
+Find the latest version name in https://bintray.com/high-mobility/maven/hmkit-crypto
+
+## Certificates
 
 Access Certificate and Device Certificate are represented in this library. The certificates will always be converted to raw bytes that are accessible with `byte[] getBytes()` method.
 You can always add a signature later with `setSignature(byte[])`. You can get the certificate data without 
 the signature with getCertificateData().
 
-### AccessCertificate: ###
+### AccessCertificate
 Use one of the designated initializers to create the object. For example:
 
 ```java
@@ -26,7 +46,7 @@ See public getters for certificate info, for example
 public byte[] getIssuer()
 ```
 
-### DeviceCertificate ###
+### DeviceCertificate
 Use one of the designated initializers to create the object. For example:
 
 ```java
@@ -60,9 +80,3 @@ sign
 ```java
 public static byte[] sign(byte[] bytes, byte[] privateKey) 
 ```
-
-
-# Dependencies #
-
-* HMBTCore (hmkit-oem.jar or hmkit-android.aar)
-* hmkit-utils.jar
