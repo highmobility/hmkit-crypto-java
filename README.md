@@ -24,7 +24,7 @@ dependencies {
 }
 ```
 
-Find the latest version names in https://bintray.com/high-mobility/maven/hmkit-crypto
+Find the latest version names in https://bintray.com/high-mobility/maven/
 
 ## Certificates
 
