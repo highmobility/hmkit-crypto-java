@@ -8,14 +8,14 @@ import java.util.Random;
  * Created by ttiganik on 26/05/16.
  */
 public class Crypto {
-    public static KeyPair createKeypair() {
+    public static HMKeyPair createKeypair() {
         HMBTCore core = new HMBTCore();
 
         byte[] privateKey = new byte[32];
         byte[] publicKey = new byte[64];
 
         core.HMBTCoreCryptoCreateKeys(privateKey, publicKey);
-        return new KeyPair(privateKey, publicKey);
+        return new HMKeyPair(privateKey, publicKey);
     }
 
     public static byte[] createSerialNumber() {
