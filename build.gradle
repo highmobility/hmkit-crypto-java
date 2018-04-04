@@ -1,24 +1,36 @@
-version '1.0'
-
-apply plugin: 'java'
-apply plugin: 'idea'
-
-sourceCompatibility = 1.7
-
-repositories {
-    mavenCentral()
-
-    flatDir {
-        dirs 'libs'
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        //Check for the latest version here: http://plugins.gradle.org/plugin/com.jfrog.artifactory
+        classpath "org.jfrog.buildinfo:build-info-extractor-gradle:4+"
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.2'
+        classpath 'com.github.dcendents:android-maven-plugin:1.2'
     }
 }
 
-dependencies {
-    testCompile group: 'junit', name: 'junit', version: '4.12'
-    compile fileTree(dir: 'libs', include: '*.jar')
+apply plugin: 'java'
+
+def artifact = new Properties()
+artifact.load(new FileInputStream("deploy.settings"))
+
+group artifact.groupId
+version artifact.version
+
+sourceCompatibility = 1.8
+
+repositories {
+    jcenter()
 }
 
-// exclude c files from jar
-jar {
-    exclude('com/highmobility/btcore/**')
+dependencies {
+    testImplementation group: 'junit', name: 'junit', version: '4.12'
+    implementation fileTree(dir: 'libs', include: '*.jar')
+    implementation 'com.highmobility:hmkit-utils:1.1.4'
 }
+
+// to push the artifacts, you need to add deploy.properties at project level
+// with bintray/artifactory credentials
+def deployPropertiesFile = file("deploy.properties")
+if (deployPropertiesFile.exists()) apply from: 'deploy.gradle'
