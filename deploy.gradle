@@ -76,6 +76,10 @@ artifacts {
     archives javadocJar
     archives sourcesJar
 }
+jar {
+    exclude ("com/highmobility/btcore/**")
+}
+
 
 // artifactory
 

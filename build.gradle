@@ -21,6 +21,7 @@ sourceCompatibility = 1.8
 
 repositories {
     jcenter()
+    maven { url "http://jfrog.high-mobility.com/artifactory/gradle-legacy/" }
 }
 
 dependencies {
