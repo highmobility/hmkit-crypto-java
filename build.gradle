@@ -15,18 +15,33 @@ apply plugin: 'java'
 def artifact = new Properties()
 artifact.load(new FileInputStream("deploy.settings"))
 
-group=artifact.groupId
-version=artifact.version
+group = artifact.groupId
+version = artifact.version
 
 sourceCompatibility = 1.8
 
 repositories {
     jcenter()
+    maven {
+        url "http://jfrog.high-mobility.com/artifactory/gradle-dev-local/"
+        credentials {
+            username System.properties['devReadUser']
+            password System.properties['devReadPassword']
+        }
+    }
+}
+
+
+configurations.all {
+    resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
 }
 
 dependencies {
-    testCompile group: 'junit', name: 'junit', version: '4.12'
-    compile 'com.highmobility:hmkit-utils:1.1.4'
+    testImplementation group: 'junit', name: 'junit', version: '4.12'
+
+    implementation('com.highmobility:hmkit-utils:1.1.6-dev') {
+        changing = true
+    }
 }
 
 // deploy
@@ -35,8 +50,8 @@ apply plugin: 'maven'
 apply plugin: 'com.jfrog.bintray'
 apply plugin: 'com.jfrog.artifactory'
 
-version=artifact.version
-group=artifact.groupId
+version = artifact.version
+group = artifact.groupId
 
 install {
     repositories.mavenInstaller {

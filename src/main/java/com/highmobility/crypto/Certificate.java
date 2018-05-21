@@ -20,68 +20,61 @@
 
 package com.highmobility.crypto;
 
-import com.highmobility.utils.Base64;
-
-import java.util.Calendar;
-import java.util.TimeZone;
+import com.highmobility.value.Bytes;
+import com.highmobility.value.Signature;
 
 /**
  * Created by ttiganik on 13/04/16.
  */
 public class Certificate {
-    byte[] bytes;
+    Bytes bytes;
 
-    Certificate(byte[] bytes) {
+    Signature signature; // TODO: 21/05/2018 handle
+    Bytes certificateData; // TODO: 21/05/2018 handle
+
+    Certificate(Bytes bytes) {
         this.bytes = bytes;
     }
 
-    Certificate(){}
+    Certificate() {
+    }
 
     /**
-     * @return The certificate data in binary form, excluding the signature.
+     * @return The certificate data, excluding the signature.
      */
-    public byte [] getCertificateData() {
-        return null;
+    public Bytes getCertificateData() {
+        return certificateData;
     }
 
     /**
      * @return The Certificate Authority's signature for the certificate, 64 bytes.
      */
-    public byte[] getSignature() {
-        return null;
+    public Signature getSignature() {
+        return signature;
     }
 
     /**
-     * @return The full certificate bytes. This includes the signature, if it exists.
-     */
-    public byte[] getBytes() {
-        return bytes;
-    }
-
-    /**
+     * Set a new signature or override the previous one.
      *
-     * @return The raw bytes encoded in base64.
+     * @param signature The new signature.
      */
-    public String getBase64() { return Base64.encode(bytes); }
-
-    static Calendar dateFromBytes(byte[] bytes) {
-        Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
-        cal.setTimeInMillis(0);
-        cal.set(2000 + bytes[0], bytes[1] - 1, bytes[2], bytes[3], bytes[4]);
-        return cal; // get back a Date object
+    public void setSignature(Signature signature) {
+        this.bytes = Bytes.concat(getCertificateData(), signature);
+        this.signature = signature;
     }
 
-    static byte[] bytesFromDate(Calendar calendar) {
-        byte [] bytes = new byte[5];
-
-        calendar.setTimeZone(TimeZone.getTimeZone("UTC"));
-
-        bytes[0] = (byte)(calendar.get(Calendar.YEAR) - 2000);
-        bytes[1] = (byte)(calendar.get(Calendar.MONTH) + 1);
-        bytes[2] = (byte)(calendar.get(Calendar.DAY_OF_MONTH));
-        bytes[3] = (byte)(calendar.get(Calendar.HOUR));
-        bytes[4] = (byte)(calendar.get(Calendar.MINUTE));
-
+    /**
+     * @return The full certificate bytes. This includes the signature, if exists.
+     */
+    public Bytes getBytes() {
         return bytes;
+    }
+
+    /**
+     * @return The raw bytes encoded in base64.
+     * @deprecated use {@link #getBytes()} instead
+     */
+    public String getBase64() {
+        return bytes.getBase64();
     }
 }
