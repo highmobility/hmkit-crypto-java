@@ -4,7 +4,6 @@ import com.highmobility.crypto.AccessCertificate;
 import com.highmobility.value.Bytes;
 import com.highmobility.value.DeviceSerial;
 import com.highmobility.value.HMCalendar;
-import com.highmobility.value.Issuer;
 import com.highmobility.value.Permissions;
 import com.highmobility.value.PublicKey;
 import com.highmobility.value.Signature;
@@ -16,71 +15,48 @@ import java.util.Calendar;
 
 import static org.junit.Assert.assertTrue;
 
-public class AccessCertificateTest {
-    AccessCertificate v1certificate;
-    Bytes v1certificateBytes = new Bytes
+public class V1AccessCertificateTest {
+    AccessCertificate certificate;
+    Bytes certBytes = new Bytes
             ("01030000030400000000000000040500000000000000050600000000000000000600000000000006000000000000000006000000000000060000000000000000060000000000000600000000000000000600000000000607010203070804050609090A0A0A0A0A0A0A0A0A0B00000000000000000600000000000006000000000000000006000000000000060000000000000000060000000000000600000000000000000600000000000B");
-
-    AccessCertificate v0certificate;
-    Bytes v0certificateBytes = new Bytes
-            ("05000000000000000506060000000000000006000000000000060000000000000000060000000000000600000000000000000600000000000006000000000000000006000000000006A62D4B2D4E8502147007010203070804050609090A0A0A0A0A0A0A0A0A0B00000000000000000600000000000006000000000000000006000000000000060000000000000000060000000000000600000000000000000600000000000B");
+    Bytes certBytesNoSignature = new Bytes
+            ("01030000030400000000000000040500000000000000050600000000000000000600000000000006000000000000000006000000000000060000000000000000060000000000000600000000000000000600000000000607010203070804050609090A0A0A0A0A0A0A0A0A");
 
     @Before public void setUp() {
-        v1certificate = new AccessCertificate(v1certificateBytes);
-        v0certificate = new AccessCertificate(v0certificateBytes);
+        certificate = new AccessCertificate(certBytes);
+    }
+
+    @Test public void certificateData() {
+        assertTrue(certificate.getCertificateData().equals(certBytesNoSignature));
+    }
+
+    @Test public void fullData() {
+        assertTrue(certificate.getBytes().equals(certBytes));
     }
 
     @Test public void testGetIssuer() {
-        Bytes bytes = new Bytes(new byte[]{0x03, 0x00, 0x00, 0x03});
-        assertTrue(bytes.equals(v1certificate.getIssuer()));
-    }
-
-    @Test public void testv0GetIssuer() {
-        Issuer issuer = new Issuer("746D6373");
-        assertTrue(v0certificate.getIssuer().equals(issuer));
+        Bytes bytes = new Bytes("03000003");
+        assertTrue(bytes.equals(certificate.getIssuer()));
     }
 
     @Test public void testGetProviderSerial() {
-        DeviceSerial serial = new DeviceSerial(new byte[]{0x04, 0x00, 0x00, 0x00, 0x00, 0x00,
-                0x00, 0x00, 0x04});
-        assertTrue(v1certificate.getProviderSerial().equals(serial));
-    }
-
-    @Test public void testv0GetProviderSerial() {
-        DeviceSerial serial = new DeviceSerial("A62D4B2D4E85021470");
-        assertTrue(serial.equals(v0certificate.getProviderSerial()));
+        DeviceSerial serial = new DeviceSerial("040000000000000004");
+        assertTrue(certificate.getProviderSerial().equals(serial));
     }
 
     @Test public void testGetGainerSerial() {
-        DeviceSerial serial = new DeviceSerial(new byte[]{0x05, 0x00, 0x00, 0x00, 0x00, 0x00,
-                0x00, 0x00, 0x05});
-        assertTrue(v1certificate.getGainerSerial().equals(serial));
-    }
-
-    @Test public void testv0GetGainerSerial() {
         DeviceSerial serial = new DeviceSerial("050000000000000005");
-        assertTrue(v0certificate.getGainerSerial().equals(serial));
+        assertTrue(certificate.getGainerSerial().equals(serial));
     }
 
     @Test public void testGetGainerPublicKey() {
-        byte[] bytes = new byte[]{0x06, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x06,
-                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x06, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                0x00, 0x00, 0x06, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x06, 0x00, 0x00, 0x00,
-                0x00, 0x00, 0x00, 0x00, 0x00, 0x06, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x06,
-                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x06, 0x00, 0x00, 0x00, 0x00,
-                0x00, 0x06};
-        PublicKey publicKey = new PublicKey(bytes);
-        assertTrue(v1certificate.getGainerPublicKey().equals(publicKey));
-    }
-
-    @Test public void testv0GetGainerPublicKey() {
         PublicKey publicKey = new PublicKey
-                ("06060000000000000006000000000000060000000000000000060000000000000600000000000000000600000000000006000000000000000006000000000006");
-        assertTrue(v0certificate.getGainerPublicKey().equals(publicKey));
+                ("06000000000000000006000000000000060000000000000000060000000000000600000000000000000600000000000006000000000000000006000000000006");
+        assertTrue(certificate.getGainerPublicKey().equals(publicKey));
     }
 
     @Test public void testGetStartDate() {
-        Calendar date = v1certificate.getStartDate().getCalendar();
+        Calendar date = certificate.getStartDate().getCalendar();
 
         assertTrue(date.get(Calendar.YEAR) == 2007);
         assertTrue(date.get(Calendar.MONTH) == 0);
@@ -90,13 +66,12 @@ public class AccessCertificateTest {
     }
 
     @Test public void testGetStartDateBytes() {
-        byte[] bytes = new byte[]{0x07, 0x01, 0x02, 0x03, 0x07};
-        HMCalendar date = new HMCalendar(bytes);
-        assertTrue(v1certificate.getStartDate().equals(date));
+        Bytes date = new Bytes("0701020307");
+        assertTrue(certificate.getStartDate().equals(date));
     }
 
     @Test public void testGetEndDate() {
-        Calendar date = v1certificate.getEndDate().getCalendar();
+        Calendar date = certificate.getEndDate().getCalendar();
 
         int year = date.get(Calendar.YEAR);
         int month = date.get(Calendar.MONTH);
@@ -112,45 +87,48 @@ public class AccessCertificateTest {
     }
 
     @Test public void testGetEndDateBytes() {
-        byte[] bytes = new byte[]{0x08, 0x04, 0x05, 0x06, 0x09};
-        HMCalendar date = new HMCalendar(bytes);
-        assertTrue(v1certificate.getEndDate().equals(date));
+        Bytes date = new Bytes("0804050609");
+        assertTrue(certificate.getEndDate().equals(date));
     }
 
     @Test public void testGetPermissions() {
-        byte[] bytes = new byte[]{0x0A, 0x0A, 0x0A, 0x0A, 0x0A, 0x0A, 0x0A, 0x0A, 0x0A};
-        Permissions permissions = new Permissions(bytes);
-        assertTrue(v1certificate.getPermissions().equals(permissions));
-        assertTrue(v1certificate.getPermissions().getLength() == 9);
+        Permissions permissions = new Permissions("0A0A0A0A0A0A0A0A0A");
+        assertTrue(certificate.getPermissions().equals(permissions));
+        assertTrue(certificate.getPermissions().getLength() == 9);
     }
 
     @Test public void testSetPermissions() {
-        Permissions newPermissions = new Permissions(new byte[]{0x0D, 0x0D});
-        assertTrue(v1certificate.getPermissions().equals(newPermissions) == false);
-        v1certificate.setPermissions(newPermissions);
-        assertTrue(v1certificate.getPermissions().getLength() == 2);
-        assertTrue(v1certificate.getPermissions().equals(newPermissions));
+        Permissions newPermissions = new Permissions("0D0D");
+        assertTrue(certificate.getPermissions().equals(newPermissions) == false);
+        // set new permissions
+        certificate.setPermissions(newPermissions);
+        assertTrue(certificate.getPermissions().getLength() == 2);
+        assertTrue(certificate.getPermissions().equals(newPermissions));
 
-        // new signature will be null
-        assertTrue(v1certificate.getSignature() == null);
-        byte[] newSig = new byte[]{(byte) 0xDD, (byte) 0xEE, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                0x00, 0x06, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x06, 0x00, 0x00, 0x00, 0x00,
-                0x00, 0x00, 0x00, 0x00, 0x06, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x06, 0x00,
-                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x06, 0x00, 0x00, 0x00, 0x00, 0x00,
-                0x00, 0x06, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x06, 0x00, 0x00,
-                0x00, 0x00, 0x00, 0x0D};
-        v1certificate.setSignature(new Signature
+        Bytes expectedBytes = new Bytes
+                ("01030000030400000000000000040500000000000000050600000000000000000600000000000006000000000000000006000000000000060000000000000000060000000000000600000000000000000600000000000607010203070804050609020D0D");
+        Bytes newBytes = certificate.getCertificateData();
+        assertTrue(newBytes.equals(expectedBytes));
+
+        // set new signature
+        assertTrue(certificate.getSignature() == null);
+        certificate.setSignature(new Signature
                 ("DDEE000000000000000600000000000006000000000000000006000000000000060000000000000000060000000000000600000000000000000600000000000D"));
-        assertTrue(v1certificate.getSignature().equals(newSig));
+        assertTrue(certificate.getSignature().equals("DDEE000000000000000600000000000006000000000000000006000000000000060000000000000000060000000000000600000000000000000600000000000D"));
 
-        // TODO: also test that other values are the same
-        DeviceSerial serial = new DeviceSerial(new byte[]{0x05, 0x00, 0x00, 0x00, 0x00, 0x00,
-                0x00, 0x00, 0x05});
-        assertTrue(v1certificate.getGainerSerial().equals(serial));
+        // all of the other values must stay the same
+        testGetIssuer();
+        testGetProviderSerial();
+        testGetGainerSerial();
+        testGetGainerPublicKey();
+        testGetStartDate();
+        testGetStartDateBytes();
+        testGetEndDate();
+        testGetEndDateBytes();
     }
 
     @Test public void testIsExpired() {
-        assertTrue(v1certificate.isExpired() == true);
+        assertTrue(certificate.isExpired() == true);
     }
 
     @Test public void testIsNotValidYet() {
@@ -168,27 +146,14 @@ public class AccessCertificateTest {
     }
 
     @Test public void testGetSignature() {
-        byte[] bytes = new byte[]{0x0B, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x06,
-                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x06, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                0x00, 0x00, 0x06, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x06, 0x00, 0x00, 0x00,
-                0x00, 0x00, 0x00, 0x00, 0x00, 0x06, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x06,
-                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x06, 0x00, 0x00, 0x00, 0x00,
-                0x00, 0x0B};
-        Signature sig = new Signature(bytes);
-        assertTrue(v1certificate.getSignature().equals(sig));
+        Signature sig = new Signature("0B00000000000000000600000000000006000000000000000006000000000000060000000000000000060000000000000600000000000000000600000000000B");
+        assertTrue(certificate.getSignature().equals(sig));
     }
 
     @Test public void testSetSignature() {
-        byte[] bytes = new byte[]{0x0D, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x06,
-                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x06, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                0x00, 0x00, 0x06, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x06, 0x00, 0x00, 0x00,
-                0x00, 0x00, 0x00, 0x00, 0x00, 0x06, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x06,
-                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x06, 0x00, 0x00, 0x00, 0x00,
-                0x00, 0x0D};
-        Signature newSig = new Signature(bytes);
-
-        assertTrue(v1certificate.getSignature().equals(newSig) == false);
-        v1certificate.setSignature(newSig);
-        assertTrue(v1certificate.getSignature().equals(newSig));
+        Signature newSig = new Signature("0D00000000000000000600000000000006000000000000000006000000000000060000000000000000060000000000000600000000000000000600000000000D");
+        assertTrue(certificate.getSignature().equals(newSig) == false);
+        certificate.setSignature(newSig);
+        assertTrue(certificate.getSignature().equals(newSig));
     }
 }
