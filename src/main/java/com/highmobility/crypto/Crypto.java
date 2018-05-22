@@ -63,7 +63,7 @@ public class Crypto {
      *
      * @param unsignedCert     The access certificate
      * @param privateKeyBase64 The private key that will be used for signing the certificate.
-     * @deprecated use {@link #sign(Bytes, PrivateKey)}
+     * @deprecated use {@link #sign(AccessCertificate, PrivateKey)}
      */
     @Deprecated
     public static void sign(AccessCertificate unsignedCert, String privateKeyBase64) {
@@ -73,8 +73,8 @@ public class Crypto {
     /**
      * Add a signature for an access certificate.
      *
-     * @param unsignedCert    The access certificate
-     * @param privateKey The private key that will be used for signing the certificate.
+     * @param unsignedCert The access certificate
+     * @param privateKey   The private key that will be used for signing the certificate.
      */
     public static void sign(AccessCertificate unsignedCert, PrivateKey privateKey) {
         Signature signature = sign(unsignedCert.getBytes(), privateKey);
@@ -87,7 +87,9 @@ public class Crypto {
      * @param bytes   The data that will be signed.
      * @param keyPair The keypair that will be used for signing.
      * @return The signature.
+     * @deprecated use {@link #sign(Bytes, PrivateKey)} instead
      */
+    @Deprecated
     public static Signature sign(Bytes bytes, HMKeyPair keyPair) {
         return sign(bytes, keyPair.getPrivateKey());
     }
@@ -101,7 +103,8 @@ public class Crypto {
      */
     public static Signature sign(Bytes bytes, PrivateKey privateKey) {
         byte[] signature = new byte[64];
-        core.HMBTCoreCryptoAddSignature(bytes.getBytes(), bytes.getLength(), privateKey.getBytes(), signature);
+        core.HMBTCoreCryptoAddSignature(bytes.getBytes(), bytes.getLength(), privateKey.getBytes
+                (), signature);
         return new Signature(signature);
     }
 
@@ -113,8 +116,9 @@ public class Crypto {
      * @param publicKey The public key that is used for verifying.
      * @return True if verified.
      */
-    public static boolean verify(byte[] data, byte[] signature, byte[] publicKey) {
-        int result = core.HMBTCoreCryptoValidateSignature(data, data.length, publicKey, signature);
+    public static boolean verify(Bytes data, Bytes signature, PublicKey publicKey) {
+        int result = core.HMBTCoreCryptoValidateSignature(data.getBytes(), data.getBytes()
+                .length, publicKey.getBytes(), signature.getBytes());
         return result == 0;
     }
 }

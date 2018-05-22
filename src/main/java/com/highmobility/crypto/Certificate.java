@@ -29,8 +29,8 @@ import com.highmobility.value.Signature;
 public class Certificate {
     Bytes bytes;
 
-    Signature signature; // TODO: 21/05/2018 handle
-    Bytes certificateData; // TODO: 21/05/2018 handle
+    Signature signature;
+    Bytes certificateData;
 
     Certificate(Bytes bytes) {
         this.bytes = bytes;
@@ -80,6 +80,7 @@ public class Certificate {
      * @return The raw bytes encoded in base64.
      * @deprecated use {@link #getBytes()} instead
      */
+    @Deprecated
     public String getBase64() {
         return bytes.getBase64();
     }

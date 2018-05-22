@@ -44,13 +44,12 @@ import java.util.TimeZone;
  * your required fields and not anything else)
  */
 public class AccessCertificate extends Certificate {
-    static DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+    private static final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+    private static final Issuer v0Issuer = new Issuer("746D6373");
+    private static final int v0Length = 93;
+    private static final int v1Length = 98;
 
     int version = 0;
-    static int v0Length = 93;
-    static int v1Length = 98;
-    static Issuer v0Issuer = new Issuer("746D6373");
-
     Issuer issuer;
     DeviceSerial providerSerial;
     DeviceSerial gainerSerial;
@@ -58,75 +57,40 @@ public class AccessCertificate extends Certificate {
     HMCalendar startDate;
     HMCalendar endDate;
     Permissions permissions;
-    Signature signature;
 
     /**
      * @return The certificate's issuer
      */
     public Issuer getIssuer() {
-        // TODO: 17/05/2018
-        if (version == 1) {
-            byte[] bytes = new byte[4];
-            System.arraycopy(this.bytes.getBytes(), 1, bytes, 0, 4);
-            return new Issuer(bytes);
-        }
-
-        return v0Issuer;
+        return issuer;
     }
 
     /**
      * @return The serial number of the device that's providing access.
      */
     public DeviceSerial getProviderSerial() {
-        // TODO: 17/05/2018
-        byte[] bytes = new byte[9];
-
-        if (version == 1) {
-            System.arraycopy(this.bytes.getBytes(), 5, bytes, 0, 9);
-        } else {
-            System.arraycopy(this.bytes.getBytes(), 73, bytes, 0, 9);
-        }
-
-        return new DeviceSerial(bytes);
+        return providerSerial;
     }
 
     /**
      * @return The serial number of the device that's gaining access.
      */
     public DeviceSerial getGainerSerial() {
-        // TODO: 17/05/2018
-        byte[] bytes = new byte[9];
-        if (version == 1) {
-            System.arraycopy(this.bytes.getBytes(), 14, bytes, 0, 9);
-        } else {
-            System.arraycopy(this.bytes.getBytes(), 0, bytes, 0, 9);
-        }
-
-        return new DeviceSerial(bytes);
+        return gainerSerial;
     }
 
     /**
      * @return The public key of the device that's gaining access.
      */
     public PublicKey getGainerPublicKey() {
-        // TODO: 17/05/2018
-        byte[] bytes = new byte[64];
-
-        if (version == 1) {
-            System.arraycopy(this.bytes.getBytes(), 23, bytes, 0, 64);
-        } else {
-            System.arraycopy(this.bytes.getBytes(), 9, bytes, 0, 64);
-        }
-
-        return new PublicKey(bytes);
+        return gainerPublicKey;
     }
 
     /**
      * @return The certificate validity start date.
      */
     public HMCalendar getStartDate() {
-        // TODO: 21/05/2018 ivar 
-        return new HMCalendar(getStartDateBytes().getBytes());
+        return startDate;
     }
 
     /**
@@ -135,23 +99,14 @@ public class AccessCertificate extends Certificate {
      */
     @Deprecated
     public Bytes getStartDateBytes() {
-        byte[] bytes = new byte[5];
-
-        if (version == 1) {
-            System.arraycopy(this.bytes.getBytes(), 87, bytes, 0, 5);
-        } else {
-            System.arraycopy(this.bytes.getBytes(), 82, bytes, 0, 5);
-        }
-
-        return new Bytes(bytes);
+        return getStartDate();
     }
 
     /**
      * @return The certificate validity end date.
      */
     public HMCalendar getEndDate() {
-        // TODO: 21/05/2018 ivar
-        return new HMCalendar(getEndDateBytes().getBytes());
+        return endDate;
     }
 
     /**
@@ -160,14 +115,7 @@ public class AccessCertificate extends Certificate {
      */
     @Deprecated
     public Bytes getEndDateBytes() {
-        byte[] bytes = new byte[5];
-        if (version == 1) {
-            System.arraycopy(this.bytes.getBytes(), 92, bytes, 0, 5);
-        } else {
-            System.arraycopy(this.bytes.getBytes(), 87, bytes, 0, 5);
-        }
-
-        return new Bytes(bytes);
+        return getEndDate();
     }
 
     /**
@@ -175,17 +123,7 @@ public class AccessCertificate extends Certificate {
      * arbitrary data as well as permission bytes that correspond to the General API.
      */
     public Permissions getPermissions() {
-        // TODO: 17/05/2018
-        int lengthLocation = version == 0 ? 92 : 97;
-        int length = bytes.getBytes()[lengthLocation];
-
-        if (length > 0) {
-            byte[] bytes = new byte[length];
-            System.arraycopy(this.bytes.getBytes(), lengthLocation + 1, bytes, 0, length);
-            return new Permissions(bytes);
-        } else {
-            return new Permissions();
-        }
+        return permissions;
     }
 
     /**
@@ -197,18 +135,19 @@ public class AccessCertificate extends Certificate {
         int lengthLocation = version == 0 ? 92 : 97;
 
         byte length = (byte) permissions.getLength();
-        byte[] newBytes;
 
-        newBytes = new byte[lengthLocation + 1 + length];
+        byte[] newBytes = new byte[lengthLocation + 1 + length];
         System.arraycopy(this.bytes.getBytes(), 0, newBytes, 0, lengthLocation);
-
         newBytes[lengthLocation] = length;
 
         if (length > 0) {
-            System.arraycopy(newBytes, lengthLocation + 1, permissions.getBytes(), 0, length);
+            System.arraycopy(permissions.getBytes(), 0, newBytes, lengthLocation + 1, length);
         }
 
         this.bytes = new Bytes(newBytes);
+        this.permissions = permissions;
+        updateCertificateData();
+        setSignature(null);
     }
 
     /**
@@ -225,47 +164,6 @@ public class AccessCertificate extends Certificate {
     public boolean isNotValidYet() {
         Calendar startDate = getStartDate().getCalendar();
         return startDate.after(Calendar.getInstance(TimeZone.getTimeZone("UTC")));
-    }
-
-    @Override
-    public Bytes getCertificateData() {
-        // TODO: 17/05/2018 set it as ivar on init and on new permissions set
-        int dataLength = version == 1 ? v1Length : v0Length;
-        int permissionsLengthPosition = version == 1 ? 97 : 92;
-
-        if (bytes.getBytes()[permissionsLengthPosition] > 0) {
-            dataLength += bytes.getBytes()[permissionsLengthPosition];
-        }
-
-        byte[] bytes = new byte[dataLength];
-        System.arraycopy(this.bytes.getBytes(), 0, bytes, 0, dataLength);
-        return new Bytes(bytes);
-    }
-
-    @Override
-    public Signature getSignature() {
-        // TODO: 17/05/2018 use ivar (set on init and addSignature, null with new setPermissions)
-        int permissionsLengthPosition = version == 1 ? 97 : 92;
-        int permissionsSize = bytes.getBytes()[permissionsLengthPosition];
-
-        if (bytes.getLength() == permissionsLengthPosition + 1 + permissionsSize) {
-            return null; // no sig
-        } else {
-            byte[] bytes = new byte[64];
-            System.arraycopy(this.bytes.getBytes(), permissionsLengthPosition + 1 + permissionsSize, bytes,
-                    0, 64);
-            return new Signature(bytes);
-        }
-    }
-
-    /**
-     * Set the signature.
-     *
-     * @param signature The Certificate Authority's signature for the certificate
-     */
-    public void setSignature(Signature signature) {
-        // all of the ivars stay the same, only the last signature bytes of the cert change.
-        bytes = Bytes.concat(getCertificateData(), signature);
     }
 
     @Override
@@ -298,6 +196,85 @@ public class AccessCertificate extends Certificate {
         super(bytes);
         testVersion();
         validateBytes();
+
+        if (version == 1) {
+            byte[] value = new byte[4];
+            System.arraycopy(bytes.getBytes(), 1, value, 0, 4);
+            issuer = new Issuer(value);
+        } else {
+            issuer = v0Issuer;
+        }
+
+        // provider serial
+        byte[] providerSerialBytes = new byte[9];
+        if (version == 1) {
+            System.arraycopy(bytes.getBytes(), 5, providerSerialBytes, 0, 9);
+        } else {
+            System.arraycopy(bytes.getBytes(), 73, providerSerialBytes, 0, 9);
+        }
+        providerSerial = new DeviceSerial(providerSerialBytes);
+
+        // gainer serial
+        byte[] gainerSerialBytes = new byte[9];
+        if (version == 1) {
+            System.arraycopy(bytes.getBytes(), 14, gainerSerialBytes, 0, 9);
+        } else {
+            System.arraycopy(bytes.getBytes(), 0, gainerSerialBytes, 0, 9);
+        }
+        gainerSerial = new DeviceSerial(gainerSerialBytes);
+
+        // gainer public key
+        byte[] gainerPublicKeyBytes = new byte[64];
+        if (version == 1) {
+            System.arraycopy(bytes.getBytes(), 23, gainerPublicKeyBytes, 0, 64);
+        } else {
+            System.arraycopy(bytes.getBytes(), 9, gainerPublicKeyBytes, 0, 64);
+        }
+        gainerPublicKey = new PublicKey(gainerPublicKeyBytes);
+
+        // start date
+        byte[] startDateBytes = new byte[5];
+        if (version == 1) {
+            System.arraycopy(this.bytes.getBytes(), 87, startDateBytes, 0, 5);
+        } else {
+            System.arraycopy(this.bytes.getBytes(), 82, startDateBytes, 0, 5);
+        }
+        startDate = new HMCalendar(startDateBytes);
+
+        // end date
+        byte[] endDateBytes = new byte[5];
+        if (version == 1) {
+            System.arraycopy(bytes.getBytes(), 92, endDateBytes, 0, 5);
+        } else {
+            System.arraycopy(bytes.getBytes(), 87, endDateBytes, 0, 5);
+        }
+        endDate = new HMCalendar(endDateBytes);
+
+        // permissions
+        int permissionsLengthLocation = version == 0 ? 92 : 97;
+        int permissionsLength = bytes.getBytes()[permissionsLengthLocation];
+
+        if (permissionsLength > 0) {
+            byte[] permissionsBytes = new byte[permissionsLength];
+            System.arraycopy(bytes.getBytes(), permissionsLengthLocation + 1, permissionsBytes,
+                    0, permissionsLength);
+            permissions = new Permissions(permissionsBytes);
+        } else {
+            permissions = new Permissions();
+        }
+
+        if (bytes.getLength() > permissionsLengthLocation + 1 + permissionsLength) {
+            byte[] signatureBytes = new byte[64];
+            System.arraycopy(this.bytes.getBytes(), permissionsLengthLocation + 1 +
+                            permissionsLength, signatureBytes,
+                    0, 64);
+            signature = new Signature(signatureBytes);
+        }
+
+        if (getEndDate().getCalendar().before(getStartDate().getCalendar()))
+            throw new IllegalArgumentException("End date is before start date");
+
+        updateCertificateData();
     }
 
     /**
@@ -311,7 +288,7 @@ public class AccessCertificate extends Certificate {
      */
     @Deprecated
     public AccessCertificate(String base64Bytes) throws IllegalArgumentException {
-        this(new Bytes(Base64.decode(base64Bytes)));
+        this(new Bytes(base64Bytes));
     }
 
     /**
@@ -366,6 +343,15 @@ public class AccessCertificate extends Certificate {
 
         this.bytes = bytesBuilder;
         validateBytes();
+
+        this.issuer = issuer;
+        this.providerSerial = providingSerial;
+        this.gainerSerial = gainerSerial;
+        this.gainerPublicKey = gainingPublicKey;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.permissions = permissions;
+        updateCertificateData();
     }
 
     /**
@@ -408,8 +394,6 @@ public class AccessCertificate extends Certificate {
         if (bytes.getLength() < expectedLength) {
             throw new IllegalArgumentException();
         }
-
-        if (getEndDate().getCalendar().before(getStartDate().getCalendar())) throw new IllegalArgumentException();
     }
 
     /**
@@ -446,5 +430,18 @@ public class AccessCertificate extends Certificate {
                 withoutSignatureLength + 64) {
             throw new IllegalArgumentException(); // bytes are not v0 or v1
         }
+    }
+
+    private void updateCertificateData() {
+        int dataLength = version == 1 ? v1Length : v0Length;
+        int permissionsLengthPosition = version == 1 ? 97 : 92;
+
+        if (bytes.getBytes()[permissionsLengthPosition] > 0) {
+            dataLength += bytes.getBytes()[permissionsLengthPosition];
+        }
+
+        byte[] bytes = new byte[dataLength];
+        System.arraycopy(this.bytes.getBytes(), 0, bytes, 0, dataLength);
+        certificateData = new Bytes(bytes);
     }
 }

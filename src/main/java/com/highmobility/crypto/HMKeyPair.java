@@ -52,7 +52,7 @@ public class HMKeyPair {
 
     /**
      * @return The public key in Base64.
-     * @deprecated use {@link PublicKey.#getBase64()} instead
+     * @deprecated use {@link #getPublicKey()} instead
      */
     @Deprecated
     public String getPublicKeyBase64() {
@@ -68,7 +68,7 @@ public class HMKeyPair {
 
     /**
      * @return The private key in Base64.
-     * @deprecated use {@link PrivateKey.#getBase64()} instead
+     * @deprecated use {@link #getPrivateKey()} instead
      */
     @Deprecated
     public String getPrivateKeyBase64() {
