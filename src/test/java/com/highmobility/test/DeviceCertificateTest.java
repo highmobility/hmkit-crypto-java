@@ -26,21 +26,27 @@ public class DeviceCertificateTest {
             serial.getHex() +
             publicKey.getHex() +
             signature.getHex());
-    @Test public void ctorWithBytes() {
 
+    Bytes bytesWithOutSignature = new Bytes(issuer.getHex() +
+            appIdentifier.getHex() +
+            serial.getHex() +
+            publicKey.getHex());
+
+    @Test public void ctorWithBytes() {
         DeviceCertificate cert = new DeviceCertificate(bytes);
         assertTrue(cert.getIssuer().equals(issuer));
         assertTrue(cert.getAppIdentifier().equals(appIdentifier));
         assertTrue(cert.getSerial().equals(serial));
         assertTrue(cert.getPublicKey().equals(publicKey));
         assertTrue(cert.getSignature().equals(signature));
-
+        assertTrue(cert.getCertificateData().equals(bytesWithOutSignature));
     }
 
     @Test public void ctorWithVars() {
         DeviceCertificate cert = new DeviceCertificate(issuer, appIdentifier, serial, publicKey);
+        assertTrue(cert.getBytes().equals(bytesWithOutSignature));
         cert.setSignature(signature);
-
         assertTrue(cert.getBytes().equals(bytes));
+        assertTrue(cert.getCertificateData().equals(bytesWithOutSignature));
     }
 }

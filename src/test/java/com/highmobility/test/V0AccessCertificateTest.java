@@ -70,7 +70,6 @@ public class AccessCertificateTest {
                 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x06, 0x00, 0x00, 0x00, 0x00,
                 0x00, 0x06};
         PublicKey publicKey = new PublicKey(bytes);
-        PublicKey certPublicKey = v1certificate.getGainerPublicKey();
         assertTrue(v1certificate.getGainerPublicKey().equals(publicKey));
     }
 
@@ -140,8 +139,14 @@ public class AccessCertificateTest {
                 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x06, 0x00, 0x00, 0x00, 0x00, 0x00,
                 0x00, 0x06, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x06, 0x00, 0x00,
                 0x00, 0x00, 0x00, 0x0D};
-        v1certificate.setSignature(new Signature("DDEE000000000000000600000000000006000000000000000006000000000000060000000000000000060000000000000600000000000000000600000000000D"));
+        v1certificate.setSignature(new Signature
+                ("DDEE000000000000000600000000000006000000000000000006000000000000060000000000000000060000000000000600000000000000000600000000000D"));
         assertTrue(v1certificate.getSignature().equals(newSig));
+
+        // TODO: also test that other values are the same
+        DeviceSerial serial = new DeviceSerial(new byte[]{0x05, 0x00, 0x00, 0x00, 0x00, 0x00,
+                0x00, 0x00, 0x05});
+        assertTrue(v1certificate.getGainerSerial().equals(serial));
     }
 
     @Test public void testIsExpired() {

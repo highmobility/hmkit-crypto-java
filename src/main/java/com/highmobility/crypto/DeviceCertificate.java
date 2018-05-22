@@ -73,30 +73,7 @@ public class DeviceCertificate extends Certificate {
 
     @Override
     public Bytes getCertificateData() {
-        // TODO: 17/05/2018 set it as ivar on init and on new permissions set
-
-        if (bytes.getLength() == 89) {
-            return bytes;
-        }
-
-        byte[] bytes = new byte[89];
-        System.arraycopy(this.bytes, 0, bytes, 0, 89);
-        return new Bytes(bytes);
-    }
-
-    /**
-     * @return The Certificate Authority's signature for the certificate, 64 bytes.
-     */
-    @Override
-    public Signature getSignature() {
-        // TODO: 17/05/2018 set it as ivar
-        if (bytes.getLength() == 153) {
-            byte[] bytes = new byte[64];
-            System.arraycopy(this.bytes.getBytes(), 89, bytes, 0, 64);
-            return new Signature(bytes);
-        }
-
-        return null;
+        return certificateData;
     }
 
     @Override
@@ -119,7 +96,6 @@ public class DeviceCertificate extends Certificate {
      * @throws IllegalArgumentException When bytes length is incorrect.
      */
     public DeviceCertificate(Bytes bytes) throws IllegalArgumentException {
-        // TODO: test:
         super(bytes);
         validateBytes();
 
@@ -138,6 +114,19 @@ public class DeviceCertificate extends Certificate {
         byte[] publicKeyBytes = new byte[64];
         System.arraycopy(this.bytes.getBytes(), 25, publicKeyBytes, 0, 64);
         publicKey = new PublicKey(publicKeyBytes);
+
+        if (bytes.getLength() == 153) {
+            byte[] sigBytes = new byte[64];
+            System.arraycopy(this.bytes.getBytes(), 89, sigBytes, 0, 64);
+            this.signature = new Signature(sigBytes);
+
+            byte[] value = new byte[89];
+            System.arraycopy(this.bytes.getBytes(), 0, value, 0, 89);
+            certificateData = new Bytes(value);
+        }
+        else {
+            certificateData = bytes;
+        }
     }
 
     /**
@@ -187,7 +176,8 @@ public class DeviceCertificate extends Certificate {
     }
 
     private void validateBytes() throws IllegalArgumentException {
-        if (bytes == null || bytes.getLength() < 89) {
+        int length = bytes.getLength();
+        if (bytes == null && length != 89 && length != 153) {
             throw new IllegalArgumentException();
         }
     }

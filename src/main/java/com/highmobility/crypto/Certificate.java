@@ -59,7 +59,13 @@ public class Certificate {
      * @param signature The new signature.
      */
     public void setSignature(Signature signature) {
-        this.bytes = Bytes.concat(getCertificateData(), signature);
+        // all of the ivars stay the same, only the last signature bytes of the cert change.
+        if (signature == null) {
+            this.bytes = getCertificateData();
+        } else {
+            this.bytes = Bytes.concat(getCertificateData(), signature);
+        }
+
         this.signature = signature;
     }
 
