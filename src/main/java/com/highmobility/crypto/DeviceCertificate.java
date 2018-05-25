@@ -100,28 +100,28 @@ public class DeviceCertificate extends Certificate {
         validateBytes();
 
         byte[] issuerBytes = new byte[4];
-        System.arraycopy(this.bytes.getBytes(), 0, issuerBytes, 0, 4);
+        System.arraycopy(bytes.getByteArray(), 0, issuerBytes, 0, 4);
         issuer = new Issuer(issuerBytes);
 
         byte[] appIdentifierBytes = new byte[12];
-        System.arraycopy(this.bytes.getBytes(), 4, appIdentifierBytes, 0, 12);
+        System.arraycopy(bytes.getByteArray(), 4, appIdentifierBytes, 0, 12);
         appIdentifier = new AppIdentifier(appIdentifierBytes);
 
         byte[] serialBytes = new byte[9];
-        System.arraycopy(this.bytes.getBytes(), 16, serialBytes, 0, 9);
+        System.arraycopy(bytes.getByteArray(), 16, serialBytes, 0, 9);
         serial = new DeviceSerial(serialBytes);
 
         byte[] publicKeyBytes = new byte[64];
-        System.arraycopy(this.bytes.getBytes(), 25, publicKeyBytes, 0, 64);
+        System.arraycopy(bytes.getByteArray(), 25, publicKeyBytes, 0, 64);
         publicKey = new PublicKey(publicKeyBytes);
 
         if (bytes.getLength() == 153) {
             byte[] sigBytes = new byte[64];
-            System.arraycopy(this.bytes.getBytes(), 89, sigBytes, 0, 64);
+            System.arraycopy(bytes.getByteArray(), 89, sigBytes, 0, 64);
             this.signature = new Signature(sigBytes);
 
             byte[] value = new byte[89];
-            System.arraycopy(this.bytes.getBytes(), 0, value, 0, 89);
+            System.arraycopy(bytes.getByteArray(), 0, value, 0, 89);
             certificateData = new Bytes(value);
         }
         else {

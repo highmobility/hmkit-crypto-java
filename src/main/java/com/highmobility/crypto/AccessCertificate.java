@@ -20,7 +20,6 @@
 
 package com.highmobility.crypto;
 
-import com.highmobility.utils.Base64;
 import com.highmobility.value.Bytes;
 import com.highmobility.value.DeviceSerial;
 import com.highmobility.value.HMCalendar;
@@ -137,11 +136,11 @@ public class AccessCertificate extends Certificate {
         byte length = (byte) permissions.getLength();
 
         byte[] newBytes = new byte[lengthLocation + 1 + length];
-        System.arraycopy(this.bytes.getBytes(), 0, newBytes, 0, lengthLocation);
+        System.arraycopy(this.bytes.getByteArray(), 0, newBytes, 0, lengthLocation);
         newBytes[lengthLocation] = length;
 
         if (length > 0) {
-            System.arraycopy(permissions.getBytes(), 0, newBytes, lengthLocation + 1, length);
+            System.arraycopy(permissions.getByteArray(), 0, newBytes, lengthLocation + 1, length);
         }
 
         this.bytes = new Bytes(newBytes);
@@ -199,7 +198,7 @@ public class AccessCertificate extends Certificate {
 
         if (version == 1) {
             byte[] value = new byte[4];
-            System.arraycopy(bytes.getBytes(), 1, value, 0, 4);
+            System.arraycopy(bytes.getByteArray(), 1, value, 0, 4);
             issuer = new Issuer(value);
         } else {
             issuer = v0Issuer;
@@ -208,55 +207,55 @@ public class AccessCertificate extends Certificate {
         // provider serial
         byte[] providerSerialBytes = new byte[9];
         if (version == 1) {
-            System.arraycopy(bytes.getBytes(), 5, providerSerialBytes, 0, 9);
+            System.arraycopy(bytes.getByteArray(), 5, providerSerialBytes, 0, 9);
         } else {
-            System.arraycopy(bytes.getBytes(), 73, providerSerialBytes, 0, 9);
+            System.arraycopy(bytes.getByteArray(), 73, providerSerialBytes, 0, 9);
         }
         providerSerial = new DeviceSerial(providerSerialBytes);
 
         // gainer serial
         byte[] gainerSerialBytes = new byte[9];
         if (version == 1) {
-            System.arraycopy(bytes.getBytes(), 14, gainerSerialBytes, 0, 9);
+            System.arraycopy(bytes.getByteArray(), 14, gainerSerialBytes, 0, 9);
         } else {
-            System.arraycopy(bytes.getBytes(), 0, gainerSerialBytes, 0, 9);
+            System.arraycopy(bytes.getByteArray(), 0, gainerSerialBytes, 0, 9);
         }
         gainerSerial = new DeviceSerial(gainerSerialBytes);
 
         // gainer public key
         byte[] gainerPublicKeyBytes = new byte[64];
         if (version == 1) {
-            System.arraycopy(bytes.getBytes(), 23, gainerPublicKeyBytes, 0, 64);
+            System.arraycopy(bytes.getByteArray(), 23, gainerPublicKeyBytes, 0, 64);
         } else {
-            System.arraycopy(bytes.getBytes(), 9, gainerPublicKeyBytes, 0, 64);
+            System.arraycopy(bytes.getByteArray(), 9, gainerPublicKeyBytes, 0, 64);
         }
         gainerPublicKey = new PublicKey(gainerPublicKeyBytes);
 
         // start date
         byte[] startDateBytes = new byte[5];
         if (version == 1) {
-            System.arraycopy(this.bytes.getBytes(), 87, startDateBytes, 0, 5);
+            System.arraycopy(this.bytes.getByteArray(), 87, startDateBytes, 0, 5);
         } else {
-            System.arraycopy(this.bytes.getBytes(), 82, startDateBytes, 0, 5);
+            System.arraycopy(this.bytes.getByteArray(), 82, startDateBytes, 0, 5);
         }
         startDate = new HMCalendar(startDateBytes);
 
         // end date
         byte[] endDateBytes = new byte[5];
         if (version == 1) {
-            System.arraycopy(bytes.getBytes(), 92, endDateBytes, 0, 5);
+            System.arraycopy(bytes.getByteArray(), 92, endDateBytes, 0, 5);
         } else {
-            System.arraycopy(bytes.getBytes(), 87, endDateBytes, 0, 5);
+            System.arraycopy(bytes.getByteArray(), 87, endDateBytes, 0, 5);
         }
         endDate = new HMCalendar(endDateBytes);
 
         // permissions
         int permissionsLengthLocation = version == 0 ? 92 : 97;
-        int permissionsLength = bytes.getBytes()[permissionsLengthLocation];
+        int permissionsLength = bytes.getByteArray()[permissionsLengthLocation];
 
         if (permissionsLength > 0) {
             byte[] permissionsBytes = new byte[permissionsLength];
-            System.arraycopy(bytes.getBytes(), permissionsLengthLocation + 1, permissionsBytes,
+            System.arraycopy(bytes.getByteArray(), permissionsLengthLocation + 1, permissionsBytes,
                     0, permissionsLength);
             permissions = new Permissions(permissionsBytes);
         } else {
@@ -265,7 +264,7 @@ public class AccessCertificate extends Certificate {
 
         if (bytes.getLength() > permissionsLengthLocation + 1 + permissionsLength) {
             byte[] signatureBytes = new byte[64];
-            System.arraycopy(this.bytes.getBytes(), permissionsLengthLocation + 1 +
+            System.arraycopy(this.bytes.getByteArray(), permissionsLengthLocation + 1 +
                             permissionsLength, signatureBytes,
                     0, 64);
             signature = new Signature(signatureBytes);
@@ -404,13 +403,13 @@ public class AccessCertificate extends Certificate {
     void testVersion() throws IllegalArgumentException {
         int permissionsLengthPosition, permissionsLength, withoutSignatureLength;
 
-        if (bytes.getBytes()[0] == 1) {
+        if (bytes.getByteArray()[0] == 1) {
             // try to verify v1
             permissionsLengthPosition = 97;
             if (bytes.getLength() < permissionsLengthPosition + 1)
                 throw new IllegalArgumentException();
 
-            permissionsLength = bytes.getBytes()[permissionsLengthPosition];
+            permissionsLength = bytes.getByteArray()[permissionsLengthPosition];
             withoutSignatureLength = v1Length + permissionsLength;
             if (bytes.getLength() == withoutSignatureLength || bytes.getLength() ==
                     withoutSignatureLength
@@ -424,7 +423,7 @@ public class AccessCertificate extends Certificate {
         permissionsLengthPosition = 92;
         if (bytes.getLength() < permissionsLengthPosition + 1) throw new IllegalArgumentException();
 
-        permissionsLength = bytes.getBytes()[permissionsLengthPosition];
+        permissionsLength = bytes.getByteArray()[permissionsLengthPosition];
         withoutSignatureLength = v0Length + permissionsLength;
         if (bytes.getLength() != withoutSignatureLength && bytes.getLength() !=
                 withoutSignatureLength + 64) {
@@ -436,12 +435,12 @@ public class AccessCertificate extends Certificate {
         int dataLength = version == 1 ? v1Length : v0Length;
         int permissionsLengthPosition = version == 1 ? 97 : 92;
 
-        if (bytes.getBytes()[permissionsLengthPosition] > 0) {
-            dataLength += bytes.getBytes()[permissionsLengthPosition];
+        if (bytes.getByteArray()[permissionsLengthPosition] > 0) {
+            dataLength += bytes.getByteArray()[permissionsLengthPosition];
         }
 
         byte[] bytes = new byte[dataLength];
-        System.arraycopy(this.bytes.getBytes(), 0, bytes, 0, dataLength);
+        System.arraycopy(this.bytes.getByteArray(), 0, bytes, 0, dataLength);
         certificateData = new Bytes(bytes);
     }
 }
