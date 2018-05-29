@@ -85,7 +85,9 @@ public class Crypto {
      * @param bytes   The data that will be signed.
      * @param keyPair The keypair that will be used for signing.
      * @return The signature.
+     * @deprecated use {@link #sign(Bytes, PrivateKey)} instead
      */
+    @Deprecated
     public static Signature sign(Bytes bytes, HMKeyPair keyPair) {
         return sign(bytes, keyPair.getPrivateKey());
     }
