@@ -41,6 +41,8 @@ dependencies {
     implementation('com.highmobility:hmkit-utils:1.1.6-dev') {
         changing = true
     }
+
+    compile fileTree(dir: 'libs', include: ['*.jar'])
 }
 
 // deploy
@@ -96,6 +98,10 @@ bintray {
     }
 }
 
+jar {
+    exclude('**/btcore')
+}
+
 task sourcesJar(type: Jar) {
     from sourceSets.main.java.srcDirs
     classifier = 'sources'
@@ -110,10 +116,6 @@ task javadocJar(type: Jar, dependsOn: javadoc) {
 artifacts {
     archives javadocJar
     archives sourcesJar
-}
-
-dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
 }
 
 // artifactory
