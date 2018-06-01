@@ -1,9 +1,9 @@
 package com.highmobility.test;
 
 import com.highmobility.crypto.AccessCertificate;
+import com.highmobility.utils.Base64;
 import com.highmobility.value.Bytes;
 import com.highmobility.value.DeviceSerial;
-import com.highmobility.value.HMCalendar;
 import com.highmobility.value.Permissions;
 import com.highmobility.value.PublicKey;
 import com.highmobility.value.Signature;
@@ -114,7 +114,8 @@ public class V1AccessCertificateTest {
         assertTrue(certificate.getSignature() == null);
         certificate.setSignature(new Signature
                 ("DDEE000000000000000600000000000006000000000000000006000000000000060000000000000000060000000000000600000000000000000600000000000D"));
-        assertTrue(certificate.getSignature().equals("DDEE000000000000000600000000000006000000000000000006000000000000060000000000000000060000000000000600000000000000000600000000000D"));
+        assertTrue(certificate.getSignature().equals
+                ("DDEE000000000000000600000000000006000000000000000006000000000000060000000000000000060000000000000600000000000000000600000000000D"));
 
         // all of the other values must stay the same
         testGetIssuer();
@@ -146,14 +147,23 @@ public class V1AccessCertificateTest {
     }
 
     @Test public void testGetSignature() {
-        Signature sig = new Signature("0B00000000000000000600000000000006000000000000000006000000000000060000000000000000060000000000000600000000000000000600000000000B");
+        Signature sig = new Signature
+                ("0B00000000000000000600000000000006000000000000000006000000000000060000000000000000060000000000000600000000000000000600000000000B");
         assertTrue(certificate.getSignature().equals(sig));
     }
 
     @Test public void testSetSignature() {
-        Signature newSig = new Signature("0D00000000000000000600000000000006000000000000000006000000000000060000000000000000060000000000000600000000000000000600000000000D");
+        Signature newSig = new Signature
+                ("0D00000000000000000600000000000006000000000000000006000000000000060000000000000000060000000000000600000000000000000600000000000D");
         assertTrue(certificate.getSignature().equals(newSig) == false);
         certificate.setSignature(newSig);
         assertTrue(certificate.getSignature().equals(newSig));
+    }
+
+    @Test public void testBase64() {
+//        byte[] bytes = Base64.decode("AXRtY3OcioazmB7zzK8BI7kQqBCAlu4krwKRgN+0ozKk5GjSiW4CI3V8oJsjGIlMJ6jzKt0M3jcoB2e30AYiDLHTeRk60suVOBnqB8EPA0wf2YHXY9bfEgUeCjUXBR4KNRAQB//9/+////8DAAAAAAAAJvqcEZdB5mGVHXK513x+MJeXGLwGQ2s3ulCMFT8fZF6td2xwIp19R5p/yMzy42c9BhnkFqEMcaZrX8eCFN6xfg==");
+        Bytes bytesObject = new Bytes("AXRtY3Ne6l/0QGHF3aUE2YKllVOCcErgcuJtF3YJbV//WSqLZ04w29OuyQDz5RwE0dkM8z39OHNKFcCg9U//ZB66IMZlZDaM60zfdXT5HMXWSK28RMufEgMUDA0bAQEPERAQB//9/+////8DAAAAAAAA6bYOk2i5i5hySCxt8KA7rUwrawkhXu5oqRhQjKVDU179owJ3wkbiAOjUzcVbnCoiSCL6+t1VX2zFN522jt8c3g==");
+        AccessCertificate cert = new AccessCertificate(bytesObject);
+        System.out.println(cert);
     }
 }
