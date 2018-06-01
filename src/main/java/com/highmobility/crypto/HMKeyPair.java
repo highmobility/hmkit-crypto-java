@@ -20,60 +20,58 @@
 
 package com.highmobility.crypto;
 
-
-import com.highmobility.utils.Base64;
+import com.highmobility.value.PrivateKey;
+import com.highmobility.value.PublicKey;
 
 /**
  * ECC private/public keypair that uses elliptic curve P-256.
  */
 public class HMKeyPair {
     private static final long serialVersionUID = 6637283024188232326L;
-    private byte[] privateKey;
-    private byte[] publicKey;
+    private PrivateKey privateKey;
+    private PublicKey publicKey;
 
     /**
      * Create a ECC Keypair object with private and public key.
      *
-     * @param privateKey The 32 bytes of the private key.
-     * @param publicKey The 64 bytes of the public key.
+     * @param privateKey The private key.
+     * @param publicKey  The public key.
      * @throws IllegalArgumentException When the keys are invalid.
      */
-    public HMKeyPair(byte[] privateKey, byte[] publicKey) throws IllegalArgumentException {
-        if (privateKey.length != 32 || publicKey.length != 64)
-            throw new IllegalArgumentException("Invalid key length");
+    public HMKeyPair(PrivateKey privateKey, PublicKey publicKey) throws IllegalArgumentException {
         this.privateKey = privateKey;
         this.publicKey = publicKey;
     }
 
     /**
-     *
      * @return The public key.
      */
-    public byte[] getPublicKey() {
+    public PublicKey getPublicKey() {
         return publicKey;
     }
 
     /**
-     *
      * @return The public key in Base64.
+     * @deprecated use {@link #getPublicKey()} instead
      */
+    @Deprecated
     public String getPublicKeyBase64() {
-        return Base64.encode(publicKey);
+        return publicKey.getBase64();
     }
 
     /**
-     *
      * @return The private key.
      */
-    public byte[] getPrivateKey() {
+    public PrivateKey getPrivateKey() {
         return privateKey;
     }
 
     /**
-     *
      * @return The private key in Base64.
+     * @deprecated use {@link #getPrivateKey()} instead
      */
+    @Deprecated
     public String getPrivateKeyBase64() {
-        return Base64.encode(privateKey);
+        return privateKey.getBase64();
     }
 }

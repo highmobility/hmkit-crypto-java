@@ -22,6 +22,11 @@ package com.highmobility.crypto;
 
 import com.highmobility.btcore.HMBTCore;
 import com.highmobility.utils.Base64;
+import com.highmobility.value.Bytes;
+import com.highmobility.value.DeviceSerial;
+import com.highmobility.value.PrivateKey;
+import com.highmobility.value.PublicKey;
+import com.highmobility.value.Signature;
 
 import java.util.Random;
 
@@ -39,76 +44,101 @@ public class Crypto {
         byte[] publicKey = new byte[64];
 
         core.HMBTCoreCryptoCreateKeys(privateKey, publicKey);
-        return new HMKeyPair(privateKey, publicKey);
+        return new HMKeyPair(new PrivateKey(privateKey), new PublicKey(publicKey));
     }
 
     /**
      * Create a random serial number.
      *
-     * @return the 9 byte serial number.
+     * @return the serial number.
      */
-    public static byte[] createSerialNumber() {
+    public static DeviceSerial createSerialNumber() {
         byte[] serialBytes = new byte[9];
         new Random().nextBytes(serialBytes);
-        return serialBytes;
+        return new DeviceSerial(serialBytes);
     }
 
     /**
      * Add a signature for an access certificate.
      *
-     * @param unsignedCert The access certificate
+     * @param unsignedCert     The access certificate
      * @param privateKeyBase64 The private key that will be used for signing the certificate.
      */
     public static void sign(AccessCertificate unsignedCert, String privateKeyBase64) {
-        sign(unsignedCert, Base64.decode(privateKeyBase64));
+        sign(unsignedCert, new PrivateKey(Base64.decode(privateKeyBase64)));
     }
 
     /**
      * Add a signature for an access certificate.
      *
      * @param unsignedCert The access certificate
-     * @param privateKeyBytes The private key that will be used for signing the certificate.
+     * @param privateKey   The private key that will be used for signing the certificate.
      */
-    public static void sign(AccessCertificate unsignedCert, byte[] privateKeyBytes) {
-        byte[] signature = sign(unsignedCert.getBytes(), privateKeyBytes);
+    public static void sign(AccessCertificate unsignedCert, PrivateKey privateKey) {
+        Signature signature = sign(unsignedCert.getBytes(), privateKey);
         unsignedCert.setSignature(signature);
     }
 
     /**
      * Sign data.
      *
-     * @param bytes The data that will be signed.
+     * @param bytes   The data that will be signed.
      * @param keyPair The keypair that will be used for signing.
-     *
      * @return The signature.
+     * @deprecated use {@link #sign(Bytes, PrivateKey)} instead
      */
-    public static byte[] sign(byte[] bytes, HMKeyPair keyPair) {
+    @Deprecated
+    public static Signature sign(Bytes bytes, HMKeyPair keyPair) {
         return sign(bytes, keyPair.getPrivateKey());
     }
 
     /**
      * Sign data.
      *
-     * @param bytes The data that will be signed.
+     * @param bytes      The data that will be signed.
      * @param privateKey The private key that will be used for signing.
-     *
      * @return The signature.
      */
-    public static byte[] sign(byte[] bytes, byte[] privateKey) {
+    public static Signature sign(Bytes bytes, PrivateKey privateKey) {
+        return sign(bytes.getByteArray(), privateKey);
+    }
+
+    /**
+     * Sign data.
+     *
+     * @param bytes      The data that will be signed.
+     * @param privateKey The private key that will be used for signing.
+     * @return The signature.
+     */
+    public static Signature sign(byte[] bytes, PrivateKey privateKey) {
+        return sign(bytes, privateKey.getByteArray());
+    }
+
+    /**
+     * Sign data.
+     *
+     * @param bytes      The data that will be signed.
+     * @param privateKey The private key that will be used for signing.
+     * @return The signature.
+     */
+    public static Signature sign(byte[] bytes, byte[] privateKey) {
         byte[] signature = new byte[64];
         core.HMBTCoreCryptoAddSignature(bytes, bytes.length, privateKey, signature);
-        return signature;
+        return new Signature(signature);
     }
 
     /**
      * Verify a signature.
      *
-     * @param data The data that was signed.
+     * @param data      The data that was signed.
      * @param signature The signature.
      * @param publicKey The public key that is used for verifying.
-     *
      * @return True if verified.
      */
+    public static boolean verify(Bytes data, Bytes signature, PublicKey publicKey) {
+        return verify(data.getByteArray(), signature.getByteArray(), publicKey.getByteArray());
+    }
+
     public static boolean verify(byte[] data, byte[] signature, byte[] publicKey) {
         int result = core.HMBTCoreCryptoValidateSignature(data, data.length, publicKey, signature);
         return result == 0;
