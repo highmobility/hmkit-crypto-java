@@ -1,12 +1,12 @@
 package com.highmobility.test;
 
 import com.highmobility.crypto.DeviceCertificate;
-import com.highmobility.value.AppIdentifier;
+import com.highmobility.crypto.value.AppIdentifier;
 import com.highmobility.value.Bytes;
-import com.highmobility.value.DeviceSerial;
-import com.highmobility.value.Issuer;
-import com.highmobility.value.PublicKey;
-import com.highmobility.value.Signature;
+import com.highmobility.crypto.value.DeviceSerial;
+import com.highmobility.crypto.value.Issuer;
+import com.highmobility.crypto.value.PublicKey;
+import com.highmobility.crypto.value.Signature;
 
 import org.junit.Test;
 

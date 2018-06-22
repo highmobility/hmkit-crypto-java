@@ -20,8 +20,8 @@
 
 package com.highmobility.crypto;
 
-import com.highmobility.value.PrivateKey;
-import com.highmobility.value.PublicKey;
+import com.highmobility.crypto.value.PrivateKey;
+import com.highmobility.crypto.value.PublicKey;
 
 /**
  * ECC private/public keypair that uses elliptic curve P-256.
@@ -51,27 +51,9 @@ public class HMKeyPair {
     }
 
     /**
-     * @return The public key in Base64.
-     * @deprecated use {@link #getPublicKey()} instead
-     */
-    @Deprecated
-    public String getPublicKeyBase64() {
-        return publicKey.getBase64();
-    }
-
-    /**
      * @return The private key.
      */
     public PrivateKey getPrivateKey() {
         return privateKey;
-    }
-
-    /**
-     * @return The private key in Base64.
-     * @deprecated use {@link #getPrivateKey()} instead
-     */
-    @Deprecated
-    public String getPrivateKeyBase64() {
-        return privateKey.getBase64();
     }
 }

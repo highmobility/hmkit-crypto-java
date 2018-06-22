@@ -1,12 +1,11 @@
 package com.highmobility.test;
 
 import com.highmobility.crypto.AccessCertificate;
-import com.highmobility.utils.Base64;
+import com.highmobility.crypto.value.DeviceSerial;
+import com.highmobility.crypto.value.Permissions;
+import com.highmobility.crypto.value.PublicKey;
+import com.highmobility.crypto.value.Signature;
 import com.highmobility.value.Bytes;
-import com.highmobility.value.DeviceSerial;
-import com.highmobility.value.Permissions;
-import com.highmobility.value.PublicKey;
-import com.highmobility.value.Signature;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -161,8 +160,14 @@ public class V1AccessCertificateTest {
     }
 
     @Test public void testBase64() {
-//        byte[] bytes = Base64.decode("AXRtY3OcioazmB7zzK8BI7kQqBCAlu4krwKRgN+0ozKk5GjSiW4CI3V8oJsjGIlMJ6jzKt0M3jcoB2e30AYiDLHTeRk60suVOBnqB8EPA0wf2YHXY9bfEgUeCjUXBR4KNRAQB//9/+////8DAAAAAAAAJvqcEZdB5mGVHXK513x+MJeXGLwGQ2s3ulCMFT8fZF6td2xwIp19R5p/yMzy42c9BhnkFqEMcaZrX8eCFN6xfg==");
-        Bytes bytesObject = new Bytes("AXRtY3Ne6l/0QGHF3aUE2YKllVOCcErgcuJtF3YJbV//WSqLZ04w29OuyQDz5RwE0dkM8z39OHNKFcCg9U//ZB66IMZlZDaM60zfdXT5HMXWSK28RMufEgMUDA0bAQEPERAQB//9/+////8DAAAAAAAA6bYOk2i5i5hySCxt8KA7rUwrawkhXu5oqRhQjKVDU179owJ3wkbiAOjUzcVbnCoiSCL6+t1VX2zFN522jt8c3g==");
+//        byte[] bytes = Base64.decode
+// ("AXRtY3OcioazmB7zzK8BI7kQqBCAlu4krwKRgN
+// +0ozKk5GjSiW4CI3V8oJsjGIlMJ6jzKt0M3jcoB2e30AYiDLHTeRk60suVOBnqB8EPA0wf2YHXY9bfEgUeCjUXBR4KNRAQB//9/+////8DAAAAAAAAJvqcEZdB5mGVHXK513x+MJeXGLwGQ2s3ulCMFT8fZF6td2xwIp19R5p/yMzy42c9BhnkFqEMcaZrX8eCFN6xfg==");
+        Bytes bytesObject = new Bytes
+                ("AXRtY3Ne6l/0QGHF3aUE2YKllVOCcErgcuJtF3YJbV" +
+                        "//WSqLZ04w29OuyQDz5RwE0dkM8z39OHNKFcCg9U" +
+                        "//ZB66IMZlZDaM60zfdXT5HMXWSK28RMufEgMUDA0bAQEPERAQB//9" +
+                        "/+////8DAAAAAAAA6bYOk2i5i5hySCxt8KA7rUwrawkhXu5oqRhQjKVDU179owJ3wkbiAOjUzcVbnCoiSCL6+t1VX2zFN522jt8c3g==");
         AccessCertificate cert = new AccessCertificate(bytesObject);
         System.out.println(cert);
     }

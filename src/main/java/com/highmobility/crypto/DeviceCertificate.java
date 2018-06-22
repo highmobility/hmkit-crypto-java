@@ -20,13 +20,13 @@
 
 package com.highmobility.crypto;
 
+import com.highmobility.crypto.value.AppIdentifier;
+import com.highmobility.crypto.value.DeviceSerial;
+import com.highmobility.crypto.value.Issuer;
+import com.highmobility.crypto.value.PublicKey;
+import com.highmobility.crypto.value.Signature;
 import com.highmobility.utils.Base64;
-import com.highmobility.value.AppIdentifier;
 import com.highmobility.value.Bytes;
-import com.highmobility.value.DeviceSerial;
-import com.highmobility.value.Issuer;
-import com.highmobility.value.PublicKey;
-import com.highmobility.value.Signature;
 
 /**
  * Created by ttiganik on 13/04/16.
@@ -123,8 +123,7 @@ public class DeviceCertificate extends Certificate {
             byte[] value = new byte[89];
             System.arraycopy(bytes.getByteArray(), 0, value, 0, 89);
             certificateData = new Bytes(value);
-        }
-        else {
+        } else {
             certificateData = bytes;
         }
     }
@@ -150,14 +149,13 @@ public class DeviceCertificate extends Certificate {
      * @param issuer        The issuer's identifying 4 bytes.
      * @param appIdentifier The specific app's identifying 12 bytes (one issuer might have many apps
      *                      / uses).
-     * @param serial        The serial of the device with the certificate that's 9 bytes.
-     * @param publicKey     The public key of the device with the certificate that's 64 bytes.
-     * @throws IllegalArgumentException When the parameters sizes are wrong.
+     * @param serial        The serial of the device with the certificate.
+     * @param publicKey     The public key of the device with the certificate.
      */
     public DeviceCertificate(Issuer issuer,
                              AppIdentifier appIdentifier,
                              DeviceSerial serial,
-                             PublicKey publicKey) throws IllegalArgumentException {
+                             PublicKey publicKey) {
         super();
 
         Bytes bytes = new Bytes();

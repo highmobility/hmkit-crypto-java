@@ -20,13 +20,13 @@
 
 package com.highmobility.crypto;
 
+import com.highmobility.crypto.value.DeviceSerial;
+import com.highmobility.crypto.value.HMCalendar;
+import com.highmobility.crypto.value.Issuer;
+import com.highmobility.crypto.value.Permissions;
+import com.highmobility.crypto.value.PublicKey;
+import com.highmobility.crypto.value.Signature;
 import com.highmobility.value.Bytes;
-import com.highmobility.value.DeviceSerial;
-import com.highmobility.value.HMCalendar;
-import com.highmobility.value.Issuer;
-import com.highmobility.value.Permissions;
-import com.highmobility.value.PublicKey;
-import com.highmobility.value.Signature;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -284,7 +284,7 @@ public class AccessCertificate extends Certificate {
      * For manual initialization see the alternative constructors.
      *
      * @param base64Bytes The Base64 encoded bytes making up the certificate.
-     * @throws IllegalArgumentException When byte count is not correct.
+     * @throws IllegalArgumentException When the bytes are incorrect.
      * @deprecated Use {@link #AccessCertificate(Bytes)} instead.
      */
     @Deprecated
@@ -313,7 +313,7 @@ public class AccessCertificate extends Certificate {
                              PublicKey gainingPublicKey,
                              HMCalendar startDate,
                              HMCalendar endDate,
-                             Permissions permissions) throws IllegalArgumentException {
+                             Permissions permissions) {
         super();
 
         Bytes bytesBuilder;

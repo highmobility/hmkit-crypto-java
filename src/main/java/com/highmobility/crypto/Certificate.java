@@ -20,8 +20,8 @@
 
 package com.highmobility.crypto;
 
+import com.highmobility.crypto.value.Signature;
 import com.highmobility.value.Bytes;
-import com.highmobility.value.Signature;
 
 /**
  * Created by ttiganik on 13/04/16.
@@ -70,7 +70,7 @@ public class Certificate {
     }
 
     /**
-     * @return The full certificate bytes. This includes the signature, if exists.
+     * @return The full certificate bytes. This includes the signature, if hasPermission.
      */
     public Bytes getBytes() {
         return bytes;

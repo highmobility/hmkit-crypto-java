@@ -23,10 +23,10 @@ package com.highmobility.crypto;
 import com.highmobility.btcore.HMBTCore;
 import com.highmobility.utils.Base64;
 import com.highmobility.value.Bytes;
-import com.highmobility.value.DeviceSerial;
-import com.highmobility.value.PrivateKey;
-import com.highmobility.value.PublicKey;
-import com.highmobility.value.Signature;
+import com.highmobility.crypto.value.DeviceSerial;
+import com.highmobility.crypto.value.PrivateKey;
+import com.highmobility.crypto.value.PublicKey;
+import com.highmobility.crypto.value.Signature;
 
 import java.util.Random;
 

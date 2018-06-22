@@ -16,11 +16,11 @@ repositories {
 }
 
 dependencies {
-  implementation('com.highmobility:hmkit-crypto:1.1.9')
+  implementation('com.highmobility:hmkit-crypto:1.3.0')
   // Depending on your environment, either hmkit-oem or hmkit-android is required for the HMBTCore dependency
-  // implementation('com.highmobility:hmkit-oem:1.1.2')
+  // implementation('com.highmobility:hmkit-oem:1.3.0')
   // or
-  // implementation 'com.highmobility:hmkit-android:1.1.11@aar'
+  // implementation 'com.highmobility:hmkit-android:1.3.0@aar'
 }
 ```
 
@@ -28,42 +28,43 @@ Find the latest version names in https://bintray.com/high-mobility/maven/
 
 ## Certificates
 
-Access Certificate and Device Certificate are represented in this library. The certificates will always be converted to raw bytes that are accessible with `byte[] getBytes()` method.
-You can always add a signature later with `setSignature(byte[])`. You can get the certificate data without 
+Access Certificate and Device Certificate are represented in this library. The certificates will always be converted to raw bytes that are accessible with `Bytes getBytes()` method.
+You can always add a signature later with `setSignature(Signature)`. You can get the certificate data without
 the signature with getCertificateData().
 
 ### AccessCertificate
-Use one of the designated initializers to create the object. For example:
+Use one of the designated initialisers to create the object. For example:
 
 ```java
-public AccessCertificate(byte[] gainerSerial,
-                             byte[] gainingPublicKey,
-                             byte[] providingSerial,
-                             byte[] startDate,
-                             byte[] endDate,
-                             byte[] permissions) throws IllegalArgumentException {
+public public AccessCertificate(Issuer issuer,
+                                DeviceSerial providingSerial,
+                                DeviceSerial gainerSerial,
+                                PublicKey gainingPublicKey,
+                                HMCalendar startDate,
+                                HMCalendar endDate,
+                                Permissions permissions)
 ```
 
 See public getters for certificate info, for example
 
 ```java
-public byte[] getIssuer()
+public Issuer getIssuer()
 ```
 
 ### DeviceCertificate
-Use one of the designated initializers to create the object. For example:
+Use one of the designated initialisers to create the object. For example:
 
 ```java
-public DeviceCertificate(byte[] issuer,
-                             byte[] appIdentifier,
-                             byte[] serial,
-                             byte[] publicKey) throws IllegalArgumentException
+public DeviceCertificate(Issuer issuer,
+                         AppIdentifier appIdentifier,
+                         DeviceSerial serial,
+                         PublicKey publicKey)
 ```
 
 See public getters for certificate info, for example
 
 ```java
-public byte[] getPublicKey()
+public PublicKey getPublicKey()
 ```
 
 ## Crypto ##
@@ -76,11 +77,11 @@ public static HMKeyPair createKeypair()
 
 create a random serial number
 ```java
-public static byte[] createSerialNumber()
+public static DeviceSerial createSerialNumber()
 ```
 
 sign
 
 ```java
-public static byte[] sign(byte[] bytes, byte[] privateKey) 
+public static Signature sign(Bytes bytes, PrivateKey privateKey)
 ```
