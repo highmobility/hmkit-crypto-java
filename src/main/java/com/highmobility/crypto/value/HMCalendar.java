@@ -54,7 +54,7 @@ public class HMCalendar extends BytesWithLength {
         bytes[0] = (byte) (calendar.get(Calendar.YEAR) - 2000);
         bytes[1] = (byte) (calendar.get(Calendar.MONTH) + 1);
         bytes[2] = (byte) (calendar.get(Calendar.DAY_OF_MONTH));
-        bytes[3] = (byte) (calendar.get(Calendar.HOUR));
+        bytes[3] = (byte) (calendar.get(Calendar.HOUR_OF_DAY));
         bytes[4] = (byte) (calendar.get(Calendar.MINUTE));
 
         return bytes;
