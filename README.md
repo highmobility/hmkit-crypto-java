@@ -1,6 +1,8 @@
 # HMKit Crypto
 
-This repository has the Certificate classes and public Crypto methods(sign, keygen) from the core. It uses HMBTCore for the Crypto methods. The core is expected to be imported from somewhere else(hmkit-oem.jar or hmkit-android.aar).
+This repository contains the Certificate classes and public Crypto methods(sign, keygen) from the core.
+It uses HMBTCore for the Crypto methods. The core is expected to be imported from somewhere
+else(hmkit-oem.jar or hmkit-android.aar).
 
 ### Dependencies
 
@@ -16,11 +18,11 @@ repositories {
 }
 
 dependencies {
-  implementation('com.highmobility:hmkit-crypto:1.3.2')
   // Depending on your environment, either hmkit-oem or hmkit-android is required for the HMBTCore dependency
   // implementation('com.highmobility:hmkit-oem:1.3.0')
   // or
   // implementation 'com.highmobility:hmkit-android:1.3.0@aar'
+  implementation('com.highmobility:hmkit-crypto:1.3.2')
 }
 ```
 
@@ -33,6 +35,7 @@ You can always add a signature later with `setSignature(Signature)`. You can get
 the signature with getCertificateData().
 
 ### AccessCertificate
+
 Use one of the designated initialisers to create the object. For example:
 
 ```java
@@ -85,3 +88,6 @@ sign
 ```java
 public static Signature sign(Bytes bytes, PrivateKey privateKey)
 ```
+
+Note that all of the Certificate fields(Issuer, DeviceSerial) inherit from custom Bytes class whose
+methods can be used for general initialisation, comparison and description.
