@@ -25,7 +25,6 @@ import com.highmobility.crypto.value.DeviceSerial;
 import com.highmobility.crypto.value.Issuer;
 import com.highmobility.crypto.value.PublicKey;
 import com.highmobility.crypto.value.Signature;
-import com.highmobility.utils.Base64;
 import com.highmobility.value.Bytes;
 
 /**
@@ -126,20 +125,6 @@ public class DeviceCertificate extends Certificate {
         } else {
             certificateData = bytes;
         }
-    }
-
-    /**
-     * Initialize the device certificate with raw bytes encoded in Base64.
-     * <p>
-     * For manual initialization see the alternative constructors.
-     *
-     * @param base64Bytes The Base64 encoded bytes making up the certificate.
-     * @throws IllegalArgumentException When byte count is incorrect.
-     * @deprecated use {@link #DeviceCertificate(Bytes)} instead
-     */
-    @Deprecated
-    public DeviceCertificate(String base64Bytes) throws IllegalArgumentException {
-        this(new Bytes(Base64.decode(base64Bytes)));
     }
 
     /**

@@ -21,12 +21,12 @@
 package com.highmobility.crypto;
 
 import com.highmobility.btcore.HMBTCore;
-import com.highmobility.utils.Base64;
-import com.highmobility.value.Bytes;
 import com.highmobility.crypto.value.DeviceSerial;
 import com.highmobility.crypto.value.PrivateKey;
 import com.highmobility.crypto.value.PublicKey;
 import com.highmobility.crypto.value.Signature;
+import com.highmobility.utils.Base64;
+import com.highmobility.value.Bytes;
 
 import java.util.Random;
 
@@ -82,19 +82,6 @@ public class Crypto {
     /**
      * Sign data.
      *
-     * @param bytes   The data that will be signed.
-     * @param keyPair The keypair that will be used for signing.
-     * @return The signature.
-     * @deprecated use {@link #sign(Bytes, PrivateKey)} instead
-     */
-    @Deprecated
-    public static Signature sign(Bytes bytes, HMKeyPair keyPair) {
-        return sign(bytes, keyPair.getPrivateKey());
-    }
-
-    /**
-     * Sign data.
-     *
      * @param bytes      The data that will be signed.
      * @param privateKey The private key that will be used for signing.
      * @return The signature.
@@ -133,12 +120,20 @@ public class Crypto {
      * @param data      The data that was signed.
      * @param signature The signature.
      * @param publicKey The public key that is used for verifying.
-     * @return True if verified.
+     * @return The verification result.
      */
     public static boolean verify(Bytes data, Bytes signature, PublicKey publicKey) {
         return verify(data.getByteArray(), signature.getByteArray(), publicKey.getByteArray());
     }
 
+    /**
+     * Verify a signature.
+     *
+     * @param data      The data that was signed.
+     * @param signature The signature.
+     * @param publicKey The public key that is used for verifying.
+     * @return The verification result.
+     */
     public static boolean verify(byte[] data, byte[] signature, byte[] publicKey) {
         int result = core.HMBTCoreCryptoValidateSignature(data, data.length, publicKey, signature);
         return result == 0;

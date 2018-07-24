@@ -93,28 +93,10 @@ public class AccessCertificate extends Certificate {
     }
 
     /**
-     * @return The certificate validity start date in byte format.
-     * @deprecated use {@link #getStartDate()} instead.
-     */
-    @Deprecated
-    public Bytes getStartDateBytes() {
-        return getStartDate();
-    }
-
-    /**
      * @return The certificate validity end date.
      */
     public HMCalendar getEndDate() {
         return endDate;
-    }
-
-    /**
-     * @return The certificate validity end date in byte format.
-     * @deprecated use {@link #getEndDate()} instead.
-     */
-    @Deprecated
-    public Bytes getEndDateBytes() {
-        return getEndDate();
     }
 
     /**
@@ -276,20 +258,6 @@ public class AccessCertificate extends Certificate {
             throw new IllegalArgumentException("End date is before start date");
 
         updateCertificateData();
-    }
-
-    /**
-     * Initialize the access certificate with raw bytes encoded in Base64.
-     * <p>
-     * For manual initialization see the alternative constructors.
-     *
-     * @param base64Bytes The Base64 encoded bytes making up the certificate.
-     * @throws IllegalArgumentException When the bytes are incorrect.
-     * @deprecated Use {@link #AccessCertificate(Bytes)} instead.
-     */
-    @Deprecated
-    public AccessCertificate(String base64Bytes) throws IllegalArgumentException {
-        this(new Bytes(base64Bytes));
     }
 
     /**
