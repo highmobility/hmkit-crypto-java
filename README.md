@@ -16,7 +16,7 @@ repositories {
 }
 
 dependencies {
-  implementation('com.highmobility:hmkit-crypto:1.3.0')
+  implementation('com.highmobility:hmkit-crypto:1.3.2')
   // Depending on your environment, either hmkit-oem or hmkit-android is required for the HMBTCore dependency
   // implementation('com.highmobility:hmkit-oem:1.3.0')
   // or
