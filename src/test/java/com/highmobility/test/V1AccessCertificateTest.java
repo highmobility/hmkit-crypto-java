@@ -160,9 +160,6 @@ public class V1AccessCertificateTest {
     }
 
     @Test public void testBase64() {
-//        byte[] bytes = Base64.decode
-// ("AXRtY3OcioazmB7zzK8BI7kQqBCAlu4krwKRgN
-// +0ozKk5GjSiW4CI3V8oJsjGIlMJ6jzKt0M3jcoB2e30AYiDLHTeRk60suVOBnqB8EPA0wf2YHXY9bfEgUeCjUXBR4KNRAQB//9/+////8DAAAAAAAAJvqcEZdB5mGVHXK513x+MJeXGLwGQ2s3ulCMFT8fZF6td2xwIp19R5p/yMzy42c9BhnkFqEMcaZrX8eCFN6xfg==");
         Bytes bytesObject = new Bytes
                 ("AXRtY3Ne6l/0QGHF3aUE2YKllVOCcErgcuJtF3YJbV" +
                         "//WSqLZ04w29OuyQDz5RwE0dkM8z39OHNKFcCg9U" +
@@ -171,4 +168,8 @@ public class V1AccessCertificateTest {
         AccessCertificate cert = new AccessCertificate(bytesObject);
         System.out.println(cert);
     }
+
+    // TODO: 24/07/2018 test with objects constructor
+    @Test public void testObjectsConstructor() {}
+
 }
