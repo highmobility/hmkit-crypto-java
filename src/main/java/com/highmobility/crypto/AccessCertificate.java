@@ -93,28 +93,10 @@ public class AccessCertificate extends Certificate {
     }
 
     /**
-     * @return The certificate validity start date in byte format.
-     * @deprecated use {@link #getStartDate()} instead.
-     */
-    @Deprecated
-    public Bytes getStartDateBytes() {
-        return getStartDate();
-    }
-
-    /**
      * @return The certificate validity end date.
      */
     public HMCalendar getEndDate() {
         return endDate;
-    }
-
-    /**
-     * @return The certificate validity end date in byte format.
-     * @deprecated use {@link #getEndDate()} instead.
-     */
-    @Deprecated
-    public Bytes getEndDateBytes() {
-        return getEndDate();
     }
 
     /**
@@ -279,20 +261,6 @@ public class AccessCertificate extends Certificate {
     }
 
     /**
-     * Initialize the access certificate with raw bytes encoded in Base64.
-     * <p>
-     * For manual initialization see the alternative constructors.
-     *
-     * @param base64Bytes The Base64 encoded bytes making up the certificate.
-     * @throws IllegalArgumentException When the bytes are incorrect.
-     * @deprecated Use {@link #AccessCertificate(Bytes)} instead.
-     */
-    @Deprecated
-    public AccessCertificate(String base64Bytes) throws IllegalArgumentException {
-        this(new Bytes(base64Bytes));
-    }
-
-    /**
      * Initialize the v1 access certificate with all its attributes except Certificate Authority
      * signature.
      *
@@ -353,40 +321,6 @@ public class AccessCertificate extends Certificate {
         this.endDate = endDate;
         this.permissions = permissions;
         updateCertificateData();
-    }
-
-    /**
-     * Initialize the access certificate with all its attributes except Certificate Authority
-     * signature.
-     *
-     * @param issuer           The 4-byte identifier of the issuer of this certificate. Set to null
-     *                         if v0 certificate.
-     * @param gainerSerial     9-byte serial number of the device that's gaining access.
-     * @param gainingPublicKey 64-byte public key of the device gaining access.
-     * @param providingSerial  9-byte serial number of the device providing access to itself.
-     * @param startDate        The start time (and date) of the certificate.
-     * @param endDate          The expiration date of the certificate.
-     * @param permissions      Permissions supplied with the certificate (up to 16 bytes).
-     * @throws IllegalArgumentException When parameters are invalid or not in correct size according
-     *                                  to the table on top.
-     * @deprecated use {@link #AccessCertificate(Issuer, DeviceSerial, DeviceSerial, PublicKey,
-     * HMCalendar, HMCalendar, Permissions)} instead
-     */
-    @Deprecated
-    public AccessCertificate(Issuer issuer,
-                             DeviceSerial providingSerial,
-                             DeviceSerial gainerSerial,
-                             PublicKey gainingPublicKey,
-                             Calendar startDate,
-                             Calendar endDate,
-                             Permissions permissions) throws IllegalArgumentException {
-        this(issuer,
-                providingSerial,
-                gainerSerial,
-                gainingPublicKey,
-                new HMCalendar(startDate),
-                new HMCalendar(endDate),
-                permissions);
     }
 
     private void validateBytes() throws IllegalArgumentException {

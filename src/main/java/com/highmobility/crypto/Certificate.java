@@ -75,13 +75,4 @@ public class Certificate {
     public Bytes getBytes() {
         return bytes;
     }
-
-    /**
-     * @return The raw bytes encoded in base64.
-     * @deprecated use {@link #getBytes()} instead
-     */
-    @Deprecated
-    public String getBase64() {
-        return bytes.getBase64();
-    }
 }

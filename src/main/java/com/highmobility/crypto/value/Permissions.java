@@ -125,6 +125,8 @@ public class Permissions extends BytesWithLength {
     /**
      * Set the permission to allow the reading of the list of stored certificates (trusted
      * devices).
+     *
+     * @param allow Whether to allow the permission.
      */
     public void allowCertificatesRead(boolean allow) {
         allow(Permission.certificatesReadPermission(allow));
@@ -132,6 +134,8 @@ public class Permissions extends BytesWithLength {
 
     /**
      * Set the permission to allow the revoke of access certificates.
+     *
+     * @param allow Whether to allow the permission.
      */
     public void allowCertificatesWrite(boolean allow) {
         allow(Permission.certificatesWritePermission(allow));
