@@ -36,8 +36,13 @@ configurations.all {
 }
 
 dependencies {
-//    implementation project(':hm-java-utils')
-    implementation('com.highmobility:hmkit-utils:1.4.0')
+    if (project.hasProperty('masterProject') == false || project.property('release') > 0) {
+        // standalone or release project
+        implementation('com.highmobility:hmkit-utils:1.4.0')
+    } else {
+        // in the master project with dev config
+        implementation project(':hm-java-utils')
+    }
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     testImplementation group: 'junit', name: 'junit', version: '4.12'
@@ -124,7 +129,7 @@ artifactory {
 
     publish {
         repository {
-            repoKey = artifact.repo
+            repoKey = project.hasProperty("repo") ? project.property("repo") : artifact.repo
             username = System.properties['hmArtifactoryPublishUser']
             password = System.properties['hmArtifactoryPublishPassword']
             maven = true
