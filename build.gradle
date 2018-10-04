@@ -38,7 +38,12 @@ configurations.all {
 dependencies {
     if (project.hasProperty('releaseType') == false || project.releaseType > 0) {
         // standalone or release project
-        implementation('com.highmobility:hmkit-utils:1.4.0')
+        if (project.hasProperty("utilsVersion")) {
+            implementation("com.highmobility:hmkit-utils:${project.utilsVersion}")
+        } else {
+            implementation("com.highmobility:hmkit-utils:1.4.0")
+        }
+
     } else {
         // in the master project with dev config
         implementation project(':hm-java-utils')
