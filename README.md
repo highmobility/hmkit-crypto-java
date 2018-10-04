@@ -8,6 +8,10 @@ else(hmkit-oem.jar or hmkit-android.aar).
 
 HMBTCore (from hmkit-oem.jar or hmkit-android.aar), hmkit-utils
 
+### Setup
+
+* git submodule update --init --recursive
+
 ### Install
 
 Releases are pushed to jcenter. To include hmkit-crypto in your project, add to build.gradle:
