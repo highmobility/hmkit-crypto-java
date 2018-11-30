@@ -1,28 +1,5 @@
-/*
- * HMKit Crypto - Crypto for Java
- * Copyright (C) 2018 High-Mobility <licensing@high-mobility.com>
- *
- * This file is part of HMKit Crypto.
- *
- * HMKit Crypto is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * HMKit Crypto is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with HMKit Crypto.  If not, see <http://www.gnu.org/licenses/>.
- */
-
 package com.highmobility.btcore;
 
-/**
- * Created by ttiganik on 13/04/16.
- */
 public class HMBTCore {
 
     static {
@@ -31,7 +8,6 @@ public class HMBTCore {
 
     //Init core
     //interface is class reference what implements HMBTCoreInterface
-    //TT
     public native void HMBTCoreInit(HMBTCoreInterface coreInterface);
     //Send clock beat to core
     public native void HMBTCoreClock(HMBTCoreInterface coreInterface);
@@ -55,14 +31,11 @@ public class HMBTCore {
     //CORE LINK
 
     //Initialize link object in core
-    //TT
     public native void HMBTCorelinkConnect(HMBTCoreInterface coreInterface, byte[] mac);
     //Delete link object in core
-    //TT
     public native void HMBTCorelinkDisconnect(HMBTCoreInterface coreInterface, byte[] mac);
 
     //Forward link incoming data to core
-    //TT
     public native void HMBTCorelinkIncomingData(HMBTCoreInterface coreInterface, byte[] data, int size, byte[] mac, int characteristic);
 
     public native void HMBTCorelinkWriteResponse(HMBTCoreInterface coreInterface, byte[] mac, int characteristic);
@@ -72,13 +45,18 @@ public class HMBTCore {
     public native void HMBTCoreSendReadDeviceCertificate(HMBTCoreInterface coreInterface, byte[] mac, byte[] nonce, byte[] caSignature);
     public native void HMBTCoreSendRegisterAccessCertificate(HMBTCoreInterface coreInterface, byte[] certificate);
 
-    //crypto
+    //Crypto
     public native void HMBTCoreCryptoCreateKeys(byte[] privateKey, byte[] publicKey);
 
     public native void HMBTCoreCryptoAddSignature(byte[] data, int size, byte[] privateKey, byte[] signature);
     public native int HMBTCoreCryptoValidateSignature(byte[] data, int size, byte[] pubKey, byte[] signature);
 
+    public native int HMBTCoreCryptoJWTAddSignature(byte[] message, int size, byte[] private_key, byte[] signature);
+    public native int HMBTCoreCryptoJWTsha(byte[] nonce, int size, byte[] hash);
+
     //Telematics
     public native void HMBTCoreTelematicsReceiveData(HMBTCoreInterface coreInterface, int length, byte[] data);
     public native void HMBTCoreSendTelematicsCommand(HMBTCoreInterface coreInterface, byte[] serial, byte[] nonce, int length, byte[] data);
+
+    public native void HMBTCoreSendRevoke(HMBTCoreInterface coreInterface, byte[] serial);
 }

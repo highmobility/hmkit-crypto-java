@@ -24,6 +24,7 @@ import com.highmobility.btcore.HMBTCore;
 import com.highmobility.crypto.value.DeviceSerial;
 import com.highmobility.crypto.value.PrivateKey;
 import com.highmobility.crypto.value.PublicKey;
+import com.highmobility.crypto.value.Sha256;
 import com.highmobility.crypto.value.Signature;
 import com.highmobility.utils.Base64;
 import com.highmobility.value.Bytes;
@@ -137,5 +138,18 @@ public class Crypto {
     public static boolean verify(byte[] data, byte[] signature, byte[] publicKey) {
         int result = core.HMBTCoreCryptoValidateSignature(data, data.length, publicKey, signature);
         return result == 0;
+    }
+
+    public static Signature signJWT(Bytes bytes, PrivateKey privateKey) {
+        byte[] signature = new byte[64];
+        core.HMBTCoreCryptoJWTAddSignature(bytes.getByteArray(), bytes.getLength(),
+                privateKey.getByteArray(), signature);
+        return new Signature(signature);
+    }
+
+    public static Sha256 sha256(Bytes bytes) {
+        byte[] sha256 = new byte[32];
+        core.HMBTCoreCryptoJWTsha(bytes.getByteArray(), bytes.getLength(), sha256);
+        return new Sha256(sha256);
     }
 }
