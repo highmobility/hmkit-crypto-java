@@ -1,8 +1,16 @@
 package com.highmobility.crypto.value;
 
+import com.highmobility.value.Bytes;
 import com.highmobility.value.BytesWithLength;
 
 public class PrivateKey extends BytesWithLength {
+    /**
+     * @param value The raw bytes.
+     */
+    public PrivateKey(Bytes value) {
+        super(value);
+    }
+
     /**
      * @param value The bytes in hex or Base64.
      */

@@ -140,16 +140,24 @@ public class Crypto {
         return result == 0;
     }
 
-    public static Signature signJWT(Bytes bytes, PrivateKey privateKey) {
+    public static Signature signJWT(byte[] bytes, PrivateKey privateKey) {
         byte[] signature = new byte[64];
-        core.HMBTCoreCryptoJWTAddSignature(bytes.getByteArray(), bytes.getLength(),
+        core.HMBTCoreCryptoJWTAddSignature(bytes, bytes.length,
                 privateKey.getByteArray(), signature);
         return new Signature(signature);
     }
 
-    public static Sha256 sha256(Bytes bytes) {
+    public static Signature signJWT(Bytes bytes, PrivateKey privateKey) {
+        return signJWT(bytes.getByteArray(), privateKey);
+    }
+
+    public static Sha256 sha256(byte[] bytes) {
         byte[] sha256 = new byte[32];
-        core.HMBTCoreCryptoJWTsha(bytes.getByteArray(), bytes.getLength(), sha256);
+        core.HMBTCoreCryptoJWTsha(bytes, bytes.length, sha256);
         return new Sha256(sha256);
+    }
+
+    public static Sha256 sha256(Bytes bytes) {
+        return sha256(bytes.getByteArray());
     }
 }

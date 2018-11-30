@@ -3,6 +3,7 @@ package com.highmobility.crypto.value;
 import com.highmobility.utils.ByteUtils;
 import com.highmobility.utils.Range;
 import com.highmobility.value.BitLocation;
+import com.highmobility.value.Bytes;
 import com.highmobility.value.BytesWithLength;
 
 import java.util.Arrays;
@@ -17,6 +18,13 @@ public class Permissions extends BytesWithLength {
 
     public Type getType() {
         return type;
+    }
+
+    /**
+     * @param value The raw bytes.
+     */
+    public Permissions(Bytes value) {
+        super(value);
     }
 
     /**

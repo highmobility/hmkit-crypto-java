@@ -1,5 +1,6 @@
 package com.highmobility.crypto.value;
 
+import com.highmobility.value.Bytes;
 import com.highmobility.value.BytesWithLength;
 
 import java.util.Calendar;
@@ -13,6 +14,13 @@ public class HMCalendar extends BytesWithLength {
      */
     public Calendar getCalendar() {
         return calendar;
+    }
+
+    /**
+     * @param value The raw bytes.
+     */
+    public HMCalendar(Bytes value) {
+        super(value);
     }
 
     /**
