@@ -3,25 +3,25 @@ package com.highmobility.crypto.value;
 import com.highmobility.value.Bytes;
 import com.highmobility.value.BytesWithLength;
 
-public class PrivateKey extends BytesWithLength {
+public class Sha256 extends BytesWithLength {
     /**
      * @param value The raw bytes.
      */
-    public PrivateKey(Bytes value) {
+    public Sha256(Bytes value) {
         super(value);
     }
 
     /**
      * @param value The bytes in hex or Base64.
      */
-    public PrivateKey(String value) {
+    public Sha256(String value) {
         super(value);
     }
 
     /**
      * @param bytes The raw bytes.
      */
-    public PrivateKey(byte[] bytes) {
+    public Sha256(byte[] bytes) {
         super(bytes);
     }
 

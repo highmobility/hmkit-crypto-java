@@ -1,8 +1,17 @@
 package com.highmobility.crypto.value;
 
+import com.highmobility.value.Bytes;
 import com.highmobility.value.BytesWithLength;
 
 public class DeviceSerial extends BytesWithLength {
+
+    /**
+     * @param value The raw bytes.
+     */
+    public DeviceSerial(Bytes value) {
+        super(value);
+    }
+
     /**
      * @param value The bytes in hex or Base64.
      */

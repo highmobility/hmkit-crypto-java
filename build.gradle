@@ -46,7 +46,7 @@ dependencies {
 
     } else {
         // in the master project with dev config
-        implementation project(':hm-java-utils')
+        implementation project(':hmkit-utils')
     }
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
