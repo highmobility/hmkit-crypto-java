@@ -35,15 +35,18 @@ configurations.all {
     resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
 }
 
+ext {
+    cryptoVersion = "1.4.2"
+    utilsVersion = "1.4.2"
+    hmkitVersion = "1.6.4"
+    autoApiVersion = "1.9.0"
+    compileSdkVersion = 28
+}
+
 dependencies {
     if (project.hasProperty('releaseType') == false || project.releaseType > 0) {
         // standalone or release project
-        if (project.hasProperty("utilsVersion")) {
-            implementation("com.highmobility:hmkit-utils:${project.utilsVersion}")
-        } else {
-            implementation("com.highmobility:hmkit-utils:1.4.2")
-        }
-
+        implementation("com.highmobility:hmkit-utils:${project.utilsVersion}")
     } else {
         // in the master project with dev config
         implementation project(':hmkit-utils')
@@ -51,7 +54,7 @@ dependencies {
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     testImplementation group: 'junit', name: 'junit', version: '4.12'
-    testImplementation('com.highmobility:hmkit-auto-api:1.9.0')
+    testImplementation("com.highmobility:hmkit-auto-api:${project.autoApiVersion}")
 }
 
 // deploy
