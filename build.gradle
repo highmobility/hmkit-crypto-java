@@ -53,7 +53,7 @@ dependencies {
     }
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    testImplementation group: 'junit', name: 'junit', version: '4.12'
+    testImplementation 'junit:junit:4.12'
     testImplementation("com.highmobility:hmkit-auto-api:${project.autoApiVersion}")
 }
 
