@@ -26,14 +26,16 @@ import com.highmobility.value.Bytes;
 /**
  * Created by ttiganik on 13/04/16.
  */
-public class Certificate {
-    Bytes bytes;
-
+public class Certificate extends Bytes {
     Signature signature;
     Bytes certificateData;
 
+    protected Certificate(int length) {
+        super(length);
+    }
+
     Certificate(Bytes bytes) {
-        this.bytes = bytes;
+        super(bytes);
     }
 
     Certificate() {
@@ -61,18 +63,11 @@ public class Certificate {
     public void setSignature(Signature signature) {
         // all of the ivars stay the same, only the last signature bytes of the cert change.
         if (signature == null) {
-            this.bytes = getCertificateData();
+            this.bytes = getCertificateData().getByteArray();
         } else {
-            this.bytes = Bytes.concat(getCertificateData(), signature);
+            this.bytes = Bytes.concat(getCertificateData(), signature).getByteArray();
         }
 
         this.signature = signature;
-    }
-
-    /**
-     * @return The full certificate bytes. This includes the signature, if hasPermission.
-     */
-    public Bytes getBytes() {
-        return bytes;
     }
 }

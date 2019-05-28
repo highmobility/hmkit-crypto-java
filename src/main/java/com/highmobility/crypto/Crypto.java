@@ -70,17 +70,6 @@ public class Crypto {
     }
 
     /**
-     * Add a signature for an access certificate.
-     *
-     * @param unsignedCert The access certificate
-     * @param privateKey   The private key that will be used for signing the certificate.
-     */
-    public static void sign(AccessCertificate unsignedCert, PrivateKey privateKey) {
-        Signature signature = sign(unsignedCert.getBytes(), privateKey);
-        unsignedCert.setSignature(signature);
-    }
-
-    /**
      * Sign data.
      *
      * @param bytes      The data that will be signed.

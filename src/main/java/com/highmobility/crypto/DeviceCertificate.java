@@ -89,6 +89,16 @@ public class DeviceCertificate extends Certificate {
     }
 
     /**
+     * Initialise the device certificate with raw bytes in hex or Base64.
+     *
+     * @param bytes The bytes.
+     * @throws IllegalArgumentException
+     */
+    public DeviceCertificate(String bytes) throws IllegalArgumentException {
+        this(new Bytes(bytes));
+    }
+
+    /**
      * Initialise the device certificate with raw bytes.
      *
      * @param bytes The bytes making up the certificate (89 bytes are expected).
@@ -141,25 +151,22 @@ public class DeviceCertificate extends Certificate {
                              AppIdentifier appIdentifier,
                              DeviceSerial serial,
                              PublicKey publicKey) {
-        super();
+        super(4 + 12 + 9 + 64);
 
-        Bytes bytes = new Bytes();
-        bytes = bytes.concat(issuer);
-        bytes = bytes.concat(appIdentifier);
-        bytes = bytes.concat(serial);
-        bytes = bytes.concat(publicKey);
+        set(0, issuer);
+        set(4, appIdentifier);
+        set(16, serial);
+        set(25, publicKey);
 
         this.issuer = issuer;
         this.appIdentifier = appIdentifier;
         this.serial = serial;
         this.publicKey = publicKey;
-        this.certificateData = bytes;
-
-        this.bytes = bytes;
+        this.certificateData = new Bytes(this); // no signature bytes
     }
 
     private void validateBytes() throws IllegalArgumentException {
-        int length = bytes.getLength();
+        int length = getLength();
         if (bytes == null || (length != 89 && length != 153)) {
             throw new IllegalArgumentException();
         }
