@@ -35,18 +35,29 @@ configurations.all {
     resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
 }
 
-ext {
-    cryptoVersion = "1.4.3"
-    utilsVersion = "1.4.3"
-    hmkitVersion = "1.6.7"
-    autoApiVersion = "2.10.0"
-    compileSdkVersion = 28
-}
+// these are not release numbers. release numbers are in deploy.settings files.
+ext.ver = [
+        crypto    : "1.4.3",
+        utils     : "1.4.3",
+        hmkit     : "1.6.9",
+        autoApi   : "2.10.2",
+        compileSdk: 28
+]
+
+ext.deps = [
+        "hmkit"   : "com.highmobility:hmkit-android:${ver.hmkit}@aar",
+        "crypto"  : "com.highmobility:hmkit-crypto:${ver.crypto}",
+        "utils"   : "com.highmobility:hmkit-utils:${ver.utils}",
+        "autoApi" : "com.highmobility:hmkit-auto-api:${ver.autoApi}",
+        "timber"  : "com.jakewharton.timber:timber:4.7.1",
+        "volley"  : "com.android.volley:volley:1.1.1",
+        "findBugs": 'com.google.code.findbugs:jsr305:3.0.2'
+]
 
 dependencies {
     if (project.hasProperty('releaseType') == false || project.releaseType > 0) {
         // standalone or release project
-        implementation("com.highmobility:hmkit-utils:${project.utilsVersion}")
+        implementation deps.utils
     } else {
         // in the master project with dev config
         implementation project(':hmkit-utils')
@@ -54,7 +65,7 @@ dependencies {
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     testImplementation 'junit:junit:4.12'
-    testImplementation("com.highmobility:hmkit-auto-api:${project.autoApiVersion}")
+    testImplementation deps.autoApi
 }
 
 // deploy
