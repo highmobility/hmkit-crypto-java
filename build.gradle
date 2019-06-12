@@ -55,6 +55,8 @@ ext.deps = [
 ]
 
 dependencies {
+    implementation project(':hmkit-core-jni')
+
     if (project.hasProperty('releaseType') == false || project.releaseType > 0) {
         // standalone or release project
         implementation deps.utils
@@ -63,7 +65,7 @@ dependencies {
         implementation project(':hmkit-utils')
     }
 
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
+
     testImplementation 'junit:junit:4.12'
     testImplementation deps.autoApi
 }

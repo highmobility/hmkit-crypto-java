@@ -4,6 +4,9 @@ This repository contains the Certificate classes and public Crypto methods(sign,
 It uses HMBTCore for the Crypto methods. The core is expected to be imported from somewhere
 else(hmkit-oem.jar or hmkit-android.aar).
 
+This project is meant to be as a submodule for hmkit-oem/hmkit-android. It is not meant to be used 
+independently.
+
 ### Dependencies
 
 HMBTCore (from hmkit-oem.jar or hmkit-android.aar), hmkit-utils
