@@ -65,27 +65,6 @@ public class Crypto {
     }
 
     /**
-     * Add a signature for an access certificate.
-     *
-     * @param unsignedCert     The access certificate
-     * @param privateKeyBase64 The private key that will be used for signing the certificate.
-     */
-    public void sign(AccessCertificate unsignedCert, String privateKeyBase64) {
-        sign(unsignedCert, new PrivateKey(Base64.decode(privateKeyBase64)));
-    }
-
-    /**
-     * Add a signature for an access certificate.
-     *
-     * @param unsignedCert The access certificate
-     * @param privateKey   The private key that will be used for signing the certificate.
-     */
-    public void sign(AccessCertificate unsignedCert, PrivateKey privateKey) {
-        Signature signature = sign(unsignedCert.getBytes(), privateKey);
-        unsignedCert.setSignature(signature);
-    }
-
-    /**
      * Sign data.
      *
      * @param bytes      The data that will be signed.
@@ -93,18 +72,7 @@ public class Crypto {
      * @return The signature.
      */
     public Signature sign(Bytes bytes, PrivateKey privateKey) {
-        return sign(bytes.getByteArray(), privateKey);
-    }
-
-    /**
-     * Sign data.
-     *
-     * @param bytes      The data that will be signed.
-     * @param privateKey The private key that will be used for signing.
-     * @return The signature.
-     */
-    public Signature sign(byte[] bytes, PrivateKey privateKey) {
-        return sign(bytes, privateKey.getByteArray());
+        return sign(bytes.getByteArray(), privateKey.getByteArray());
     }
 
     /**

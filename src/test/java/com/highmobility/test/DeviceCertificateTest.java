@@ -45,9 +45,9 @@ public class DeviceCertificateTest {
 
     @Test public void ctorWithVars() {
         DeviceCertificate cert = new DeviceCertificate(issuer, appIdentifier, serial, publicKey);
-        assertTrue(cert.getBytes().equals(bytesWithOutSignature));
+        assertTrue(cert.equals(bytesWithOutSignature));
         cert.setSignature(signature);
-        assertTrue(cert.getBytes().equals(bytes));
+        assertTrue(cert.equals(bytes));
         assertTrue(cert.getCertificateData().equals(bytesWithOutSignature));
     }
 
