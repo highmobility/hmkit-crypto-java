@@ -1,3 +1,4 @@
+/*
 buildscript {
     repositories {
         jcenter()
@@ -9,8 +10,13 @@ buildscript {
         classpath 'com.github.dcendents:android-maven-plugin:1+'
     }
 }
+*/
 
-apply plugin: 'java'
+plugins {
+    id "com.jfrog.artifactory" version "4.9.7"
+    id "java"
+    id "maven"
+}
 
 def artifact = new Properties()
 artifact.load(new FileInputStream("$projectDir/deploy.settings"))
@@ -31,10 +37,6 @@ repositories {
     }
 }
 
-configurations.all {
-    resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
-}
-
 // these are not release numbers. release numbers are in deploy.settings files.
 ext.ver = [
         crypto    : "1.4.3",
@@ -45,7 +47,7 @@ ext.ver = [
 ]
 
 ext.deps = [
-        "hmkit"   : "com.highmobility:hmkit-android:${ver.hmkit}@aar",
+        "com.highmobility.hmkit"   : "com.highmobility:hmkit-android:${ver.hmkit}@aar",
         "crypto"  : "com.highmobility:hmkit-crypto:${ver.crypto}",
         "utils"   : "com.highmobility:hmkit-utils:${ver.utils}",
         "autoApi" : "com.highmobility:hmkit-auto-api:${ver.autoApi}",
@@ -64,20 +66,15 @@ dependencies {
         // in the master project with dev config
         implementation project(':hmkit-utils')
     }
-
-
+    
     testImplementation 'junit:junit:4.12'
     testImplementation deps.autoApi
 }
 
 // deploy
 
-apply plugin: 'maven'
-apply plugin: 'com.jfrog.bintray'
-apply plugin: 'com.jfrog.artifactory'
-
-version = artifact.version
-group = artifact.groupId
+//apply plugin: 'maven'
+/*apply plugin: 'com.jfrog.bintray'
 
 install {
     repositories.mavenInstaller {
@@ -121,7 +118,7 @@ bintray {
             name = artifact.version
         }
     }
-}
+}*/
 
 jar {
     exclude('**/btcore')
