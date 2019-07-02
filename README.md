@@ -25,11 +25,12 @@ repositories {
 }
 
 dependencies {
-  // Depending on your environment, either hmkit-oem or hmkit-android is required for the HMBTCore dependency
+  // Depending on your environment, use hmkit-oem or hmkit-android to get the transitive crypto
+  // dependency 
   // implementation 'com.highmobility:hmkit-oem:1.3.0' 
   // or
-  // implementation 'com.highmobility:hmkit-android:1.6.7@aar'
-  implementation 'com.highmobility:hmkit-crypto:1.4.3'
+  // implementation 'com.highmobility:hmkit-android:1.6.7@aar' { transitive = true }
+  
 }
 ```
 

@@ -1,16 +1,16 @@
-/*
+
 buildscript {
     repositories {
         jcenter()
     }
-    dependencies {
+/*    dependencies {
         //Check for the latest version here: http://plugins.gradle.org/plugin/com.jfrog.artifactory
         classpath "org.jfrog.buildinfo:build-info-extractor-gradle:4.5.0"
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1+'
         classpath 'com.github.dcendents:android-maven-plugin:1+'
-    }
+    }*/
 }
-*/
+
 
 plugins {
     id "com.jfrog.artifactory" version "4.9.7"
@@ -39,31 +39,27 @@ repositories {
 
 // these are not release numbers. release numbers are in deploy.settings files.
 ext.ver = [
-        crypto    : "1.4.3",
+        corejni   : "1.0.0",
         utils     : "1.4.3",
-        hmkit     : "1.6.9",
         autoApi   : "2.10.2",
         compileSdk: 28
 ]
 
 ext.deps = [
-        "com.highmobility.hmkit"   : "com.highmobility:hmkit-android:${ver.hmkit}@aar",
-        "crypto"  : "com.highmobility:hmkit-crypto:${ver.crypto}",
+        "corejni"   : "com.highmobility:hmkit-core-jni:${ver.corejni}",
         "utils"   : "com.highmobility:hmkit-utils:${ver.utils}",
         "autoApi" : "com.highmobility:hmkit-auto-api:${ver.autoApi}",
         "timber"  : "com.jakewharton.timber:timber:4.7.1",
-        "volley"  : "com.android.volley:volley:1.1.1",
-        "findBugs": 'com.google.code.findbugs:jsr305:3.0.2'
 ]
 
 dependencies {
-    implementation project(':hmkit-core-jni')
-
     if (project.hasProperty('releaseType') == false || project.releaseType > 0) {
         // standalone or release project
         implementation deps.utils
+        implementation deps.corejni
     } else {
         // in the master project with dev config
+        implementation project(':hmkit-core-jni')
         implementation project(':hmkit-utils')
     }
     
