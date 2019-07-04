@@ -92,7 +92,7 @@ public class DeviceCertificate extends Certificate {
      * Initialise the device certificate with raw bytes in hex or Base64.
      *
      * @param bytes The bytes.
-     * @throws IllegalArgumentException
+     * @throws IllegalArgumentException When bytes length is not correct.
      */
     public DeviceCertificate(String bytes) throws IllegalArgumentException {
         this(new Bytes(bytes));

@@ -168,7 +168,7 @@ public class AccessCertificate extends Certificate {
      * Initialise the Access Certificate with raw bytes in hex or Base64.
      *
      * @param bytes The bytes.
-     * @throws IllegalArgumentException
+     * @throws IllegalArgumentException When bytes length is not correct.
      */
     public AccessCertificate(String bytes) throws IllegalArgumentException {
         this(new Bytes(bytes));
