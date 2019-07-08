@@ -26,7 +26,6 @@ import com.highmobility.crypto.value.PrivateKey;
 import com.highmobility.crypto.value.PublicKey;
 import com.highmobility.crypto.value.Sha256;
 import com.highmobility.crypto.value.Signature;
-import com.highmobility.utils.Base64;
 import com.highmobility.value.Bytes;
 
 import java.util.Random;
