@@ -26,7 +26,7 @@ dependencies {
   // implementation 'com.highmobility:hmkit-oem:1.3.0' 
   // or
   // implementation 'com.highmobility:hmkit-android:1.6.7@aar'
-  implementation 'com.highmobility:hmkit-crypto:1.4.3'
+  implementation 'com.highmobility:hmkit-crypto:1.4.4-dev'
 }
 ```
 
