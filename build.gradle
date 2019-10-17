@@ -58,14 +58,16 @@ dependencies {
     if (project.hasProperty('releaseType') == false || project.releaseType > 0) {
         // standalone or release project
         implementation deps.utils
+        testImplementation deps.autoApi
     } else {
         // in the master project with dev config
         implementation project(':hmkit-utils')
+        testImplementation project(':hm-java-auto-api')
     }
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     testImplementation 'junit:junit:4.12'
-    testImplementation deps.autoApi
+
 }
 
 // deploy
