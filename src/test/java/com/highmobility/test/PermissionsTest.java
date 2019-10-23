@@ -88,9 +88,9 @@ public class PermissionsTest {
 
         // Auto API package is used to get the bit locations for AutoAPI permissions.
         BitLocation carSdkReset = PermissionLocation.allowCarSdkResetLocation();
-        BitLocation doorLocksRead = PermissionLocation.locationFor(Identifier.DOOR_LOCKS,
+        BitLocation doorLocksRead = PermissionLocation.locationFor(Identifier.DOORS,
                 PermissionLocation.Type.READ);
-        BitLocation doorLocksWrite = PermissionLocation.locationFor(Identifier.DOOR_LOCKS,
+        BitLocation doorLocksWrite = PermissionLocation.locationFor(Identifier.DOORS,
                 PermissionLocation.Type.WRITE);
 
         BitLocation tachoGraphRead = PermissionLocation.locationFor(Identifier.TACHOGRAPH,
@@ -115,7 +115,7 @@ public class PermissionsTest {
         permissions.allow(PermissionLocation.locationFor(Identifier.LIGHT_CONDITIONS,
                 PermissionLocation.Type.READ), true); // these are the same - from environment
 
-        permissions.allow(PermissionLocation.locationFor(Identifier.OFF_ROAD,
+        permissions.allow(PermissionLocation.locationFor(Identifier.OFFROAD,
                 PermissionLocation.Type.READ), true); // these are the same - from environment
 
         permissions.allow(PermissionLocation.locationFor(Identifier.NOTIFICATIONS,

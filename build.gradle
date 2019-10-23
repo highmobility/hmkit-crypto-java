@@ -36,9 +36,10 @@ sourceCompatibility = 1.8
 // these are not release numbers. release numbers are in deploy.settings files.
 ext.ver = [
         corejni   : "1.0.0",
-        utils     : "1.4.3",
+        crypto    : "1.4.4-dev",
+        utils     : "1.4.4-dev",
         hmkit     : "1.6.10",
-        autoApi   : "2.10.2",
+        autoApi   : "3.0.0-dev4",
         compileSdk: 28
 ]
 
@@ -54,14 +55,16 @@ dependencies {
         // standalone or release project
         implementation deps.utils
         implementation deps.corejni
+        testImplementation deps.autoApi
     } else {
         // in the master project with dev config
         implementation project(':hmkit-core-jni')
         implementation project(':hmkit-utils')
+        testImplementation project(':hm-java-auto-api')
     }
 
     testImplementation 'junit:junit:4.12'
-    testImplementation deps.autoApi
+
 }
 
 // deploy
