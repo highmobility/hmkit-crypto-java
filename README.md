@@ -4,6 +4,9 @@ This repository contains the Certificate classes and public Crypto methods(sign,
 It uses HMBTCore for the Crypto methods. The core is expected to be imported from somewhere
 else(hmkit-oem.jar or hmkit-android.aar).
 
+This project is meant to be as a submodule for hmkit-oem/hmkit-android. It is not meant to be used 
+independently.
+
 ### Dependencies
 
 HMBTCore (from hmkit-oem.jar or hmkit-android.aar), hmkit-utils
@@ -22,11 +25,12 @@ repositories {
 }
 
 dependencies {
-  // Depending on your environment, either hmkit-oem or hmkit-android is required for the HMBTCore dependency
+  // Depending on your environment, use hmkit-oem or hmkit-android to get the transitive crypto
+  // dependency 
   // implementation 'com.highmobility:hmkit-oem:1.3.0' 
   // or
-  // implementation 'com.highmobility:hmkit-android:1.6.7@aar'
-  implementation 'com.highmobility:hmkit-crypto:1.4.3'
+  // implementation 'com.highmobility:hmkit-android:1.6.7@aar' { transitive = true }
+  
 }
 ```
 

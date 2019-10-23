@@ -116,17 +116,16 @@ public class AccessCertificate extends Certificate {
         int lengthLocation = version == 0 ? 92 : 97;
 
         byte length = (byte) permissions.getLength();
-
         byte[] newBytes = new byte[lengthLocation + 1 + length];
 
-        System.arraycopy(this.bytes.getByteArray(), 0, newBytes, 0, lengthLocation);
+        System.arraycopy(this.bytes, 0, newBytes, 0, lengthLocation);
         newBytes[lengthLocation] = length;
 
         if (length > 0) {
             System.arraycopy(permissions.getByteArray(), 0, newBytes, lengthLocation + 1, length);
         }
 
-        this.bytes = new Bytes(newBytes);
+        this.bytes = newBytes;
         this.permissions = permissions;
         updateCertificateData();
         setSignature(null);
@@ -163,6 +162,16 @@ public class AccessCertificate extends Certificate {
         description += "\nsignature: " + getSignature() + "\n";
 
         return description;
+    }
+
+    /**
+     * Initialise the Access Certificate with raw bytes in hex or Base64.
+     *
+     * @param bytes The bytes.
+     * @throws IllegalArgumentException When bytes length is not correct.
+     */
+    public AccessCertificate(String bytes) throws IllegalArgumentException {
+        this(new Bytes(bytes));
     }
 
     /**
@@ -217,9 +226,9 @@ public class AccessCertificate extends Certificate {
         // start date
         byte[] startDateBytes = new byte[5];
         if (version == 1) {
-            System.arraycopy(this.bytes.getByteArray(), 87, startDateBytes, 0, 5);
+            System.arraycopy(this.bytes, 87, startDateBytes, 0, 5);
         } else {
-            System.arraycopy(this.bytes.getByteArray(), 82, startDateBytes, 0, 5);
+            System.arraycopy(this.bytes, 82, startDateBytes, 0, 5);
         }
         startDate = new HMCalendar(startDateBytes);
 
@@ -248,7 +257,7 @@ public class AccessCertificate extends Certificate {
 
         if (bytes.getLength() > permissionsLengthLocation + 1 + permissionsLength) {
             byte[] signatureBytes = new byte[64];
-            System.arraycopy(this.bytes.getByteArray(), permissionsLengthLocation + 1 +
+            System.arraycopy(this.bytes, permissionsLengthLocation + 1 +
                             permissionsLength, signatureBytes,
                     0, 64);
             signature = new Signature(signatureBytes);
@@ -310,7 +319,7 @@ public class AccessCertificate extends Certificate {
             bytesBuilder = Bytes.concat(bytesBuilder, new Bytes("00"));
         }
 
-        this.bytes = bytesBuilder;
+        this.bytes = bytesBuilder.getByteArray();
         validateBytes();
 
         this.issuer = issuer;
@@ -326,7 +335,7 @@ public class AccessCertificate extends Certificate {
     private void validateBytes() throws IllegalArgumentException {
         int expectedLength = version == 1 ? v1Length : v0Length;
 
-        if (bytes.getLength() < expectedLength) {
+        if (bytes.length < expectedLength) {
             throw new IllegalArgumentException();
         }
     }
@@ -339,15 +348,15 @@ public class AccessCertificate extends Certificate {
     void testVersion() throws IllegalArgumentException {
         int permissionsLengthPosition, permissionsLength, withoutSignatureLength;
 
-        if (bytes.getByteArray()[0] == 1) {
+        if (bytes[0] == 1) {
             // try to verify v1
             permissionsLengthPosition = 97;
-            if (bytes.getLength() < permissionsLengthPosition + 1)
+            if (bytes.length < permissionsLengthPosition + 1)
                 throw new IllegalArgumentException();
 
-            permissionsLength = bytes.getByteArray()[permissionsLengthPosition];
+            permissionsLength = bytes[permissionsLengthPosition];
             withoutSignatureLength = v1Length + permissionsLength;
-            if (bytes.getLength() == withoutSignatureLength || bytes.getLength() ==
+            if (bytes.length == withoutSignatureLength || bytes.length ==
                     withoutSignatureLength
                             + 64) {
                 version = 1;
@@ -357,12 +366,12 @@ public class AccessCertificate extends Certificate {
 
         // try to verify v0
         permissionsLengthPosition = 92;
-        if (bytes.getLength() < permissionsLengthPosition + 1)
+        if (bytes.length < permissionsLengthPosition + 1)
             throw new IllegalArgumentException();
 
-        permissionsLength = bytes.getByteArray()[permissionsLengthPosition];
+        permissionsLength = bytes[permissionsLengthPosition];
         withoutSignatureLength = v0Length + permissionsLength;
-        if (bytes.getLength() != withoutSignatureLength && bytes.getLength() !=
+        if (bytes.length != withoutSignatureLength && bytes.length !=
                 withoutSignatureLength + 64) {
             throw new IllegalArgumentException(); // bytes are not v0 or v1
         }
@@ -372,12 +381,12 @@ public class AccessCertificate extends Certificate {
         int dataLength = version == 1 ? v1Length : v0Length;
         int permissionsLengthPosition = version == 1 ? 97 : 92;
 
-        if (bytes.getByteArray()[permissionsLengthPosition] > 0) {
-            dataLength += bytes.getByteArray()[permissionsLengthPosition];
+        if (bytes[permissionsLengthPosition] > 0) {
+            dataLength += bytes[permissionsLengthPosition];
         }
 
         byte[] bytes = new byte[dataLength];
-        System.arraycopy(this.bytes.getByteArray(), 0, bytes, 0, dataLength);
+        System.arraycopy(this.bytes, 0, bytes, 0, dataLength);
         certificateData = new Bytes(bytes);
     }
 }

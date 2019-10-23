@@ -1,4 +1,10 @@
-include 'hm-java-utils'
+include ':hmkit-utils',
+        ':hmkit-core-jni'
+
+project(':hmkit-core-jni').projectDir = new File('../hm-java-core-jni/')
+project(':hmkit-utils').projectDir = new File('../hm-java-utils/')
+
 def artifact = new Properties()
 artifact.load(new FileInputStream("deploy.settings"))
 rootProject.name = artifact.id
+
