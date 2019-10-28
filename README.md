@@ -29,7 +29,7 @@ dependencies {
   // dependency 
   // implementation 'com.highmobility:hmkit-oem:1.3.0' 
   // or
-  // implementation 'com.highmobility:hmkit-android:1.6.10@aar' { transitive = true }
+  // implementation 'com.highmobility:hmkit-android:2.0.0-dev@aar' { transitive = true }
 }
 ```
 
