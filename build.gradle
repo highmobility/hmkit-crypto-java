@@ -60,11 +60,10 @@ dependencies {
         // in the master project with dev config
         implementation project(':hmkit-core-jni')
         implementation project(':hmkit-utils')
-        testImplementation project(':hm-java-auto-api')
+        testImplementation project(':hmkit-auto-api')
     }
 
     testImplementation 'junit:junit:4.12'
-
 }
 
 // deploy
