@@ -34,7 +34,7 @@ public class Crypto {
 
     private HMBTCore core;
 
-    // Either HMKit Android or HMKit OEM is needed for the core.
+    // HMBTCore is available in either HMKit Android or HMKit OEM.
     public Crypto(HMBTCore core) {
         this.core = core;
     }
