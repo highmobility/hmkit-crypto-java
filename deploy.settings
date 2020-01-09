@@ -1,7 +1,7 @@
 siteUrl = https://github.com/highmobility/hm-java-crypto
 gitUrl = https://github.com/highmobility/hm-java-crypto
-version = 1.4.4-dev
+version = 1.4.4
 groupId = com.highmobility
-licenses = ['GPL-3.0']
+licenses = ['MIT']
 id = hmkit-crypto
 repo = gradle-dev-local
