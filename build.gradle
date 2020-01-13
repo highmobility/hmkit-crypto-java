@@ -8,7 +8,7 @@ buildscript {
     }
 }
 
-apply plugin: "java"
+apply plugin: "java-library"
 apply plugin: "maven"
 apply plugin: "com.jfrog.artifactory"
 apply plugin: 'com.jfrog.bintray'
@@ -35,10 +35,8 @@ sourceCompatibility = 1.8
 // these are not release numbers. release numbers are in deploy.settings files.
 ext.ver = [
         corejni   : "1.0.0",
-        crypto    : "1.4.4",
         utils     : "1.4.4",
-        hmkit     : "2.0.0",
-        autoApi   : "3.11.0",
+        autoApi   : "3.11.1",
         compileSdk: 28
 ]
 
@@ -52,8 +50,8 @@ ext.deps = [
 dependencies {
     if (project.hasProperty('releaseType') == false || project.releaseType > 0) {
         // standalone or release project
-        implementation deps.utils
-        implementation deps.corejni
+        api deps.utils
+        api deps.corejni
         testImplementation deps.autoApi
     } else {
         // in the master project with dev config
