@@ -1,23 +1,26 @@
 /*
- * HMKit Crypto - Crypto for Java
- * Copyright (C) 2018 High-Mobility <licensing@high-mobility.com>
+ * The MIT License
  *
- * This file is part of HMKit Crypto.
+ * Copyright (c) 2014- High-Mobility GmbH (https://high-mobility.com)
  *
- * HMKit Crypto is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
  *
- * HMKit Crypto is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
  *
- * You should have received a copy of the GNU General Public License
- * along with HMKit Crypto.  If not, see <http://www.gnu.org/licenses/>.
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
  */
-
 package com.highmobility.crypto;
 
 import com.highmobility.crypto.value.AppIdentifier;
@@ -89,6 +92,16 @@ public class DeviceCertificate extends Certificate {
     }
 
     /**
+     * Initialise the device certificate with raw bytes in hex or Base64.
+     *
+     * @param bytes The bytes.
+     * @throws IllegalArgumentException When bytes length is not correct.
+     */
+    public DeviceCertificate(String bytes) throws IllegalArgumentException {
+        this(new Bytes(bytes));
+    }
+
+    /**
      * Initialise the device certificate with raw bytes.
      *
      * @param bytes The bytes making up the certificate (89 bytes are expected).
@@ -141,25 +154,22 @@ public class DeviceCertificate extends Certificate {
                              AppIdentifier appIdentifier,
                              DeviceSerial serial,
                              PublicKey publicKey) {
-        super();
+        super(4 + 12 + 9 + 64);
 
-        Bytes bytes = new Bytes();
-        bytes = bytes.concat(issuer);
-        bytes = bytes.concat(appIdentifier);
-        bytes = bytes.concat(serial);
-        bytes = bytes.concat(publicKey);
+        set(0, issuer);
+        set(4, appIdentifier);
+        set(16, serial);
+        set(25, publicKey);
 
         this.issuer = issuer;
         this.appIdentifier = appIdentifier;
         this.serial = serial;
         this.publicKey = publicKey;
-        this.certificateData = bytes;
-
-        this.bytes = bytes;
+        this.certificateData = new Bytes(this); // no signature bytes
     }
 
     private void validateBytes() throws IllegalArgumentException {
-        int length = bytes.getLength();
+        int length = getLength();
         if (bytes == null || (length != 89 && length != 153)) {
             throw new IllegalArgumentException();
         }

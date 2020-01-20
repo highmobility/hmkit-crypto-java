@@ -3,14 +3,26 @@ buildscript {
         jcenter()
     }
     dependencies {
-        //Check for the latest version here: http://plugins.gradle.org/plugin/com.jfrog.artifactory
-        classpath "org.jfrog.buildinfo:build-info-extractor-gradle:4.5.0"
-        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1+'
-        classpath 'com.github.dcendents:android-maven-plugin:1+'
+        classpath "org.jfrog.buildinfo:build-info-extractor-gradle:4.13.0"
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.4'
     }
 }
 
-apply plugin: 'java'
+apply plugin: "java-library"
+apply plugin: "maven"
+apply plugin: "com.jfrog.artifactory"
+apply plugin: 'com.jfrog.bintray'
+
+repositories {
+    jcenter()
+    maven {
+        url "http://jfrog.high-mobility.com/artifactory/gradle-dev-local/"
+        credentials {
+            username devReadUser
+            password devReadPassword
+        }
+    }
+}
 
 def artifact = new Properties()
 artifact.load(new FileInputStream("$projectDir/deploy.settings"))
@@ -20,62 +32,77 @@ version = artifact.version
 
 sourceCompatibility = 1.8
 
-repositories {
-    jcenter()
-    maven {
-        url "http://jfrog.high-mobility.com/artifactory/gradle-dev-local/"
-        credentials {
-            username System.properties['devReadUser']
-            password System.properties['devReadPassword']
-        }
-    }
-}
-
-configurations.all {
-    resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
-}
-
 // these are not release numbers. release numbers are in deploy.settings files.
 ext.ver = [
-        crypto    : "1.4.3",
-        utils     : "1.4.3",
-        hmkit     : "1.6.10",
-        autoApi   : "2.10.2",
+        corejni   : "1.0.0",
+        utils     : "1.4.4",
+        autoApi   : "3.11.1",
         compileSdk: 28
 ]
 
 ext.deps = [
-        "hmkit"   : "com.highmobility:hmkit-android:${ver.hmkit}@aar",
-        "crypto"  : "com.highmobility:hmkit-crypto:${ver.crypto}",
-        "utils"   : "com.highmobility:hmkit-utils:${ver.utils}",
-        "autoApi" : "com.highmobility:hmkit-auto-api:${ver.autoApi}",
-        "timber"  : "com.jakewharton.timber:timber:4.7.1",
-        "volley"  : "com.android.volley:volley:1.1.1",
-        "findBugs": 'com.google.code.findbugs:jsr305:3.0.2'
+        "corejni": "com.highmobility:hmkit-core-jni:${ver.corejni}",
+        "utils"  : "com.highmobility:hmkit-utils:${ver.utils}",
+        "autoApi": "com.highmobility:hmkit-auto-api:${ver.autoApi}",
+        "timber" : "com.jakewharton.timber:timber:4.7.1",
 ]
 
 dependencies {
     if (project.hasProperty('releaseType') == false || project.releaseType > 0) {
         // standalone or release project
-        implementation deps.utils
+        api deps.utils
+        api deps.corejni
+        testImplementation deps.autoApi
     } else {
         // in the master project with dev config
+        implementation project(':hmkit-core-jni')
         implementation project(':hmkit-utils')
+        testImplementation project(':hmkit-auto-api')
     }
 
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
     testImplementation 'junit:junit:4.12'
-    testImplementation deps.autoApi
 }
 
 // deploy
+//
 
-apply plugin: 'maven'
-apply plugin: 'com.jfrog.bintray'
-apply plugin: 'com.jfrog.artifactory'
+// add the sources and doc artifacts
 
-version = artifact.version
-group = artifact.groupId
+task sourcesJar(type: Jar) {
+    from sourceSets.main.java.srcDirs
+    classifier = 'sources'
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    from javadoc.destinationDir
+    classifier = 'javadoc'
+}
+
+artifacts {
+    archives javadocJar
+    archives sourcesJar
+}
+
+// artifactory
+
+artifactory {
+    contextUrl = hmArtifactoryUrl
+
+    publish {
+        repository {
+            repoKey = project.hasProperty("repo") ? project.property("repo") : artifact.repo
+            username = hmArtifactoryPublishUser
+            password = hmArtifactoryPublishPassword
+        }
+
+        defaults {
+            publishConfigs('archives', 'published')
+            publishIvy = false
+        }
+    }
+}
+
+// bintray
 
 install {
     repositories.mavenInstaller {
@@ -89,8 +116,8 @@ install {
             inceptionYear '2018'
             licenses {
                 license { // HARDCODED
-                    name 'GPL-3.0'
-                    url 'https://www.gnu.org/licenses/gpl.txt'
+                    name 'MIT'
+                    url 'https://opensource.org/licenses/MIT'
                     distribution 'repo'
                 }
             }
@@ -104,8 +131,8 @@ install {
 }
 
 bintray {
-    user = System.properties['hmBintrayUser']
-    key = System.properties['hmBintrayApikey']
+    user = hmBintrayUser
+    key = hmBintrayApikey
 
     configurations = ['archives']
     pkg {
@@ -114,50 +141,9 @@ bintray {
         websiteUrl = artifact.siteUrl
         vcsUrl = artifact.gitUrl
         licenses = artifact.licenses
-        publish = true
+
         version {
             name = artifact.version
-        }
-    }
-}
-
-jar {
-    exclude('**/btcore')
-}
-
-task sourcesJar(type: Jar) {
-    from sourceSets.main.java.srcDirs
-    classifier = 'sources'
-}
-
-task javadocJar(type: Jar, dependsOn: javadoc) {
-    classifier = 'javadoc'
-    from javadoc.destinationDir
-    // options.encoding = 'UTF-8'
-}
-
-artifacts {
-    archives javadocJar
-    archives sourcesJar
-}
-
-// artifactory
-
-artifactory {
-    contextUrl = System.properties['hmArtifactoryUrl']
-
-    publish {
-        repository {
-            repoKey = project.hasProperty("repo") ? project.property("repo") : artifact.repo
-            username = System.properties['hmArtifactoryPublishUser']
-            password = System.properties['hmArtifactoryPublishPassword']
-            maven = true
-        }
-
-        defaults {
-            publishConfigs('archives', 'published')
-            publishPom = true
-            publishIvy = false
         }
     }
 }

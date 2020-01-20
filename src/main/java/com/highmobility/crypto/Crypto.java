@@ -1,23 +1,26 @@
 /*
- * HMKit Crypto - Crypto for Java
- * Copyright (C) 2018 High-Mobility <licensing@high-mobility.com>
+ * The MIT License
  *
- * This file is part of HMKit Crypto.
+ * Copyright (c) 2014- High-Mobility GmbH (https://high-mobility.com)
  *
- * HMKit Crypto is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
  *
- * HMKit Crypto is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
  *
- * You should have received a copy of the GNU General Public License
- * along with HMKit Crypto.  If not, see <http://www.gnu.org/licenses/>.
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
  */
-
 package com.highmobility.crypto;
 
 import com.highmobility.btcore.HMBTCore;
@@ -26,21 +29,25 @@ import com.highmobility.crypto.value.PrivateKey;
 import com.highmobility.crypto.value.PublicKey;
 import com.highmobility.crypto.value.Sha256;
 import com.highmobility.crypto.value.Signature;
-import com.highmobility.utils.Base64;
 import com.highmobility.value.Bytes;
 
 import java.util.Random;
 
 public class Crypto {
 
-    private static final HMBTCore core = new HMBTCore();
+    private HMBTCore core;
+
+    // HMBTCore is available in either HMKit Android or HMKit OEM.
+    public Crypto(HMBTCore core) {
+        this.core = core;
+    }
 
     /**
      * Create a keypair.
      *
      * @return The KeyPair.
      */
-    public static HMKeyPair createKeypair() {
+    public HMKeyPair createKeypair() {
         byte[] privateKey = new byte[32];
         byte[] publicKey = new byte[64];
 
@@ -53,31 +60,21 @@ public class Crypto {
      *
      * @return the serial number.
      */
-    public static DeviceSerial createSerialNumber() {
+    public DeviceSerial createSerialNumber() {
         byte[] serialBytes = new byte[9];
         new Random().nextBytes(serialBytes);
         return new DeviceSerial(serialBytes);
     }
 
     /**
-     * Add a signature for an access certificate.
+     * Sign data.
      *
-     * @param unsignedCert     The access certificate
-     * @param privateKeyBase64 The private key that will be used for signing the certificate.
+     * @param bytes      The data that will be signed.
+     * @param privateKey The private key that will be used for signing.
+     * @return The signature.
      */
-    public static void sign(AccessCertificate unsignedCert, String privateKeyBase64) {
-        sign(unsignedCert, new PrivateKey(Base64.decode(privateKeyBase64)));
-    }
-
-    /**
-     * Add a signature for an access certificate.
-     *
-     * @param unsignedCert The access certificate
-     * @param privateKey   The private key that will be used for signing the certificate.
-     */
-    public static void sign(AccessCertificate unsignedCert, PrivateKey privateKey) {
-        Signature signature = sign(unsignedCert.getBytes(), privateKey);
-        unsignedCert.setSignature(signature);
+    public Signature sign(Bytes bytes, PrivateKey privateKey) {
+        return sign(bytes.getByteArray(), privateKey.getByteArray());
     }
 
     /**
@@ -87,29 +84,7 @@ public class Crypto {
      * @param privateKey The private key that will be used for signing.
      * @return The signature.
      */
-    public static Signature sign(Bytes bytes, PrivateKey privateKey) {
-        return sign(bytes.getByteArray(), privateKey);
-    }
-
-    /**
-     * Sign data.
-     *
-     * @param bytes      The data that will be signed.
-     * @param privateKey The private key that will be used for signing.
-     * @return The signature.
-     */
-    public static Signature sign(byte[] bytes, PrivateKey privateKey) {
-        return sign(bytes, privateKey.getByteArray());
-    }
-
-    /**
-     * Sign data.
-     *
-     * @param bytes      The data that will be signed.
-     * @param privateKey The private key that will be used for signing.
-     * @return The signature.
-     */
-    public static Signature sign(byte[] bytes, byte[] privateKey) {
+    public Signature sign(byte[] bytes, byte[] privateKey) {
         byte[] signature = new byte[64];
         core.HMBTCoreCryptoAddSignature(bytes, bytes.length, privateKey, signature);
         return new Signature(signature);
@@ -123,7 +98,7 @@ public class Crypto {
      * @param publicKey The public key that is used for verifying.
      * @return The verification result.
      */
-    public static boolean verify(Bytes data, Bytes signature, PublicKey publicKey) {
+    public boolean verify(Bytes data, Bytes signature, PublicKey publicKey) {
         return verify(data.getByteArray(), signature.getByteArray(), publicKey.getByteArray());
     }
 
@@ -135,29 +110,29 @@ public class Crypto {
      * @param publicKey The public key that is used for verifying.
      * @return The verification result.
      */
-    public static boolean verify(byte[] data, byte[] signature, byte[] publicKey) {
+    public boolean verify(byte[] data, byte[] signature, byte[] publicKey) {
         int result = core.HMBTCoreCryptoValidateSignature(data, data.length, publicKey, signature);
         return result == 0;
     }
 
-    public static Signature signJWT(byte[] bytes, PrivateKey privateKey) {
+    public Signature signJWT(byte[] bytes, PrivateKey privateKey) {
         byte[] signature = new byte[64];
         core.HMBTCoreCryptoJWTAddSignature(bytes, bytes.length,
                 privateKey.getByteArray(), signature);
         return new Signature(signature);
     }
 
-    public static Signature signJWT(Bytes bytes, PrivateKey privateKey) {
+    public Signature signJWT(Bytes bytes, PrivateKey privateKey) {
         return signJWT(bytes.getByteArray(), privateKey);
     }
 
-    public static Sha256 sha256(byte[] bytes) {
+    public Sha256 sha256(byte[] bytes) {
         byte[] sha256 = new byte[32];
         core.HMBTCoreCryptoJWTsha(bytes, bytes.length, sha256);
         return new Sha256(sha256);
     }
 
-    public static Sha256 sha256(Bytes bytes) {
+    public Sha256 sha256(Bytes bytes) {
         return sha256(bytes.getByteArray());
     }
 }

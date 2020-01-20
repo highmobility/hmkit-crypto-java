@@ -1,23 +1,26 @@
 /*
- * HMKit Crypto - Crypto for Java
- * Copyright (C) 2018 High-Mobility <licensing@high-mobility.com>
+ * The MIT License
  *
- * This file is part of HMKit Crypto.
+ * Copyright (c) 2014- High-Mobility GmbH (https://high-mobility.com)
  *
- * HMKit Crypto is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
  *
- * HMKit Crypto is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
  *
- * You should have received a copy of the GNU General Public License
- * along with HMKit Crypto.  If not, see <http://www.gnu.org/licenses/>.
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
  */
-
 package com.highmobility.crypto;
 
 import com.highmobility.crypto.value.Signature;
@@ -26,14 +29,16 @@ import com.highmobility.value.Bytes;
 /**
  * Created by ttiganik on 13/04/16.
  */
-public class Certificate {
-    Bytes bytes;
-
+public class Certificate extends Bytes {
     Signature signature;
     Bytes certificateData;
 
+    protected Certificate(int length) {
+        super(length);
+    }
+
     Certificate(Bytes bytes) {
-        this.bytes = bytes;
+        super(bytes);
     }
 
     Certificate() {
@@ -61,18 +66,11 @@ public class Certificate {
     public void setSignature(Signature signature) {
         // all of the ivars stay the same, only the last signature bytes of the cert change.
         if (signature == null) {
-            this.bytes = getCertificateData();
+            this.bytes = getCertificateData().getByteArray();
         } else {
-            this.bytes = Bytes.concat(getCertificateData(), signature);
+            this.bytes = Bytes.concat(getCertificateData(), signature).getByteArray();
         }
 
         this.signature = signature;
-    }
-
-    /**
-     * @return The full certificate bytes. This includes the signature, if hasPermission.
-     */
-    public Bytes getBytes() {
-        return bytes;
     }
 }

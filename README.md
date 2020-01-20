@@ -1,16 +1,17 @@
 # HMKit Crypto
 
-This repository contains the Certificate classes and public Crypto methods(sign, keygen) from the core.
-It uses HMBTCore for the Crypto methods. The core is expected to be imported from somewhere
-else(hmkit-oem.jar or hmkit-android.aar).
+This repository contains the Certificate classes and public Crypto methods(sign, keygen).
+It uses our C Core for the Crypto methods. The core is expected to be imported from either
+HMKit Android or HMKit OEM. This means this library can be used only as a submodule for these 
+projects.
 
 ### Dependencies
 
-HMBTCore (from hmkit-oem.jar or hmkit-android.aar), hmkit-utils
+HMBTCore (from either HMKit Android or HMKit OEM), hmkit-utils
 
 ### Setup
 
-* git submodule update --init --recursive
+* Follow the setup process in either HMKit Android or HMKit OEM projects.
 
 ### Install
 
@@ -22,11 +23,11 @@ repositories {
 }
 
 dependencies {
-  // Depending on your environment, either hmkit-oem or hmkit-android is required for the HMBTCore dependency
-  // implementation 'com.highmobility:hmkit-oem:1.3.0' 
+  // Depending on your environment, use hmkit-oem or hmkit-android to get the transitive crypto
+  // dependency 
+  // implementation 'com.highmobility:hmkit-oem:2.0.0'
   // or
-  // implementation 'com.highmobility:hmkit-android:1.6.7@aar'
-  implementation 'com.highmobility:hmkit-crypto:1.4.3'
+  // implementation 'com.highmobility:hmkit-android:2.0.0@aar' { transitive = true }
 }
 ```
 
@@ -34,8 +35,9 @@ Find the latest version names in https://bintray.com/high-mobility/maven/
 
 ## Certificates
 
-Access Certificate and Device Certificate are represented in this library. The certificates will always be converted to raw bytes that are accessible with `Bytes getBytes()` method.
-You can always add a signature later with `setSignature(Signature)`. You can get the certificate data without
+Access Certificate and Device Certificate are represented in this library. The certificates will 
+always be converted to raw bytes that are accessible with `Bytes getBytes()` method. You can always 
+add a signature later with `setSignature(Signature)`. You can get the certificate data without
 the signature with getCertificateData().
 
 ### AccessCertificate

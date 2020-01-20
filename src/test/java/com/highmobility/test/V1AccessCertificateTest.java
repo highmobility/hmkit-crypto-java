@@ -1,3 +1,26 @@
+/*
+ * The MIT License
+ *
+ * Copyright (c) 2014- High-Mobility GmbH (https://high-mobility.com)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
 package com.highmobility.test;
 
 import com.highmobility.crypto.AccessCertificate;
@@ -32,7 +55,7 @@ public class V1AccessCertificateTest {
     }
 
     @Test public void fullData() {
-        assertTrue(certificate.getBytes().equals(certBytes));
+        assertTrue(certificate.equals(certBytes));
     }
 
     @Test public void testGetIssuer() {
@@ -184,12 +207,12 @@ public class V1AccessCertificateTest {
                 new Permissions("1007FFFDFFEFFFFFFF03000000000000")
         );
 
-        assertTrue(cert.getBytes().equals
+        assertTrue(cert.equals
                 ("01746D63735EEA5FF44061C5DDA504D982A5955382704AE072E26D1776096D5FFF592A8B674E30DBD3AEC900F3E51C04D1D90CF33DFD38734A15C0A0F54FFF641EBA20C66564368CEB4CDF7574F91CC5D648ADBC44CB9F1203140C0D1B01010F11101007FFFDFFEFFFFFFF03000000000000"));
 
         cert.setSignature(new Signature
                 ("E9B60E9368B98B9872482C6DF0A03BAD4C2B6B09215EEE68A918508CA543535EFDA30277C246E200E8D4CDC55B9C2A224822FAFADD555F6CC5379DB68EDF1CDE"));
-        assertTrue(cert.getBytes().equals
+        assertTrue(cert.equals
                 ("01746D63735EEA5FF44061C5DDA504D982A5955382704AE072E26D1776096D5FFF592A8B674E30DBD3AEC900F3E51C04D1D90CF33DFD38734A15C0A0F54FFF641EBA20C66564368CEB4CDF7574F91CC5D648ADBC44CB9F1203140C0D1B01010F11101007FFFDFFEFFFFFFF03000000000000E9B60E9368B98B9872482C6DF0A03BAD4C2B6B09215EEE68A918508CA543535EFDA30277C246E200E8D4CDC55B9C2A224822FAFADD555F6CC5379DB68EDF1CDE"));
     }
 }
