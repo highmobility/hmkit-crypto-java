@@ -1,5 +1,5 @@
-siteUrl = https://github.com/highmobility/hm-java-crypto
-gitUrl = https://github.com/highmobility/hm-java-crypto
+siteUrl = https://github.com/highmobility/hmkit-crypto-java
+gitUrl = https://github.com/highmobility/hmkit-crypto-java
 version = 1.4.5
 groupId = com.highmobility
 licenses = ['MIT']
