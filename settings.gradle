@@ -1,7 +1,7 @@
 include ':hmkit-utils',
         ':hmkit-core-jni'
 
-project(':hmkit-core-jni').projectDir = new File('../hm-java-core-jni/')
+project(':hmkit-core-jni').projectDir = new File('../hmkit-core-jni/')
 project(':hmkit-utils').projectDir = new File('../hm-java-utils/')
 
 def artifact = new Properties()
