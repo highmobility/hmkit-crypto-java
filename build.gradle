@@ -34,7 +34,7 @@ sourceCompatibility = 1.8
 
 // these are not release numbers. release numbers are in deploy.settings files.
 ext.ver = [
-        corejni   : "1.0.0",
+        corejni   : "1.0.1",
         utils     : "1.4.4",
         autoApi   : "3.11.1",
         compileSdk: 28
