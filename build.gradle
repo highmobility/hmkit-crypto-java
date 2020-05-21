@@ -45,7 +45,7 @@ ext.deps = [
 ]
 
 dependencies {
-    if (project.hasProperty('releaseType') == false || project.releaseType > 0) {
+    if (project.hasProperty('depLocation') == false || project.depLocation > 0) {
         // standalone or release project
         api deps.utils
         api deps.corejni

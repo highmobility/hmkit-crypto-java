@@ -4,4 +4,3 @@ version = 1.4.5
 groupId = com.highmobility
 licenses = MIT
 id = hmkit-crypto
-repo = gradle-dev-local
