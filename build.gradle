@@ -23,12 +23,6 @@ repositories {
     }
 }
 
-def deploy = new Properties()
-deploy.load(new FileInputStream("$projectDir/deploy.settings"))
-
-group = deploy.groupId
-version = deploy.version
-
 sourceCompatibility = 1.8
 
 // these are not release numbers. release numbers are in deploy.settings files.
