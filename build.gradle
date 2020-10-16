@@ -3,8 +3,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath "org.jfrog.buildinfo:build-info-extractor-gradle:4.13.0"
-        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.4'
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.5'
     }
 }
 
@@ -27,17 +26,18 @@ sourceCompatibility = 1.8
 
 // these are not release numbers. release numbers are in deploy.settings files.
 ext.ver = [
-        corejni   : "1.0.1",
-        utils     : "1.4.4",
-        autoApi   : "3.11.1",
-        compileSdk: 28
+        "hmkit-core-jni"    : "1.0.2-dev",
+        "hmkit-crypto"      : "1.4.6-dev",
+        "hmkit-utils"       : "1.4.5-dev",
+        "hmkit-auto-api"    : "3.12.0-dev",
+        compileSdk          : 28
 ]
 
 ext.deps = [
-        "corejni": "com.highmobility:hmkit-core-jni:${ver.corejni}",
-        "utils"  : "com.highmobility:hmkit-utils:${ver.utils}",
-        "autoApi": "com.highmobility:hmkit-auto-api:${ver.autoApi}",
-        "timber" : "com.jakewharton.timber:timber:4.7.1",
+        "utils"   : "com.highmobility:hmkit-utils:${ver."hmkit-utils"}",
+        "corejni" : "com.highmobility:hmkit-core-jni:${ver."hmkit-core-jni"}",
+        "autoApi" : "com.highmobility:hmkit-auto-api:${ver."hmkit-auto-api"}",
+        "timber"  : "com.jakewharton.timber:timber:4.7.1",
 ]
 
 dependencies {
@@ -57,6 +57,5 @@ dependencies {
 }
 
 // deploy script
-apply from: "https://raw.githubusercontent.com/tonisives/tools/master/scripts/deploy-java.gradle"
-
-apply from: "https://raw.githubusercontent.com/tonisives/tools/master/scripts/test-shell-logging.gradle"
+apply from: "https://raw.githubusercontent.com/tonisives/tools/master/gradle/deploy-java-v2.gradle"
+apply from: "https://raw.githubusercontent.com/tonisives/tools/master/gradle/test-shell-logging.gradle"
