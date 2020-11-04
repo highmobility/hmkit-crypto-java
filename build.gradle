@@ -8,6 +8,7 @@ buildscript {
 }
 
 apply plugin: "java-library"
+apply from: "deploy.gradle"
 
 repositories {
     jcenter()
