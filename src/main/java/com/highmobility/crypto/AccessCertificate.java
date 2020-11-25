@@ -37,8 +37,6 @@ import java.util.Calendar;
 import java.util.TimeZone;
 
 /**
- * Created by ttiganik on 13/04/16.
- * <p>
  * Access Certificate is used to recognise and authorise two HM SDK-enabled devices.
  * <p>
  * This class handles both the v0 and v1 certificate types. The getters are the same for both

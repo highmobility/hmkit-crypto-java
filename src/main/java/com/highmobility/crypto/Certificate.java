@@ -27,7 +27,7 @@ import com.highmobility.crypto.value.Signature;
 import com.highmobility.value.Bytes;
 
 /**
- * Created by ttiganik on 13/04/16.
+ * Base Certificate class.
  */
 public class Certificate extends Bytes {
     Signature signature;

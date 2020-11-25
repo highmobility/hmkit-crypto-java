@@ -31,8 +31,6 @@ import com.highmobility.crypto.value.Signature;
 import com.highmobility.value.Bytes;
 
 /**
- * Created by ttiganik on 13/04/16.
- * <p>
  * Device Certificate is used to recognize a valid device.
  * <p>
  * Certificate binary format BytesWithLength[0 to 4]: Issuer (4 bytes) BytesWithLength[4 to 16]: App
