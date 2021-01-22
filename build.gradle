@@ -9,6 +9,8 @@ buildscript {
 
 apply plugin: "java-library"
 apply from: "deploy.gradle"
+apply from: "https://raw.githubusercontent.com/tonisives/tools/master/gradle/deploy-java-v2.gradle"
+apply from: "https://raw.githubusercontent.com/tonisives/tools/master/gradle/test-shell-logging.gradle"
 
 repositories {
     jcenter()
@@ -56,7 +58,3 @@ dependencies {
 
     testImplementation 'junit:junit:4.12'
 }
-
-// deploy script
-apply from: "https://raw.githubusercontent.com/tonisives/tools/master/gradle/deploy-java-v2.gradle"
-apply from: "https://raw.githubusercontent.com/tonisives/tools/master/gradle/test-shell-logging.gradle"
