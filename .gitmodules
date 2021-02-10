@@ -1,0 +1,3 @@
+[submodule "hmkit-utils-java"]
+	path = hmkit-utils-java
+	url = git@github.com:highmobility/hmkit-utils-java.git

@@ -1,10 +1,3 @@
-include ':hmkit-utils',
-        ':hmkit-core-jni'
+rootProject.name = "hmkit-crypto"
 
-project(':hmkit-core-jni').projectDir = new File('../hmkit-core-jni/')
-project(':hmkit-utils').projectDir = new File('../hm-java-utils/')
-
-def deploy = new Properties()
-deploy.load(new FileInputStream("deploy.settings"))
-rootProject.name = deploy.id
-
+include ':hmkit-utils-java'

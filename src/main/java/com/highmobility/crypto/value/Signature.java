@@ -26,6 +26,9 @@ package com.highmobility.crypto.value;
 import com.highmobility.value.Bytes;
 import com.highmobility.value.BytesWithLength;
 
+/**
+ * Raw 64 bytes of r and s components of the ECDSA signature.
+ */
 public class Signature extends BytesWithLength {
     /**
      * @param value The raw bytes.

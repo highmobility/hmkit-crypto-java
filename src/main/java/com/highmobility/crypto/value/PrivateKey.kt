@@ -21,34 +21,30 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.highmobility.crypto.value;
+package com.highmobility.crypto.value
+import com.highmobility.value.Bytes
+import com.highmobility.value.BytesWithLength
 
-import com.highmobility.value.Bytes;
-import com.highmobility.value.BytesWithLength;
-
-public class PublicKey extends BytesWithLength {
+/**
+ * 32 bytes of the EC private key in ANSI X9.62.
+ */
+class PrivateKey : BytesWithLength {
     /**
      * @param value The raw bytes.
      */
-    public PublicKey(Bytes value) {
-        super(value);
-    }
+    constructor(value: Bytes?) : super(value) {}
 
     /**
      * @param value The bytes in hex or Base64.
      */
-    public PublicKey(String value) {
-        super(value);
-    }
+    constructor(value: String?) : super(value) {}
 
     /**
      * @param bytes The raw bytes.
      */
-    public PublicKey(byte[] bytes) {
-        super(bytes);
-    }
+    constructor(bytes: ByteArray?) : super(bytes) {}
 
-    @Override protected int getExpectedLength() {
-        return 64;
+    override fun getExpectedLength(): Int {
+        return 32
     }
 }
