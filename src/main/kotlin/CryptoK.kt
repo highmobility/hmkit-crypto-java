@@ -114,7 +114,7 @@ class CryptoK {
      */
     fun sign(bytes: ByteArray, privateKey: PrivateKey): Signature {
         val signer = ECDSASigner(HMacDSAKCalculator(SHA256Digest()))
-        val javaPrivateKey = privateKey.toJavaPrivateKey()
+        val javaPrivateKey = privateKey.toJavaKey()
         val privKeyParams = ECPrivateKeyParameters(javaPrivateKey.d, CURVE)
         signer.init(true, privKeyParams)
 
@@ -194,17 +194,6 @@ class CryptoK {
         val params = ECNamedCurveTable.getParameterSpec("secp256r1")
         val keySpec = ECPublicKeySpec(params.curve.decodePoint(encoded), params)
         return BCECPublicKey("ECDSA", keySpec, BouncyCastleProvider.CONFIGURATION)
-    }
-
-    private fun PrivateKey.toJavaPrivateKey(): BCECPrivateKey {
-        val spec =
-            ECNamedCurveTable.getParameterSpec(CURVE_NAME) // this ec curve is used for bitcoin operations
-        val privateKeySpec = ECPrivateKeySpec(BigInteger(this.byteArray), spec)
-
-        val kecFactory = KeyFactory.getInstance("EC", "BC")
-        val privateKey = kecFactory.generatePrivate(privateKeySpec)
-
-        return privateKey as BCECPrivateKey
     }
 
     private fun getServiceAccountHmPrivateKey(serviceAccountApiPrivateKey: String): PrivateKey {

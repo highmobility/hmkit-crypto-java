@@ -22,8 +22,16 @@
  * THE SOFTWARE.
  */
 package com.highmobility.crypto.value
+
+import CURVE_NAME
+import JavaPrivateKey
 import com.highmobility.value.Bytes
 import com.highmobility.value.BytesWithLength
+import org.bouncycastle.jcajce.provider.asymmetric.ec.BCECPrivateKey
+import org.bouncycastle.jce.ECNamedCurveTable
+import org.bouncycastle.jce.spec.ECPrivateKeySpec
+import java.math.BigInteger
+import java.security.KeyFactory
 
 /**
  * 32 bytes of the EC private key in ANSI X9.62.
@@ -44,7 +52,28 @@ class PrivateKey : BytesWithLength {
      */
     constructor(bytes: ByteArray?) : super(bytes) {}
 
+    constructor(javaKey: BCECPrivateKey) {
+        val d = (javaKey as BCECPrivateKey).d
+        this.bytes = d.toByteArray()
+    }
+
+    fun toJavaKey(): BCECPrivateKey {
+        val spec =
+            ECNamedCurveTable.getParameterSpec(CURVE_NAME) // this ec curve is used for bitcoin operations
+        val privateKeySpec = ECPrivateKeySpec(BigInteger(this.byteArray), spec)
+
+        val kecFactory = KeyFactory.getInstance("EC", "BC")
+        val privateKey = kecFactory.generatePrivate(privateKeySpec)
+
+        return privateKey as BCECPrivateKey
+    }
+
     override fun getExpectedLength(): Int {
         return 32
     }
+}
+
+fun JavaPrivateKey.getBytes(): Bytes {
+    val d = (this as BCECPrivateKey).d
+    return Bytes(d.toByteArray())
 }

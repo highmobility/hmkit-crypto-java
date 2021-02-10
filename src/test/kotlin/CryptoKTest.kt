@@ -16,22 +16,6 @@ internal class CryptoKTest {
     }
 
     @Test
-    fun createSerialNumber() {
-
-    }
-
-    @Test
-    fun signAndVerify() {
-        // test: sign with a generated key. verify with the same generated key
-        val keyPair = cryptoK.createKeypair()
-
-        val sig = cryptoK.sign(msg, keyPair.privateKey)
-        assert(sig.size == 64)
-
-        assert(cryptoK.verify(msg, sig, keyPair.publicKey))
-    }
-
-    @Test
     fun publicToJavaAndBack() {
         // convert key to java and back and see if the bytes are the same
         val publicKey =
@@ -44,11 +28,30 @@ internal class CryptoKTest {
 
     @Test
     fun privateToJavaAndBack() {
-        val publicKey =
-            PublicKey("7FEE7D0CBBADFD4BF99AA8CECFF7036A0D767CACC6AA27BD5AB9E400805BC184")
+        val privateKey =
+            PrivateKey("7FEE7D0CBBADFD4BF99AA8CECFF7036A0D767CACC6AA27BD5AB9E400805BC184")
 
-        // TODO: 9/2/21 just convert to java and back and see if the bytes are the same
+        val javaKey = privateKey.toJavaKey()
+        val fromJava = PrivateKey(javaKey)
+        assert(privateKey == fromJava)
     }
+
+    @Test
+    fun createSerialNumber() {
+
+    }
+
+    @Test
+    fun signAndVerify() {
+        // test: sign with a generated key. verify with the same generated key
+        val keyPair = cryptoK.createKeypair()
+
+        val sig = cryptoK.sign(msg, keyPair.privateKey)
+        assert(sig.size == 64)
+        assert(cryptoK.verify(msg, sig, keyPair.publicKey))
+    }
+
+
 
     @Test
     fun signAndVerifyWithKeysFromHmCryptoTool() {
