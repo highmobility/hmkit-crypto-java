@@ -21,37 +21,32 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.highmobility.crypto.value;
+package com.highmobility.crypto.value
 
-import com.highmobility.value.Bytes;
-import com.highmobility.value.BytesWithLength;
+import com.highmobility.value.Bytes
+import com.highmobility.value.BytesWithLength
 
 /**
- * Raw 64 bytes of r and s components of the ECDSA signature.
+ * Raw 64 bytes of r and s components of the ECDSA signature with sha256. For java it translates
+ * to SHA256withPLAIN-ECDSA
  */
-public class Signature extends BytesWithLength {
+class Signature : BytesWithLength {
     /**
      * @param value The raw bytes.
      */
-    public Signature(Bytes value) {
-        super(value);
-    }
+    constructor(value: Bytes?) : super(value)
 
     /**
      * @param value The bytes in hex or Base64.
      */
-    public Signature(String value) {
-        super(value);
-    }
+    constructor(value: String?) : super(value)
 
     /**
      * @param bytes The raw bytes.
      */
-    public Signature(byte[] bytes) {
-        super(bytes);
-    }
+    constructor(bytes: ByteArray?) : super(bytes)
 
-    @Override protected int getExpectedLength() {
-        return 64;
+    override fun getExpectedLength(): Int {
+        return 64
     }
 }

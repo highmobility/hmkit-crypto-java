@@ -11,6 +11,7 @@ fun BigInteger.toBytes(): Bytes {
     return Bytes(data)
 }
 
+// prepend 00 if numBytes bigger. remove from beginning if numBytes smaller
 fun BigInteger.toBytes(numBytes: Int): Bytes {
     val bytes = ByteArray(numBytes)
     val biBytes = this.toByteArray()

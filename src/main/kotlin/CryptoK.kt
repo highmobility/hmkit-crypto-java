@@ -1,42 +1,23 @@
+//import java.security.Signature
+
 import com.highmobility.crypto.HMKeyPair
 import com.highmobility.crypto.value.*
-import com.highmobility.crypto.value.PrivateKey
-import com.highmobility.crypto.value.PublicKey
-import com.highmobility.crypto.value.Signature
-
 import com.highmobility.utils.Base64
 import com.highmobility.value.Bytes
-import org.bouncycastle.jcajce.provider.asymmetric.ec.BCECPrivateKey
-import org.bouncycastle.jcajce.provider.asymmetric.ec.BCECPublicKey
+import org.bouncycastle.asn1.sec.SECNamedCurves
+import org.bouncycastle.crypto.params.ECDomainParameters
 import org.bouncycastle.jce.ECNamedCurveTable
 import org.bouncycastle.jce.provider.BouncyCastleProvider
 import org.bouncycastle.jce.spec.ECNamedCurveParameterSpec
-import java.math.BigInteger
-import java.security.interfaces.ECPrivateKey
-//import java.security.Signature
-
-import java.util.*
-
-import org.bouncycastle.asn1.sec.SECNamedCurves
-
-import org.bouncycastle.crypto.params.ECPrivateKeyParameters
-
-import org.bouncycastle.crypto.digests.SHA256Digest
-import org.bouncycastle.crypto.params.ECDomainParameters
-import org.bouncycastle.crypto.params.ECPublicKeyParameters
-
-import org.bouncycastle.crypto.signers.HMacDSAKCalculator
-
-import org.bouncycastle.crypto.signers.ECDSASigner
-import org.bouncycastle.crypto.util.PublicKeyFactory
-import org.bouncycastle.jce.spec.ECPrivateKeySpec
-import org.bouncycastle.jce.spec.ECPublicKeySpec
-
-import java.security.*
+import org.bouncycastle.jce.spec.ECParameterSpec
 import java.security.KeyFactory
-
+import java.security.KeyPair
+import java.security.KeyPairGenerator
+import java.security.SecureRandom
+import java.security.Security
+import java.security.interfaces.ECPrivateKey
 import java.security.spec.PKCS8EncodedKeySpec
-
+import java.util.*
 
 typealias JavaSignature = java.security.Signature
 typealias JavaPrivateKey = java.security.PrivateKey
@@ -62,6 +43,7 @@ ES256
 val CURVE_NAME = "secp256r1"
 val params = SECNamedCurves.getByName(CURVE_NAME);
 val CURVE = ECDomainParameters(params.curve, params.g, params.n, params.h);
+val CURVE_SPEC = ECParameterSpec(params.curve, params.g, params.n, params.h);
 
 class CryptoK {
 
@@ -70,28 +52,56 @@ class CryptoK {
     }
 
     /**
+     * Create a random serial number.
+     *
+     * @return the serial number.
+     */
+    fun createSerialNumber(): DeviceSerial {
+        val serialBytes = ByteArray(9)
+        Random().nextBytes(serialBytes)
+        return DeviceSerial(serialBytes)
+    }
+
+    /**
      * Create a keypair.
      *
      * @return The KeyPair.
      */
-    fun createKeypair(): HMKeyPair {
-        val javaKeyPair = generateJavaKeyPair()
-        val javaPublicKey = javaKeyPair.public
-        val publicKey = PublicKey(javaKeyPair.public.getBytes())
+    fun createKeyPair(): HMKeyPair {
+        val javaKeyPair = createJavaKeyPair()
+        val publicKeyBytes = javaKeyPair.public.getBytes()
+
+        val publicKey = PublicKey(publicKeyBytes)
         val privateKey = PrivateKey(javaKeyPair.private.getBytes())
 
         return HMKeyPair(privateKey, publicKey)
     }
 
-    /**
-     * Create a random serial number.
-     *
-     * @return the serial number.
-     */
-    fun createSerialNumber(): DeviceSerial? {
-        val serialBytes = ByteArray(9)
-        Random().nextBytes(serialBytes)
-        return DeviceSerial(serialBytes)
+    fun createJavaKeyPair(): KeyPair {
+        val ecSpec: ECNamedCurveParameterSpec = ECNamedCurveTable.getParameterSpec(CURVE_NAME)
+        val g = KeyPairGenerator.getInstance("ECDSA", "BC")
+        g.initialize(ecSpec, SecureRandom())
+        val javaKeyPair = g.generateKeyPair()
+        return javaKeyPair
+    }
+
+    fun sign(bytes: ByteArray, privateKey: JavaPrivateKey): Signature {
+        // https://stackoverflow.com/questions/48783809/ecdsa-sign-with-bouncycastle-and-verify-with-crypto
+        // there are also withCVC-ECDSA, withECDSA
+        val signature = JavaSignature.getInstance("SHA256withPLAIN-ECDSA", "BC")
+        signature.initSign(privateKey)
+
+        signature.update(bytes)
+        val sigBytes: ByteArray = signature.sign()
+        return Signature(sigBytes)
+    }
+
+    fun verify(data: ByteArray, signature: Signature, publicKey: JavaPublicKey): Boolean {
+        val ecdsaVerify = JavaSignature.getInstance("SHA256withPLAIN-ECDSA", "BC")
+        ecdsaVerify.initVerify(publicKey)
+        ecdsaVerify.update(data)
+        val result: Boolean = ecdsaVerify.verify(signature.byteArray)
+        return result
     }
 
     /**
@@ -113,15 +123,7 @@ class CryptoK {
      * @return The signature.
      */
     fun sign(bytes: ByteArray, privateKey: PrivateKey): Signature {
-        val signer = ECDSASigner(HMacDSAKCalculator(SHA256Digest()))
-        val javaPrivateKey = privateKey.toJavaKey()
-        val privKeyParams = ECPrivateKeyParameters(javaPrivateKey.d, CURVE)
-        signer.init(true, privKeyParams)
-
-        val components = signer.generateSignature(bytes)
-        val bytes = components[0].toBytes(32)
-            .concat(components[1].toBytes(32))
-        return Signature(bytes)
+        return sign(bytes, privateKey.toJavaKey())
     }
 
     /**
@@ -133,15 +135,7 @@ class CryptoK {
      * @return The verification result.
      */
     fun verify(data: Bytes, signature: Signature, publicKey: PublicKey): Boolean {
-        val signer = ECDSASigner()
-        val javaPublicKey = publicKey.toJavaKey()
-        val params = ECPublicKeyParameters(
-            CURVE.curve.decodePoint(javaPublicKey.encoded), CURVE
-        );
-        signer.init(false, params)
-
-        val sigComponents = signature.components()
-        return signer.verifySignature(data.byteArray, sigComponents[0], sigComponents[1]);
+        return verify(data.byteArray, signature, publicKey.toJavaKey())
     }
 
     /**
@@ -153,8 +147,7 @@ class CryptoK {
      * @return The verification result.
      */
     fun verify(data: Bytes, signature: Signature, publicKey: ByteArray): Boolean {
-        return verify(data, signature, publicKey)
-        // TODO: 9/2/21 verify this is needed
+        return verify(data, signature, PublicKey(publicKey))
     }
 
     fun signJWT(bytes: ByteArray, privateKey: PrivateKey): Signature {
@@ -188,12 +181,6 @@ class CryptoK {
 
     fun decrypt() {
 
-    }
-
-    fun decodeKey(encoded: ByteArray?): BCECPublicKey? {
-        val params = ECNamedCurveTable.getParameterSpec("secp256r1")
-        val keySpec = ECPublicKeySpec(params.curve.decodePoint(encoded), params)
-        return BCECPublicKey("ECDSA", keySpec, BouncyCastleProvider.CONFIGURATION)
     }
 
     private fun getServiceAccountHmPrivateKey(serviceAccountApiPrivateKey: String): PrivateKey {
@@ -230,51 +217,5 @@ class CryptoK {
      */
     private fun getClientPrivateKey(clientPrivateKey: String): PrivateKey {
         return PrivateKey(clientPrivateKey)
-    }
-
-    private fun BigInteger.toBytes(): Bytes {
-        var data = this.toByteArray()
-        if (data.size != 1 && data[0] == 0.toByte()) {
-            val tmp = ByteArray(data.size - 1)
-            System.arraycopy(data, 1, tmp, 0, tmp.size)
-            data = tmp
-        }
-        return Bytes(data)
-    }
-
-    private fun BigInteger.toBytes(numBytes: Int): Bytes {
-        val bytes = ByteArray(numBytes)
-        val biBytes = this.toByteArray()
-        val start = if (biBytes.size == numBytes + 1) 1 else 0
-        val length = Math.min(biBytes.size, numBytes)
-        System.arraycopy(biBytes, start, bytes, numBytes - length, length)
-        return Bytes(bytes)
-    }
-
-    private fun JavaPrivateKey.getBytes(): Bytes? {
-        return if (this == null) {
-            null
-        } else if (this is BCECPrivateKey) {
-            this.d.toBytes(32)
-        } else {
-            null
-        }
-    }
-
-
-    private fun generateJavaKeyPair(): KeyPair {
-        val ecSpec: ECNamedCurveParameterSpec = ECNamedCurveTable.getParameterSpec("P-256")
-        val g = KeyPairGenerator.getInstance("ECDSA", "BC")
-        g.initialize(ecSpec, SecureRandom())
-        return g.generateKeyPair()
-    }
-
-    /**
-     * Returns the signature r and s components
-     */
-    private fun Signature.components(): Array<BigInteger> {
-        val r = getRange(0, 32)
-        val s = getRange(32, 64)
-        return arrayOf(BigInteger(1, r.byteArray), BigInteger(1, s.byteArray))
     }
 }

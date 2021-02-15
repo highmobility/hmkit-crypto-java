@@ -34,15 +34,7 @@ class PublicKey : BytesWithLength {
     constructor(bytes: ByteArray) : super(bytes)
 
     constructor(javaKey: BCECPublicKey) {
-        val W = (javaKey as BCECPublicKey).q
-        val WX = W.affineXCoord
-        val WY = W.affineYCoord
-
-        val xBytes = WX.toBigInteger().toBytes()
-        val yBytes = WY.toBigInteger().toBytes()
-        val bytes = xBytes.concat(yBytes)
-
-        this.bytes = bytes.byteArray
+        this.bytes = javaKey.getBytes().byteArray
     }
 
     override fun getExpectedLength(): Int {
@@ -50,17 +42,19 @@ class PublicKey : BytesWithLength {
     }
 
     fun toJavaKey(): BCECPublicKey {
-        val rawKeyEncoded = Bytes("04").concat(this).byteArray
+        val rawKeyEncoded = Bytes(65)
+        rawKeyEncoded.set(0, 0x04)
+        rawKeyEncoded.set(1, this)
 
         val params = ECNamedCurveTable.getParameterSpec(CURVE_NAME)
-        val keySpec = ECPublicKeySpec(params.curve.decodePoint(rawKeyEncoded), params)
+        val keySpec = ECPublicKeySpec(params.curve.decodePoint(rawKeyEncoded.byteArray), params)
         val publicKey = BCECPublicKey("ECDSA", keySpec, BouncyCastleProvider.CONFIGURATION)
         return publicKey
     }
 
     // this is from x509
     private fun x509toJavaPublicKey(byteArray: ByteArray): BCECPublicKey {
-        // TODO: 9/2/21 maybe add 04 byte in from to get DER encoding
+        // maybe add 04 byte in from to get DER encoding
         val bpubKey = PublicKeyFactory.createKey(byteArray) as ECPublicKeyParameters
         val kf = KeyFactory.getInstance("EC", "BC")
         val spec = ECNamedCurveTable.getParameterSpec(CURVE_NAME)
@@ -77,9 +71,9 @@ fun JavaPublicKey.getBytes(): Bytes {
     val W = (this as BCECPublicKey).q
     val WX = W.affineXCoord
     val WY = W.affineYCoord
-
-    val xBytes = WX.toBigInteger().toBytes()
-    val yBytes = WY.toBigInteger().toBytes()
+    // sometimes 1 biginteger is 31 bytes long
+    val xBytes = WX.toBigInteger().toBytes(32)
+    val yBytes = WY.toBigInteger().toBytes(32)
     val bytes = xBytes.concat(yBytes)
     return bytes
 }

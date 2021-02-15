@@ -23,13 +23,15 @@
  */
 package com.highmobility.crypto.value
 
-import CURVE_NAME
+import CURVE
+import CURVE_SPEC
 import JavaPrivateKey
 import com.highmobility.value.Bytes
 import com.highmobility.value.BytesWithLength
+import org.bouncycastle.crypto.params.ECPrivateKeyParameters
 import org.bouncycastle.jcajce.provider.asymmetric.ec.BCECPrivateKey
-import org.bouncycastle.jce.ECNamedCurveTable
 import org.bouncycastle.jce.spec.ECPrivateKeySpec
+import toBytes
 import java.math.BigInteger
 import java.security.KeyFactory
 
@@ -58,13 +60,11 @@ class PrivateKey : BytesWithLength {
     }
 
     fun toJavaKey(): BCECPrivateKey {
-        val spec =
-            ECNamedCurveTable.getParameterSpec(CURVE_NAME) // this ec curve is used for bitcoin operations
-        val privateKeySpec = ECPrivateKeySpec(BigInteger(this.byteArray), spec)
-
         val kecFactory = KeyFactory.getInstance("EC", "BC")
-        val privateKey = kecFactory.generatePrivate(privateKeySpec)
+        val generatedECPrivateKeyParams = ECPrivateKeyParameters(BigInteger(1, byteArray), CURVE)
+        val privateKeySpec = ECPrivateKeySpec(generatedECPrivateKeyParams.d, CURVE_SPEC)
 
+        val privateKey = kecFactory.generatePrivate(privateKeySpec)
         return privateKey as BCECPrivateKey
     }
 
@@ -75,5 +75,5 @@ class PrivateKey : BytesWithLength {
 
 fun JavaPrivateKey.getBytes(): Bytes {
     val d = (this as BCECPrivateKey).d
-    return Bytes(d.toByteArray())
+    return Bytes(d.toBytes(32))
 }
