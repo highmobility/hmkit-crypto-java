@@ -1,5 +1,3 @@
-//import java.security.Signature
-
 import com.highmobility.crypto.HMKeyPair
 import com.highmobility.crypto.value.*
 import com.highmobility.utils.Base64
@@ -18,6 +16,8 @@ import java.security.Security
 import java.security.interfaces.ECPrivateKey
 import java.security.spec.PKCS8EncodedKeySpec
 import java.util.*
+
+import java.security.MessageDigest
 
 typealias JavaSignature = java.security.Signature
 typealias JavaPrivateKey = java.security.PrivateKey
@@ -150,6 +150,15 @@ class CryptoK {
         return verify(data, signature, PublicKey(publicKey))
     }
 
+    fun sha256(bytes: ByteArray): Sha256 {
+        val digest = MessageDigest.getInstance("SHA-256", "BC")
+        return Sha256(digest.digest(bytes))
+    }
+
+    fun sha256(bytes: Bytes): Sha256 {
+        return sha256(bytes.byteArray)
+    }
+
     fun signJWT(bytes: ByteArray, privateKey: PrivateKey): Signature {
         val signature = ByteArray(64)
 //        core.HMBTCoreCryptoJWTAddSignature(
@@ -161,16 +170,6 @@ class CryptoK {
 
     fun signJWT(bytes: Bytes, privateKey: PrivateKey): Signature {
         return signJWT(bytes.byteArray, privateKey)
-    }
-
-    fun sha256(bytes: ByteArray): Sha256? {
-        val sha256 = ByteArray(32)
-//        core.HMBTCoreCryptoJWTsha(bytes, bytes.size, sha256)
-        return sha256(sha256)
-    }
-
-    fun sha256(bytes: Bytes): Sha256? {
-        return sha256(bytes.byteArray)
     }
 
     // TODO: these should probably go to separate class/fleet module
