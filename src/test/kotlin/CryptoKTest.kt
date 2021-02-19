@@ -121,7 +121,10 @@ internal class CryptoKTest {
 
     @Test
     fun signJWT() {
-
+        val private = cryptoK.createKeypair().privateKey
+        val signature = cryptoK.signJWT("asd".toByteArray(), private)
+        assert(signature.size == 64)
+        // // TODO: 19/2/21 verify with fleet
     }
 
     @Test

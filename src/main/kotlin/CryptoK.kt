@@ -142,26 +142,42 @@ class CryptoK {
         return sha256(bytes.byteArray)
     }
 
-    fun signJWT(bytes: ByteArray, privateKey: PrivateKey): Signature {
-        val signature = ByteArray(64)
-//        core.HMBTCoreCryptoJWTAddSignature(
-//            bytes, bytes.size,
-//            privateKey.byteArray, signature
-//        )
-        return Signature(signature)
+    /**
+     * Create JWT signature. It is the same as normal signing, but without padding to 64
+     *
+     * @param message The message
+     * @param privateKey The private key
+     * @return The signature
+     */
+    fun signJWT(message: ByteArray, privateKey: PrivateKey): Signature {
+        val signature = JavaSignature.getInstance(SIGN_ALGORITHM, "BC")
+        signature.initSign(privateKey.toJavaKey())
+        signature.update(message)
+        val sigBytes = signature.sign()
+        return Signature(sigBytes)
     }
 
-    fun signJWT(bytes: Bytes, privateKey: PrivateKey): Signature {
-        return signJWT(bytes.byteArray, privateKey)
+    /**
+     * Create JWT signature. It is the same as normal signing, but without padding to 64
+     *
+     * @param message The message
+     * @param privateKey The private key
+     * @return The signature
+     */
+    fun signJWT(message: Bytes, privateKey: PrivateKey): Signature {
+        return signJWT(message.byteArray, privateKey)
     }
 
     // TODO: these could go to separate class or to fleet module
-
-    fun encrypt() {
+    fun encrypt(message: Bytes, privateKey: PrivateKey, publicKey: PublicKey) {
 
     }
 
     fun decrypt() {
+
+    }
+
+    private fun encryptDecrypt() {
 
     }
 }
