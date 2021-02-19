@@ -21,32 +21,50 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.highmobility.crypto.value
+package com.highmobility.cryptok.value;
 
-import com.highmobility.value.Bytes
-import com.highmobility.value.BytesWithLength
+import com.highmobility.value.BitLocation;
 
-/**
- * Raw 64 bytes of r and s components of the ECDSA signature with sha256. For java it translates
- * to SHA256withPLAIN-ECDSA
- */
-class Signature : BytesWithLength {
-    /**
-     * @param value The raw bytes.
-     */
-    constructor(value: Bytes?) : super(value)
+public class Permission {
+    boolean allowed;
+    BitLocation location;
 
     /**
-     * @param value The bytes in hex or Base64.
+     * @return Whether the permission is allowed.
      */
-    constructor(value: String?) : super(value)
+    public boolean isAllowed() {
+        return allowed;
+    }
 
     /**
-     * @param bytes The raw bytes.
+     * @return The byte and bit location.
      */
-    constructor(bytes: ByteArray?) : super(bytes)
+    public BitLocation getBitLocation() {
+        return location;
+    }
 
-    override fun getExpectedLength(): Int {
-        return 64
+    /**
+     * General permissions.
+     */
+
+    /**
+     * @param allowed Whether to allow the permission.
+     * @return The certificates read permission.
+     */
+    public static Permission certificatesReadPermission(boolean allowed) {
+        return new Permission(new BitLocation(1, 0), allowed);
+    }
+
+    /**
+     * @param allowed Whether to allow the permission.
+     * @return The certificates write permission.
+     */
+    public static Permission certificatesWritePermission(boolean allowed) {
+        return new Permission(new BitLocation(1, 1), allowed);
+    }
+
+    public Permission(BitLocation location, boolean allowed) {
+        this.allowed = allowed;
+        this.location = location;
     }
 }

@@ -20,3 +20,13 @@ fun BigInteger.toBytes(numBytes: Int): Bytes {
     System.arraycopy(biBytes, start, bytes, numBytes - length, length)
     return Bytes(bytes)
 }
+
+fun Bytes.fillWith0sUntil64(): Bytes {
+    val size = 64
+    return if (this.length % size == 0) {
+        this
+    } else {
+        val sizeToFill = size - this.length % size
+        Bytes(this.byteArray + ByteArray(sizeToFill))
+    }
+}

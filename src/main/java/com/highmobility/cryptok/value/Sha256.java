@@ -21,41 +21,34 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.highmobility.crypto.value.custom;
+package com.highmobility.cryptok.value;
 
-import com.highmobility.crypto.value.Permissions;
-import com.highmobility.utils.ByteUtils;
-import com.highmobility.value.BitLocation;
+import com.highmobility.value.Bytes;
+import com.highmobility.value.BytesWithLength;
 
-/**
- * Custom permissions for car rental.
- */
-public class CarRentalPermissions extends Permissions {
-    public CarRentalPermissions() {
-        super(Type.CAR_RENTAL);
+public class Sha256 extends BytesWithLength {
+    /**
+     * @param value The raw bytes.
+     */
+    public Sha256(Bytes value) {
+        super(value);
     }
 
-    public void allowAutoApiRead(boolean allow) {
-        allow(new BitLocation(2, 0), allow);
+    /**
+     * @param value The bytes in hex or Base64.
+     */
+    public Sha256(String value) {
+        super(value);
     }
 
-    public void allowAutoApiWrite(boolean allow) {
-        allow(new BitLocation(2, 1), allow);
+    /**
+     * @param bytes The raw bytes.
+     */
+    public Sha256(byte[] bytes) {
+        super(bytes);
     }
 
-    public void allowDoorLocksWrite(boolean allow) {
-        allow(new BitLocation(2, 2), allow);
-    }
-
-    public void allowEngineWrite(boolean allow) {
-        allow(new BitLocation(2, 3), allow);
-    }
-
-    public void allowTheftAlarmWrite(boolean allow) {
-        allow(new BitLocation(2, 4), allow);
-    }
-
-    public void setBookingIdentifier(CarRentalBookingIdentifier bookingIdentifier) {
-        ByteUtils.setBytes(bytes, bookingIdentifier.getByteArray(), 10);
+    @Override protected int getExpectedLength() {
+        return 32;
     }
 }

@@ -21,34 +21,35 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.highmobility.crypto.value;
+package com.highmobility.cryptok.value;
 
 import com.highmobility.value.Bytes;
 import com.highmobility.value.BytesWithLength;
 
-public class Issuer extends BytesWithLength {
+public class DeviceSerial extends BytesWithLength {
+
     /**
      * @param value The raw bytes.
      */
-    public Issuer(Bytes value) {
+    public DeviceSerial(Bytes value) {
         super(value);
     }
 
     /**
      * @param value The bytes in hex or Base64.
      */
-    public Issuer(String value) {
+    public DeviceSerial(String value) {
         super(value);
     }
 
     /**
      * @param bytes The raw bytes.
      */
-    public Issuer(byte[] bytes) {
+    public DeviceSerial(byte[] bytes) {
         super(bytes);
     }
 
     @Override protected int getExpectedLength() {
-        return 4;
+        return 9;
     }
 }

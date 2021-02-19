@@ -21,34 +21,42 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.highmobility.crypto.value;
+package com.highmobility.cryptok;
 
-import com.highmobility.value.Bytes;
-import com.highmobility.value.BytesWithLength;
+import com.highmobility.cryptok.value.PrivateKey;
+import com.highmobility.cryptok.value.PublicKey;
 
-public class Sha256 extends BytesWithLength {
+/**
+ * ECC private/public keypair that uses elliptic curve P-256.
+ */
+public class HMKeyPair {
+    private static final long serialVersionUID = 6637283024188232326L;
+    private PrivateKey privateKey;
+    private PublicKey publicKey;
+
     /**
-     * @param value The raw bytes.
+     * Create a ECC Keypair object with private and public key.
+     *
+     * @param privateKey The private key.
+     * @param publicKey  The public key.
+     * @throws IllegalArgumentException When the keys are invalid.
      */
-    public Sha256(Bytes value) {
-        super(value);
+    public HMKeyPair(PrivateKey privateKey, PublicKey publicKey) throws IllegalArgumentException {
+        this.privateKey = privateKey;
+        this.publicKey = publicKey;
     }
 
     /**
-     * @param value The bytes in hex or Base64.
+     * @return The public key.
      */
-    public Sha256(String value) {
-        super(value);
+    public PublicKey getPublicKey() {
+        return publicKey;
     }
 
     /**
-     * @param bytes The raw bytes.
+     * @return The private key.
      */
-    public Sha256(byte[] bytes) {
-        super(bytes);
-    }
-
-    @Override protected int getExpectedLength() {
-        return 32;
+    public PrivateKey getPrivateKey() {
+        return privateKey;
     }
 }

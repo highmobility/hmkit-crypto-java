@@ -21,13 +21,13 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.highmobility.crypto;
+package com.highmobility.cryptok;
 
-import com.highmobility.crypto.value.AppIdentifier;
-import com.highmobility.crypto.value.DeviceSerial;
-import com.highmobility.crypto.value.Issuer;
-import com.highmobility.crypto.value.PublicKey;
-import com.highmobility.crypto.value.Signature;
+import com.highmobility.cryptok.value.AppIdentifier;
+import com.highmobility.cryptok.value.DeviceSerial;
+import com.highmobility.cryptok.value.Issuer;
+import com.highmobility.cryptok.value.PublicKey;
+import com.highmobility.cryptok.value.Signature;
 import com.highmobility.value.Bytes;
 
 /**

@@ -1,49 +1,34 @@
-import com.highmobility.crypto.HMKeyPair
-import com.highmobility.crypto.value.*
-import com.highmobility.utils.Base64
+import com.highmobility.cryptok.HMKeyPair
+import com.highmobility.cryptok.value.*
+import com.highmobility.cryptok.value.PrivateKey
+import com.highmobility.cryptok.value.PublicKey
+import com.highmobility.cryptok.value.Signature
 import com.highmobility.value.Bytes
-import org.bouncycastle.asn1.sec.SECNamedCurves
 import org.bouncycastle.crypto.params.ECDomainParameters
 import org.bouncycastle.jce.ECNamedCurveTable
 import org.bouncycastle.jce.provider.BouncyCastleProvider
 import org.bouncycastle.jce.spec.ECNamedCurveParameterSpec
 import org.bouncycastle.jce.spec.ECParameterSpec
-import java.security.KeyFactory
-import java.security.KeyPair
-import java.security.KeyPairGenerator
-import java.security.SecureRandom
-import java.security.Security
-import java.security.interfaces.ECPrivateKey
-import java.security.spec.PKCS8EncodedKeySpec
+import java.security.*
 import java.util.*
-
-import java.security.MessageDigest
 
 typealias JavaSignature = java.security.Signature
 typealias JavaPrivateKey = java.security.PrivateKey
 typealias JavaPublicKey = java.security.PublicKey
 
 /*
-Platform: key-pair generation
-Key-pair used in Public-Key Infrastructure
-ECDH secp256r1
-
-
-Platform: Device certificate signature
-Signature for downloading access certificates
-ECDSA, SHA256
-
-
-Platform: JWT signature
-For signing Service Account API requests
-ES256
+Key-pair used in Public-Key Infrastructure: ECDH secp256r1
+Signature for downloading access certificates: ECDSA, SHA256
+JWT signature For signing Service Account API requests: ES256
  */
-// secp256r1, prime256v1
 
-val CURVE_NAME = "secp256r1"
-val params = SECNamedCurves.getByName(CURVE_NAME);
-val CURVE = ECDomainParameters(params.curve, params.g, params.n, params.h);
-val CURVE_SPEC = ECParameterSpec(params.curve, params.g, params.n, params.h);
+val KEY_GEN_ALGORITHM = "EC" // ECDH and ECDSA can be used with same algorithm
+var SIGN_ALGORITHM = "SHA256withPLAIN-ECDSA"
+
+val CURVE_NAME = "secp256r1" // this is 1.3.132.0.prime256v1
+val params = ECNamedCurveTable.getParameterSpec(CURVE_NAME)
+val CURVE = ECDomainParameters(params.curve, params.g, params.n, params.h)
+val CURVE_SPEC = ECParameterSpec(params.curve, params.g, params.n, params.h)
 
 class CryptoK {
 
@@ -67,8 +52,8 @@ class CryptoK {
      *
      * @return The KeyPair.
      */
-    fun createKeyPair(): HMKeyPair {
-        val javaKeyPair = createJavaKeyPair()
+    fun createKeypair(): HMKeyPair {
+        val javaKeyPair = createJavaKeypair()
         val publicKeyBytes = javaKeyPair.public.getBytes()
 
         val publicKey = PublicKey(publicKeyBytes)
@@ -77,65 +62,63 @@ class CryptoK {
         return HMKeyPair(privateKey, publicKey)
     }
 
-    fun createJavaKeyPair(): KeyPair {
+    fun createJavaKeypair(): KeyPair {
         val ecSpec: ECNamedCurveParameterSpec = ECNamedCurveTable.getParameterSpec(CURVE_NAME)
-        val g = KeyPairGenerator.getInstance("ECDSA", "BC")
+        val g = KeyPairGenerator.getInstance(KEY_GEN_ALGORITHM, "BC")
         g.initialize(ecSpec, SecureRandom())
         val javaKeyPair = g.generateKeyPair()
         return javaKeyPair
     }
 
-    fun sign(bytes: ByteArray, privateKey: JavaPrivateKey): Signature {
-        // https://stackoverflow.com/questions/48783809/ecdsa-sign-with-bouncycastle-and-verify-with-crypto
-        // there are also withCVC-ECDSA, withECDSA
-        val signature = JavaSignature.getInstance("SHA256withPLAIN-ECDSA", "BC")
-        signature.initSign(privateKey)
+    fun verify(message: Bytes, signature: Signature, publicKey: JavaPublicKey): Boolean {
+        val formattedMessage = message.fillWith0sUntil64()
 
-        signature.update(bytes)
-        val sigBytes: ByteArray = signature.sign()
-        return Signature(sigBytes)
-    }
-
-    fun verify(data: ByteArray, signature: Signature, publicKey: JavaPublicKey): Boolean {
         val ecdsaVerify = JavaSignature.getInstance("SHA256withPLAIN-ECDSA", "BC")
         ecdsaVerify.initVerify(publicKey)
-        ecdsaVerify.update(data)
-        val result: Boolean = ecdsaVerify.verify(signature.byteArray)
+        ecdsaVerify.update(formattedMessage.byteArray)
+        val result = ecdsaVerify.verify(signature.byteArray)
         return result
     }
 
     /**
      * Sign data.
      *
-     * @param bytes      The data that will be signed.
+     * @param message      The message that will be signed.
      * @param privateKey The private key that will be used for signing.
      * @return The signature.
      */
-    fun sign(bytes: Bytes, privateKey: PrivateKey): Signature {
-        return sign(bytes.byteArray, privateKey)
+    fun sign(message: Bytes, privateKey: PrivateKey): Signature {
+        val formattedMessage = message.fillWith0sUntil64()
+        // https://stackoverflow.com/questions/34063694/fixed-length-64-bytes-ec-p-256-signature-with-jce
+        // there are also withCVC-ECDSA, withECDSA
+        val signature = JavaSignature.getInstance(SIGN_ALGORITHM, "BC")
+        signature.initSign(privateKey.toJavaKey())
+        signature.update(formattedMessage.byteArray)
+        val sigBytes = signature.sign()
+        return Signature(sigBytes)
     }
 
     /**
      * Sign data.
      *
-     * @param bytes      The data that will be signed.
+     * @param message      The message that will be signed.
      * @param privateKey The private key that will be used for signing.
      * @return The signature.
      */
-    fun sign(bytes: ByteArray, privateKey: PrivateKey): Signature {
-        return sign(bytes, privateKey.toJavaKey())
+    fun sign(message: ByteArray, privateKey: PrivateKey): Signature {
+        return sign(Bytes(message), privateKey)
     }
 
     /**
      * Verify a signature.
      *
-     * @param data      The data that was signed.
+     * @param message      The message that was signed.
      * @param signature The signature.
      * @param publicKey The public key that is used for verifying.
      * @return The verification result.
      */
-    fun verify(data: Bytes, signature: Signature, publicKey: PublicKey): Boolean {
-        return verify(data.byteArray, signature, publicKey.toJavaKey())
+    fun verify(message: Bytes, signature: Signature, publicKey: PublicKey): Boolean {
+        return verify(message, signature, publicKey.toJavaKey())
     }
 
     /**
@@ -172,7 +155,7 @@ class CryptoK {
         return signJWT(bytes.byteArray, privateKey)
     }
 
-    // TODO: these should probably go to separate class/fleet module
+    // TODO: these could go to separate class or to fleet module
 
     fun encrypt() {
 
@@ -180,41 +163,5 @@ class CryptoK {
 
     fun decrypt() {
 
-    }
-
-    private fun getServiceAccountHmPrivateKey(serviceAccountApiPrivateKey: String): PrivateKey {
-        val bigIntegerBytes =
-            getServiceAccountJavaPrivateKey(serviceAccountApiPrivateKey).s.toByteArray()
-        val privateKeyBytes = ByteArray(32)
-
-        for (i in 0..31) {
-            privateKeyBytes[i] = bigIntegerBytes[i + 1]
-        }
-
-        return PrivateKey(privateKeyBytes)
-    }
-
-    /**
-     * This private key is downloaded when creating a Service Account API key. It should be in
-     * PKCS 8 format
-     */
-    private fun getServiceAccountJavaPrivateKey(serviceAccountApiPrivateKey: String): ECPrivateKey {
-        var encodedKeyString = serviceAccountApiPrivateKey
-        encodedKeyString = encodedKeyString.replace("-----BEGIN PRIVATE KEY----", "")
-        encodedKeyString = encodedKeyString.replace("-----END PRIVATE KEY-----", "")
-        val decodedPrivateKey = Base64.decode(encodedKeyString)
-        val keySpec = PKCS8EncodedKeySpec(decodedPrivateKey)
-        // how to convert PKCS#8 to EC private key https://stackoverflow.com/a/52301461/599743
-        val kf = KeyFactory.getInstance("EC", "BC")
-        val ecPrivateKey = kf.generatePrivate(keySpec) as ECPrivateKey
-        return ecPrivateKey
-    }
-
-    /**
-     * This key is paired with the app's client certificate. It should be the 32 bytes of the
-     * ANSI X9.62 Prime 256v1 curve in hex or base64.
-     */
-    private fun getClientPrivateKey(clientPrivateKey: String): PrivateKey {
-        return PrivateKey(clientPrivateKey)
     }
 }

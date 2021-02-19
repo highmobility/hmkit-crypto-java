@@ -1,3 +1,6 @@
+tests require osx/linux platform to verify crypto with core
+
+
 # HMKit Crypto
 
 This repository contains the Certificate classes and public Crypto methods(sign, keygen).

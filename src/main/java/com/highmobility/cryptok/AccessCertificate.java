@@ -21,14 +21,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.highmobility.crypto;
+package com.highmobility.cryptok;
 
-import com.highmobility.crypto.value.DeviceSerial;
-import com.highmobility.crypto.value.HMCalendar;
-import com.highmobility.crypto.value.Issuer;
-import com.highmobility.crypto.value.Permissions;
-import com.highmobility.crypto.value.PublicKey;
-import com.highmobility.crypto.value.Signature;
+import com.highmobility.cryptok.value.DeviceSerial;
+import com.highmobility.cryptok.value.HMCalendar;
+import com.highmobility.cryptok.value.Issuer;
+import com.highmobility.cryptok.value.Permissions;
+import com.highmobility.cryptok.value.PublicKey;
+import com.highmobility.cryptok.value.Signature;
 import com.highmobility.value.Bytes;
 
 import java.text.DateFormat;
@@ -298,26 +298,26 @@ public class AccessCertificate extends Certificate {
 
         if (issuer == null) {
             bytesBuilder = gainerSerial;
-            bytesBuilder = Bytes.concat(bytesBuilder, gainingPublicKey);
-            bytesBuilder = Bytes.concat(bytesBuilder, providingSerial);
+            bytesBuilder = concat(bytesBuilder, gainingPublicKey);
+            bytesBuilder = concat(bytesBuilder, providingSerial);
         } else {
             version = 1;
             bytesBuilder = new Bytes("01");
-            bytesBuilder = Bytes.concat(bytesBuilder, issuer);
-            bytesBuilder = Bytes.concat(bytesBuilder, providingSerial);
-            bytesBuilder = Bytes.concat(bytesBuilder, gainerSerial);
-            bytesBuilder = Bytes.concat(bytesBuilder, gainingPublicKey);
+            bytesBuilder = concat(bytesBuilder, issuer);
+            bytesBuilder = concat(bytesBuilder, providingSerial);
+            bytesBuilder = concat(bytesBuilder, gainerSerial);
+            bytesBuilder = concat(bytesBuilder, gainingPublicKey);
         }
 
-        bytesBuilder = Bytes.concat(bytesBuilder, startDate);
-        bytesBuilder = Bytes.concat(bytesBuilder, endDate);
+        bytesBuilder = concat(bytesBuilder, startDate);
+        bytesBuilder = concat(bytesBuilder, endDate);
 
         if (permissions != null && permissions.getLength() > 0) {
-            bytesBuilder = Bytes.concat(bytesBuilder, new Bytes(new byte[]{(byte) permissions
+            bytesBuilder = concat(bytesBuilder, new Bytes(new byte[]{(byte) permissions
                     .getLength()}));
-            bytesBuilder = Bytes.concat(bytesBuilder, permissions);
+            bytesBuilder = concat(bytesBuilder, permissions);
         } else {
-            bytesBuilder = Bytes.concat(bytesBuilder, new Bytes("00"));
+            bytesBuilder = concat(bytesBuilder, new Bytes("00"));
         }
 
         this.bytes = bytesBuilder.getByteArray();

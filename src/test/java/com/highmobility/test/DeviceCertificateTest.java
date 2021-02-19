@@ -23,12 +23,12 @@
  */
 package com.highmobility.test;
 
-import com.highmobility.crypto.DeviceCertificate;
-import com.highmobility.crypto.value.AppIdentifier;
-import com.highmobility.crypto.value.DeviceSerial;
-import com.highmobility.crypto.value.Issuer;
-import com.highmobility.crypto.value.PublicKey;
-import com.highmobility.crypto.value.Signature;
+import com.highmobility.cryptok.DeviceCertificate;
+import com.highmobility.cryptok.value.AppIdentifier;
+import com.highmobility.cryptok.value.DeviceSerial;
+import com.highmobility.cryptok.value.Issuer;
+import com.highmobility.cryptok.value.PublicKey;
+import com.highmobility.cryptok.value.Signature;
 import com.highmobility.utils.Base64;
 import com.highmobility.value.Bytes;
 

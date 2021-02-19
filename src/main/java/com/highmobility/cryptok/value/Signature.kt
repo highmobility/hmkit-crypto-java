@@ -21,59 +21,65 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.highmobility.crypto.value
+package com.highmobility.cryptok.value
 
-import CURVE
-import CURVE_SPEC
-import JavaPrivateKey
 import com.highmobility.value.Bytes
 import com.highmobility.value.BytesWithLength
-import org.bouncycastle.crypto.params.ECPrivateKeyParameters
-import org.bouncycastle.jcajce.provider.asymmetric.ec.BCECPrivateKey
-import org.bouncycastle.jce.spec.ECPrivateKeySpec
-import toBytes
 import java.math.BigInteger
-import java.security.KeyFactory
+import org.bouncycastle.asn1.ASN1Encoding
+
+import org.bouncycastle.asn1.DERSequence
+
+import org.bouncycastle.asn1.ASN1Integer
+
+import org.bouncycastle.asn1.ASN1EncodableVector
 
 /**
- * 32 bytes of the EC private key in ANSI X9.62.
+ * Raw 64 bytes of r and s components of the ECDSA signature with sha256 - ASN.1. P1363 format.
+ * Java signature is ASN.1 DER
  */
-class PrivateKey : BytesWithLength {
+class Signature : BytesWithLength {
     /**
      * @param value The raw bytes.
      */
-    constructor(value: Bytes?) : super(value) {}
+    constructor(value: Bytes?) : super(value)
 
     /**
      * @param value The bytes in hex or Base64.
      */
-    constructor(value: String?) : super(value) {}
+    constructor(value: String?) : super(value)
 
     /**
      * @param bytes The raw bytes.
      */
-    constructor(bytes: ByteArray?) : super(bytes) {}
-
-    constructor(javaKey: BCECPrivateKey) {
-        val d = (javaKey as BCECPrivateKey).d
-        this.bytes = d.toByteArray()
-    }
-
-    fun toJavaKey(): BCECPrivateKey {
-        val kecFactory = KeyFactory.getInstance("EC", "BC")
-        val generatedECPrivateKeyParams = ECPrivateKeyParameters(BigInteger(1, byteArray), CURVE)
-        val privateKeySpec = ECPrivateKeySpec(generatedECPrivateKeyParams.d, CURVE_SPEC)
-
-        val privateKey = kecFactory.generatePrivate(privateKeySpec)
-        return privateKey as BCECPrivateKey
-    }
+    constructor(bytes: ByteArray?) : super(bytes)
 
     override fun getExpectedLength(): Int {
-        return 32
+        return 64
     }
-}
 
-fun JavaPrivateKey.getBytes(): Bytes {
-    val d = (this as BCECPrivateKey).d
-    return Bytes(d.toBytes(32))
+//    fun getR(): Bytes {
+//        return Bytes(subList(0, 32).toByteArray())
+//    }
+//
+//    fun getS(): Bytes {
+//        return Bytes(subList(32, 64).toByteArray())
+//    }
+
+    fun getR(): BigInteger {
+        return BigInteger(1, subList(0, 32).toByteArray())
+    }
+
+    fun getS(): BigInteger {
+        return BigInteger(1, subList(32, 64).toByteArray())
+    }
+
+    // 0x30 b1 0x02 b2 (vr) 0x02 b3 (vs)
+    fun derEncoded(): ByteArray {
+        val v = ASN1EncodableVector()
+        v.add(ASN1Integer(getR()))
+        v.add(ASN1Integer(getS()))
+        val derEncodedSignature = DERSequence(v).getEncoded(ASN1Encoding.DER)
+        return derEncodedSignature
+    }
 }

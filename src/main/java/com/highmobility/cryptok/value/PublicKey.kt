@@ -1,12 +1,14 @@
-package com.highmobility.crypto.value
+package com.highmobility.cryptok.value
 
 import CURVE_NAME
 import JavaPublicKey
+import KEY_GEN_ALGORITHM
 import com.highmobility.value.Bytes
 import com.highmobility.value.BytesWithLength
 import org.bouncycastle.crypto.params.ECPublicKeyParameters
 import org.bouncycastle.crypto.util.PublicKeyFactory
 import org.bouncycastle.jcajce.provider.asymmetric.ec.BCECPublicKey
+import org.bouncycastle.jcajce.provider.asymmetric.util.ECUtil
 import org.bouncycastle.jce.ECNamedCurveTable
 import org.bouncycastle.jce.provider.BouncyCastleProvider
 import org.bouncycastle.jce.spec.ECPublicKeySpec
@@ -48,7 +50,8 @@ class PublicKey : BytesWithLength {
 
         val params = ECNamedCurveTable.getParameterSpec(CURVE_NAME)
         val keySpec = ECPublicKeySpec(params.curve.decodePoint(rawKeyEncoded.byteArray), params)
-        val publicKey = BCECPublicKey("ECDSA", keySpec, BouncyCastleProvider.CONFIGURATION)
+        val publicKey =
+            BCECPublicKey(KEY_GEN_ALGORITHM, keySpec, BouncyCastleProvider.CONFIGURATION)
         return publicKey
     }
 
@@ -56,14 +59,9 @@ class PublicKey : BytesWithLength {
     private fun x509toJavaPublicKey(byteArray: ByteArray): BCECPublicKey {
         // maybe add 04 byte in from to get DER encoding
         val bpubKey = PublicKeyFactory.createKey(byteArray) as ECPublicKeyParameters
-        val kf = KeyFactory.getInstance("EC", "BC")
+        val kf = KeyFactory.getInstance(KEY_GEN_ALGORITHM, "BC")
         val spec = ECNamedCurveTable.getParameterSpec(CURVE_NAME)
-        return kf.generatePublic(
-            ECPublicKeySpec(
-                bpubKey.q,
-                spec
-            )
-        ) as BCECPublicKey
+        return kf.generatePublic(ECPublicKeySpec(bpubKey.q, spec)) as BCECPublicKey
     }
 }
 
@@ -76,4 +74,8 @@ fun JavaPublicKey.getBytes(): Bytes {
     val yBytes = WY.toBigInteger().toBytes(32)
     val bytes = xBytes.concat(yBytes)
     return bytes
+}
+
+fun JavaPublicKey.getParameters(): ECPublicKeyParameters {
+    return ECUtil.generatePublicKeyParameter(this) as ECPublicKeyParameters
 }
