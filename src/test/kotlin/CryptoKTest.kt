@@ -1,7 +1,6 @@
 import com.highmobility.cryptok.value.PrivateKey
 import com.highmobility.cryptok.value.PublicKey
 import com.highmobility.cryptok.value.Signature
-import com.highmobility.cryptok.value.getBytes
 import com.highmobility.hmkit.HMKit
 import com.highmobility.value.Bytes
 import org.junit.Test
@@ -63,6 +62,7 @@ internal class CryptoKTest {
         assert(cryptoK.verify(lessThan64BytesMessage, sig, keyPair.publicKey))
         assert(cryptoCore.verify(lessThan64BytesMessage, sig, CorePublicKey(keyPair.publicKey)))
 
+        // verify the blocking until 64 method
         val moreThan64BytesMessage = Bytes(ByteArray(79))
         val sig2 = cryptoK.sign(moreThan64BytesMessage, keyPair.privateKey)
         assert(sig.size == 64)
@@ -115,8 +115,25 @@ internal class CryptoKTest {
     }
 
     @Test
-    fun hmac() {
+    fun sharedKey() {
+        val privateKey =
+            PrivateKey("7FEE7D0CBBADFD4BF99AA8CECFF7036A0D767CACC6AA27BD5AB9E400805BC184")
+        val publicKey =
+            PublicKey("E759E9D7594504EA36180549F5276B12396B2EE9B8B37C5E452B78CE29D95A97D6A3EC2BDA924FAE15BED2D6FBC263FFB4CBECF27F6BA6CA066DE660DA19D97B")
 
+        val shared = cryptoK.createSharedSecret(privateKey, publicKey)
+        assert(shared == Bytes("17164A21309671D54484C3E6C3A3FF22E3F008E142E2A78B55124823F50AD77B"))
+    }
+
+    @Test
+    fun hmac() {
+        val message = Bytes("AABB")
+        // shared key from DH ^^ method
+        val shared = Bytes("17164A21309671D54484C3E6C3A3FF22E3F008E142E2A78B55124823F50AD77B")
+        val expectedResult =
+            Bytes("3573DF5D8EE68A67EFEEFE1544A0F90D46C204134FAD44EC14C7BCE3EA6DC736")
+        val hmac = cryptoK.hmac(shared, message)
+        assert(hmac == expectedResult)
     }
 
     @Test

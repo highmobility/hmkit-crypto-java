@@ -59,4 +59,11 @@ public class HMKeyPair {
     public PrivateKey getPrivateKey() {
         return privateKey;
     }
+
+    @Override public String toString() {
+        return "HMKeyPair{" +
+                "privateKey=" + privateKey +
+                ", publicKey=" + publicKey +
+                '}';
+    }
 }

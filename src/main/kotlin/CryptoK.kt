@@ -11,6 +11,10 @@ import org.bouncycastle.jce.spec.ECNamedCurveParameterSpec
 import org.bouncycastle.jce.spec.ECParameterSpec
 import java.security.*
 import java.util.*
+import javax.crypto.KeyAgreement
+import javax.crypto.Mac
+import javax.crypto.SecretKey
+import javax.crypto.spec.SecretKeySpec
 
 typealias JavaSignature = java.security.Signature
 typealias JavaPrivateKey = java.security.PrivateKey
@@ -22,7 +26,7 @@ Signature for downloading access certificates: ECDSA, SHA256
 JWT signature For signing Service Account API requests: ES256
  */
 
-val KEY_GEN_ALGORITHM = "EC" // ECDH and ECDSA can be used with same algorithm
+val KEY_GEN_ALGORITHM = "ECDH" // EC and ECDSA can be used with same algorithm
 var SIGN_ALGORITHM = "SHA256withPLAIN-ECDSA"
 
 val CURVE_NAME = "secp256r1" // this is 1.3.132.0.prime256v1
@@ -71,7 +75,7 @@ class CryptoK {
     }
 
     fun verify(message: Bytes, signature: Signature, publicKey: JavaPublicKey): Boolean {
-        val formattedMessage = message.fillWith0sUntil64()
+        val formattedMessage = message.fillWith0sUntil(64)
 
         val ecdsaVerify = JavaSignature.getInstance("SHA256withPLAIN-ECDSA", "BC")
         ecdsaVerify.initVerify(publicKey)
@@ -88,7 +92,7 @@ class CryptoK {
      * @return The signature.
      */
     fun sign(message: Bytes, privateKey: PrivateKey): Signature {
-        val formattedMessage = message.fillWith0sUntil64()
+        val formattedMessage = message.fillWith0sUntil(64)
         // https://stackoverflow.com/questions/34063694/fixed-length-64-bytes-ec-p-256-signature-with-jce
         // there are also withCVC-ECDSA, withECDSA
         val signature = JavaSignature.getInstance(SIGN_ALGORITHM, "BC")
@@ -168,7 +172,19 @@ class CryptoK {
         return signJWT(message.byteArray, privateKey)
     }
 
+    // MARK: Telematics
     // TODO: these could go to separate class or to fleet module
+
+    fun encryptContainer(
+        message: Bytes,
+        privateKey: PrivateKey,
+        serverPublicKey: PublicKey,
+        nonce: Bytes,
+        serial: DeviceSerial
+    ) {
+
+    }
+
     fun encrypt(message: Bytes, privateKey: PrivateKey, publicKey: PublicKey) {
 
     }
@@ -177,7 +193,32 @@ class CryptoK {
 
     }
 
-    private fun encryptDecrypt() {
+    internal fun encryptDecrypt() {
 
+    }
+
+    internal fun createSessionKey(
+        privateKey: PrivateKey,
+        otherPublicKey: PublicKey,
+        nonce: Bytes
+    ): Bytes {
+        return hmac(createSharedSecret(privateKey, otherPublicKey), nonce)
+    }
+
+    internal fun hmac(sharedSecret: Bytes, message: Bytes): Bytes {
+        val key: SecretKey = SecretKeySpec(sharedSecret.byteArray, "HmacSHA256")
+        val mac: Mac = Mac.getInstance("HmacSHA256", "BC")
+        mac.init(key)
+        val hmac = mac.doFinal(message.fillWith0sUntil(256).byteArray)
+        return Bytes(hmac)
+    }
+
+    // Shared Diffie-Helman key from my private and other public
+    internal fun createSharedSecret(privateKey: PrivateKey, publicKey: PublicKey): Bytes {
+        val ka = KeyAgreement.getInstance(KEY_GEN_ALGORITHM, "BC")
+        ka.init(privateKey.toJavaKey())
+        ka.doPhase(publicKey.toJavaKey(), true);
+        val secret = ka.generateSecret() // 32 bytes
+        return Bytes(secret)
     }
 }

@@ -21,12 +21,12 @@ fun BigInteger.toBytes(numBytes: Int): Bytes {
     return Bytes(bytes)
 }
 
-fun Bytes.fillWith0sUntil64(): Bytes {
-    val size = 64
-    return if (this.length % size == 0) {
+// Fill with 0-s until blockSize or blockSize * multiplier until bigger or equal to current array.
+fun Bytes.fillWith0sUntil(blockSize: Int): Bytes {
+    return if (this.length % blockSize == 0) {
         this
     } else {
-        val sizeToFill = size - this.length % size
+        val sizeToFill = blockSize - this.length % blockSize
         Bytes(this.byteArray + ByteArray(sizeToFill))
     }
 }
