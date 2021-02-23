@@ -57,14 +57,13 @@ dependencies {
     if (project.hasProperty('depLocation') == false || project.depLocation > 0) {
 //         standalone or release project
         api deps.utils
-        testImplementation deps.autoApi
     } else {
         // in the master project with dev config
         implementation project(':hmkit-utils')
-        testImplementation project(':hmkit-auto-api')
     }
 
     testImplementation 'junit:junit:4.12'
+    testImplementation deps.autoApi
     // oem is used to verify with core crypto
 
     if (Os.isFamily(Os.FAMILY_MAC)) {
