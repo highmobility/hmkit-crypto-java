@@ -1,18 +1,18 @@
 package com.highmobility.cryptok.value
 
-import CURVE_NAME
-import JavaPublicKey
-import KEY_GEN_ALGORITHM
+import com.highmobility.cryptok.CURVE_NAME
+import com.highmobility.cryptok.JavaPublicKey
+import com.highmobility.cryptok.KEY_GEN_ALGORITHM
 import com.highmobility.value.Bytes
 import com.highmobility.value.BytesWithLength
 import org.bouncycastle.crypto.params.ECPublicKeyParameters
 import org.bouncycastle.crypto.util.PublicKeyFactory
 import org.bouncycastle.jcajce.provider.asymmetric.ec.BCECPublicKey
-import org.bouncycastle.jcajce.provider.asymmetric.util.ECUtil
 import org.bouncycastle.jce.ECNamedCurveTable
 import org.bouncycastle.jce.provider.BouncyCastleProvider
 import org.bouncycastle.jce.spec.ECPublicKeySpec
-import toBytes
+import com.highmobility.cryptok.toBytes
+import org.bouncycastle.jcajce.provider.asymmetric.util.ECUtil
 import java.security.KeyFactory
 
 /**

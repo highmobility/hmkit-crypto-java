@@ -1,3 +1,5 @@
+package com.highmobility.cryptok
+
 import com.highmobility.cryptok.value.PrivateKey
 import com.highmobility.cryptok.value.PublicKey
 import com.highmobility.cryptok.value.Signature
@@ -8,8 +10,8 @@ import org.junit.Test
 typealias CorePublicKey = com.highmobility.crypto.value.PublicKey
 typealias CorePrivateKey = com.highmobility.crypto.value.PrivateKey
 
-internal class CryptoKTest {
-    val cryptoK = CryptoK()
+internal class CryptoTest {
+    val cryptoK = Crypto()
     val cryptoCore = HMKit.getInstance().crypto
 
     @Test
@@ -155,6 +157,10 @@ internal class CryptoKTest {
 
     @Test
     fun jwt() {
-
+        val privateKey =
+            PrivateKey("7FEE7D0CBBADFD4BF99AA8CECFF7036A0D767CACC6AA27BD5AB9E400805BC184")
+        val message = Bytes("AABB")
+        cryptoK.signJWT(message.byteArray, privateKey)
+        // cannot test the signature, it is different every time
     }
 }

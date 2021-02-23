@@ -58,8 +58,7 @@ dependencies {
 //         standalone or release project
         api deps.utils
     } else {
-        // in the master project with dev config
-        implementation project(':hmkit-utils')
+        api project(':hmkit-utils')
     }
 
     testImplementation 'junit:junit:4.12'

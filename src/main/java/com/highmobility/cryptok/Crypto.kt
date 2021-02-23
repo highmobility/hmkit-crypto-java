@@ -1,4 +1,5 @@
-import com.highmobility.cryptok.HMKeyPair
+package com.highmobility.cryptok
+
 import com.highmobility.cryptok.value.*
 import com.highmobility.cryptok.value.PrivateKey
 import com.highmobility.cryptok.value.PublicKey
@@ -34,7 +35,7 @@ val params = ECNamedCurveTable.getParameterSpec(CURVE_NAME)
 val CURVE = ECDomainParameters(params.curve, params.g, params.n, params.h)
 val CURVE_SPEC = ECParameterSpec(params.curve, params.g, params.n, params.h)
 
-class CryptoK {
+class Crypto {
 
     init {
         Security.addProvider(BouncyCastleProvider())
@@ -185,12 +186,22 @@ class CryptoK {
 
     }
 
-    fun encrypt(message: Bytes, privateKey: PrivateKey, publicKey: PublicKey) {
-
+    fun encrypt(
+        message: PrivateKey,
+        privateKey: AccessCertificate,
+        publicKey: Bytes,
+        serial: DeviceSerial?,
+        command: Bytes
+    ): Bytes {
+        TODO()
     }
 
-    fun decrypt() {
-
+    fun decrypt(
+        privateKey: PrivateKey,
+        accessCertificate: AccessCertificate,
+        response: Bytes
+    ): Bytes {
+        TODO()
     }
 
     internal fun encryptDecrypt() {
@@ -221,4 +232,6 @@ class CryptoK {
         val secret = ka.generateSecret() // 32 bytes
         return Bytes(secret)
     }
+
+
 }

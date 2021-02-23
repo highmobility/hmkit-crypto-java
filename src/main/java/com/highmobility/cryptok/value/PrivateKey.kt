@@ -23,15 +23,15 @@
  */
 package com.highmobility.cryptok.value
 
-import CURVE_SPEC
-import JavaPrivateKey
-import KEY_GEN_ALGORITHM
+import com.highmobility.cryptok.CURVE_SPEC
+import com.highmobility.cryptok.JavaPrivateKey
+import com.highmobility.cryptok.KEY_GEN_ALGORITHM
 import com.highmobility.utils.Base64
 import com.highmobility.value.Bytes
 import com.highmobility.value.BytesWithLength
 import org.bouncycastle.jcajce.provider.asymmetric.ec.BCECPrivateKey
 import org.bouncycastle.jce.spec.ECPrivateKeySpec
-import toBytes
+import com.highmobility.cryptok.toBytes
 import java.math.BigInteger
 import java.security.KeyFactory
 import java.security.spec.PKCS8EncodedKeySpec
