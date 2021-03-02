@@ -10,12 +10,14 @@ import org.bouncycastle.jce.ECNamedCurveTable
 import org.bouncycastle.jce.provider.BouncyCastleProvider
 import org.bouncycastle.jce.spec.ECNamedCurveParameterSpec
 import org.bouncycastle.jce.spec.ECParameterSpec
+import org.bouncycastle.pqc.math.linearalgebra.ByteUtils.xor
 import java.security.*
 import java.util.*
 import javax.crypto.KeyAgreement
 import javax.crypto.Mac
 import javax.crypto.SecretKey
 import javax.crypto.spec.SecretKeySpec
+import javax.crypto.Cipher
 
 typealias JavaSignature = java.security.Signature
 typealias JavaPrivateKey = java.security.PrivateKey
@@ -174,38 +176,69 @@ class Crypto {
     }
 
     // MARK: Telematics
-    // TODO: these could go to separate class or to fleet module
 
-    fun encryptContainer(
-        message: Bytes,
+    fun createTelematicsContainer(
+        command: Bytes,
         privateKey: PrivateKey,
-        serverPublicKey: PublicKey,
+        serial: DeviceSerial,
+        accessCertificate: AccessCertificate,
         nonce: Bytes,
-        serial: DeviceSerial
-    ) {
-
-    }
-
-    fun encrypt(
-        message: PrivateKey,
-        privateKey: AccessCertificate,
-        publicKey: Bytes,
-        serial: DeviceSerial?,
-        command: Bytes
     ): Bytes {
-        TODO()
+        val container = TelematicsContainer(
+            this,
+            command,
+            privateKey,
+            // if fleet is sending, the sender serial is the gainer(fleet)
+            accessCertificate.gainerPublicKey,
+            serial,
+            accessCertificate.gainerSerial,
+            nonce
+        )
+        return container.getEscapedAndWithStartEndBytes()
     }
 
-    fun decrypt(
+    // This can throw IllegalArgumentException
+    fun getCommandFromTelematicsContainer(
+        container: Bytes,
         privateKey: PrivateKey,
         accessCertificate: AccessCertificate,
-        response: Bytes
     ): Bytes {
-        TODO()
+        val container = TelematicsContainer(
+            this,
+            container,
+            privateKey,
+            accessCertificate.gainerPublicKey
+        )
+
+        return container.getUnecryptedPayload()
     }
 
-    internal fun encryptDecrypt() {
+    internal fun encryptDecrypt(
+        message: Bytes,
+        privateKey: PrivateKey,
+        publicKey: PublicKey,
+        nonce: Bytes
+    ): Bytes {
+        // Uses private_key and access_certificate to compute key
+        // Creates session_key(hmac) using compute_key as key and nonce as message
+        val sessionKey = createSessionKey(privateKey, publicKey, nonce)
+        // Creates signature using session_key
+        val encryptionKey = sessionKey.getRange(0, 16)
+        // expand nonce because it should be 16 bytes long
+        val iv = nonce.getRange(0, 7).concat(nonce)
+        // Creates signature using session_key
+        val cipher = aes(iv, encryptionKey)
 
+        // Expand cipher binary(repeat it) until the container length
+
+        var cipherExpanded = cipher
+        while (cipherExpanded.size < message.size) {
+            cipherExpanded = cipherExpanded.concat(cipherExpanded)
+        }
+        cipherExpanded = cipherExpanded.getRange(0, message.size)
+        // XOR the expanded cipher and container
+        val result = xor(cipherExpanded.byteArray, message.byteArray)
+        return Bytes(result)
     }
 
     internal fun createSessionKey(
@@ -233,5 +266,16 @@ class Crypto {
         return Bytes(secret)
     }
 
+    internal fun aes(key: Bytes, message: Bytes): Bytes {
+        val cipher = Cipher.getInstance("AES/ECB/PKCS7Padding", "BC")
+        val key = SecretKeySpec(key.byteArray, "AES")
 
+        // Encrypt
+        cipher.init(Cipher.ENCRYPT_MODE, key)
+        val cipherText = ByteArray(cipher.getOutputSize(message.length))
+        var ctLength = cipher.update(message.byteArray, 0, message.length, cipherText, 0)
+        ctLength += cipher.doFinal(cipherText, ctLength)
+
+        return Bytes(cipherText)
+    }
 }

@@ -1,5 +1,6 @@
 package com.highmobility.cryptok
 
+import com.highmobility.cryptok.value.DeviceSerial
 import com.highmobility.cryptok.value.PrivateKey
 import com.highmobility.cryptok.value.PublicKey
 import com.highmobility.cryptok.value.Signature
@@ -147,20 +148,41 @@ internal class CryptoTest {
     }
 
     @Test
-    fun encrypt() {
-    }
-
-    @Test
-    fun decrypt() {
-
-    }
-
-    @Test
     fun jwt() {
         val privateKey =
             PrivateKey("7FEE7D0CBBADFD4BF99AA8CECFF7036A0D767CACC6AA27BD5AB9E400805BC184")
         val message = Bytes("AABB")
         cryptoK.signJWT(message.byteArray, privateKey)
         // cannot test the signature, it is different every time
+    }
+
+    @Test
+    fun encryptAndDecrypt() {
+        val vehiclePrivateKey = PrivateKey(
+            "468A685967EF57ADC7FB6C51B12045722C74277C45EDD8EC005D1FF4197D6006"
+        )
+        val vehicleCertificate = AccessCertificate(
+            "01746D63730908070605040302010102030405060708096A94B494B0BD287E9C98014CECC1E3E19F30C002B74116BB727B93FB422DBDC12172A3FD24C36EB2ABEC57AA94D74A53A393D7B0AE30E6131B1EEDBCA3A17530110101010111020201010301020310937CB737CD8EA3E5E510830A54D2945F5BD8C54A1486489D7E8B911B06ABC1CE12B1D1B4E9994D99987106C63730919E5630FFBD755CF00AD62ABA1AC53983"
+        )
+        val nonce = Bytes("AABBCCDDEEFF000000")
+        val vehicleSerial = DeviceSerial("090807060504030201")
+        val command = Bytes("AABB")
+
+        val encryptedCommand = cryptoK.encryptDecrypt(
+            command,
+            vehiclePrivateKey,
+            vehicleCertificate.gainerPublicKey,
+            nonce
+        )
+
+        val decryptedCommand = cryptoK.encryptDecrypt(
+            encryptedCommand,
+            vehiclePrivateKey,
+            vehicleCertificate.gainerPublicKey,
+            nonce
+        )
+
+        assert(encryptedCommand != command)
+        assert(decryptedCommand == command)
     }
 }

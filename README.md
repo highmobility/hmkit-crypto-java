@@ -5,13 +5,8 @@ tests require osx/linux platform to verify crypto with core
 
 This repository contains the Certificate classes and public Crypto methods(sign, keygen).
 
-The library should be accessed from either [hmkit-oem](https://github.com/highmobility/hmkit-oem/blob/1bfca938c495f564934838f10460f35916628f77/hmkit-oem/src/main/java/com/highmobility/hmkit/HMKit.java#L51) or 
-[hmkit-android](https://github.com/highmobility/hmkit-android/blob/26fe7293312623a647965cd5f2d6ba9adcb6235f/hmkit-android/src/main/java/com/highmobility/hmkit/HMKit.java#L156). 
-It cannot be used independently because it doesn't include the core.
-
 ### Dependencies
 
-* [hmkit-core](https://github.com/highmobility/hmkit-core) (from either HMKit Android or HMKit OEM)
 * hmkit-utils
 
 ### Setup
