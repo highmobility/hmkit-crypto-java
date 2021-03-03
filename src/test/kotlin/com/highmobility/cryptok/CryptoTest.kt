@@ -2,18 +2,12 @@ package com.highmobility.cryptok
 
 import com.highmobility.cryptok.value.PrivateKey
 import com.highmobility.cryptok.value.PublicKey
-import com.highmobility.cryptok.value.Signature
-import com.highmobility.hmkit.HMKit
 import com.highmobility.value.Bytes
 import org.junit.Test
 import java.util.*
 
-typealias CorePublicKey = com.highmobility.crypto.value.PublicKey
-typealias CorePrivateKey = com.highmobility.crypto.value.PrivateKey
-
 internal class CryptoTest {
     val cryptoK = Crypto()
-    val cryptoCore = HMKit.getInstance().crypto
 
     @Test
     fun createKeypair() {
@@ -63,47 +57,12 @@ internal class CryptoTest {
         val sig = cryptoK.sign(lessThan64BytesMessage, keyPair.privateKey)
         assert(sig.size == 64)
         assert(cryptoK.verify(lessThan64BytesMessage, sig, keyPair.publicKey))
-        assert(cryptoCore.verify(lessThan64BytesMessage, sig, CorePublicKey(keyPair.publicKey)))
 
         // verify the blocking until 64 method
         val moreThan64BytesMessage = Bytes(ByteArray(79))
         val sig2 = cryptoK.sign(moreThan64BytesMessage, keyPair.privateKey)
         assert(sig.size == 64)
         assert(cryptoK.verify(moreThan64BytesMessage, sig2, keyPair.publicKey))
-        assert(cryptoCore.verify(moreThan64BytesMessage, sig2, CorePublicKey(keyPair.publicKey)))
-    }
-
-    @Test
-    fun javaKeysWithCore() {
-        val message = Bytes("AABB")
-        val kKeyPair = cryptoK.createKeypair()
-
-        val corePublic = CorePublicKey(kKeyPair.publicKey)
-        val corePrivate = CorePrivateKey(kKeyPair.privateKey)
-
-        // test the keys from java crypto: generate sig with private and verify with public
-        val coreSig = cryptoCore.sign(message, corePrivate)
-        assert(cryptoCore.verify(message, coreSig, corePublic))
-        assert(cryptoK.verify(message, Signature(coreSig), kKeyPair.publicKey))
-
-        val kSig = cryptoK.sign(message, kKeyPair.privateKey)
-        assert(cryptoK.verify(message, kSig, kKeyPair.publicKey))
-        assert(cryptoCore.verify(message, kSig, corePublic))
-    }
-
-    @Test
-    fun testCoreKeysWithJava() {
-        val message = Bytes("AABB")
-        val coreKeyPair = cryptoCore.createKeypair()
-
-        val public = PublicKey(coreKeyPair.publicKey)
-        val private = PrivateKey(coreKeyPair.privateKey)
-
-        // this means creating java keys with core bytes is correct
-        val kSig = cryptoK.sign(message, private)
-        assert(cryptoK.verify(message, kSig, public))
-        // this means sign method is correct
-        assert(cryptoCore.verify(message, kSig, coreKeyPair.publicKey))
     }
 
     @Test
