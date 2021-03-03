@@ -29,11 +29,11 @@ import com.highmobility.crypto.KEY_GEN_ALGORITHM
 import com.highmobility.utils.Base64
 import com.highmobility.value.Bytes
 import com.highmobility.value.BytesWithLength
-import org.bouncycastle.jcajce.provider.asymmetric.ec.BCECPrivateKey
 import org.bouncycastle.jce.spec.ECPrivateKeySpec
 import com.highmobility.crypto.toBytes
 import java.math.BigInteger
 import java.security.KeyFactory
+import java.security.interfaces.ECPrivateKey
 import java.security.spec.PKCS8EncodedKeySpec
 
 /**
@@ -55,15 +55,15 @@ class PrivateKey : BytesWithLength {
      */
     constructor(bytes: ByteArray?) : super(bytes) {}
 
-    constructor(javaKey: BCECPrivateKey) {
+    constructor(javaKey: ECPrivateKey) {
         this.bytes = javaKey.getBytes().byteArray
     }
 
-    fun toJavaKey(): BCECPrivateKey {
-        val kecFactory = KeyFactory.getInstance(KEY_GEN_ALGORITHM, "BC")
+    fun toJavaKey(): ECPrivateKey {
+        val keyFactory = KeyFactory.getInstance(KEY_GEN_ALGORITHM, "BC")
         val d = BigInteger(1, byteArray)
         val privateKeySpec = ECPrivateKeySpec(d, CURVE_SPEC)
-        return kecFactory.generatePrivate(privateKeySpec) as BCECPrivateKey
+        return keyFactory.generatePrivate(privateKeySpec) as ECPrivateKey
     }
 
     override fun getExpectedLength(): Int {
@@ -80,12 +80,12 @@ class PrivateKey : BytesWithLength {
             val keySpec = PKCS8EncodedKeySpec(decodedPrivateKey)
             // how to convert PKCS#8 to EC private key https://stackoverflow.com/a/52301461/599743
             val kf = KeyFactory.getInstance(KEY_GEN_ALGORITHM, "BC")
-            return PrivateKey(kf.generatePrivate(keySpec) as BCECPrivateKey)
+            return PrivateKey(kf.generatePrivate(keySpec) as ECPrivateKey)
         }
     }
 }
 
 fun JavaPrivateKey.getBytes(): Bytes {
-    val d = (this as BCECPrivateKey).d
+    val d = (this as ECPrivateKey).s
     return Bytes(d.toBytes(32))
 }
