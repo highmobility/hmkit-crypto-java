@@ -21,34 +21,26 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.highmobility.cryptok.value;
+package com.highmobility.crypto.value.custom;
 
-import com.highmobility.value.Bytes;
 import com.highmobility.value.BytesWithLength;
 
-public class Issuer extends BytesWithLength {
-    /**
-     * @param value The raw bytes.
-     */
-    public Issuer(Bytes value) {
-        super(value);
-    }
-
+public class CarRentalBookingIdentifier extends BytesWithLength {
     /**
      * @param value The bytes in hex or Base64.
      */
-    public Issuer(String value) {
+    public CarRentalBookingIdentifier(String value) {
         super(value);
     }
 
     /**
      * @param bytes The raw bytes.
      */
-    public Issuer(byte[] bytes) {
+    public CarRentalBookingIdentifier(byte[] bytes) {
         super(bytes);
     }
 
     @Override protected int getExpectedLength() {
-        return 4;
+        return 6;
     }
 }

@@ -23,13 +23,13 @@
  */
 package com.highmobility.test;
 
-import com.highmobility.cryptok.AccessCertificate;
-import com.highmobility.cryptok.value.DeviceSerial;
-import com.highmobility.cryptok.value.HMCalendar;
-import com.highmobility.cryptok.value.Issuer;
-import com.highmobility.cryptok.value.Permissions;
-import com.highmobility.cryptok.value.PublicKey;
-import com.highmobility.cryptok.value.Signature;
+import com.highmobility.crypto.AccessCertificate;
+import com.highmobility.crypto.value.DeviceSerial;
+import com.highmobility.crypto.value.HMCalendar;
+import com.highmobility.crypto.value.Issuer;
+import com.highmobility.crypto.value.Permissions;
+import com.highmobility.crypto.value.PublicKey;
+import com.highmobility.crypto.value.Signature;
 import com.highmobility.value.Bytes;
 
 import org.junit.Before;

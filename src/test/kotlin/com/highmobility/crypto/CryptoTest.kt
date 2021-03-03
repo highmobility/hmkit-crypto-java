@@ -1,7 +1,7 @@
-package com.highmobility.cryptok
+package com.highmobility.crypto
 
-import com.highmobility.cryptok.value.PrivateKey
-import com.highmobility.cryptok.value.PublicKey
+import com.highmobility.crypto.value.PrivateKey
+import com.highmobility.crypto.value.PublicKey
 import com.highmobility.value.Bytes
 import org.junit.Test
 import java.util.*

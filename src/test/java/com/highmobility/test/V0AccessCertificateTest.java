@@ -23,11 +23,11 @@
  */
 package com.highmobility.test;
 
-import com.highmobility.cryptok.AccessCertificate;
-import com.highmobility.cryptok.value.Issuer;
+import com.highmobility.crypto.AccessCertificate;
+import com.highmobility.crypto.value.Issuer;
 import com.highmobility.value.Bytes;
-import com.highmobility.cryptok.value.DeviceSerial;
-import com.highmobility.cryptok.value.PublicKey;
+import com.highmobility.crypto.value.DeviceSerial;
+import com.highmobility.crypto.value.PublicKey;
 
 import org.junit.Before;
 import org.junit.Test;

@@ -1,4 +1,4 @@
-package com.highmobility.cryptok
+package com.highmobility.crypto
 
 import com.highmobility.value.Bytes
 import java.lang.IllegalArgumentException

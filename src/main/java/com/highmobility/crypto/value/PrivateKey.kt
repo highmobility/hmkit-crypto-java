@@ -21,17 +21,17 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.highmobility.cryptok.value
+package com.highmobility.crypto.value
 
-import com.highmobility.cryptok.CURVE_SPEC
-import com.highmobility.cryptok.JavaPrivateKey
-import com.highmobility.cryptok.KEY_GEN_ALGORITHM
+import com.highmobility.crypto.CURVE_SPEC
+import com.highmobility.crypto.JavaPrivateKey
+import com.highmobility.crypto.KEY_GEN_ALGORITHM
 import com.highmobility.utils.Base64
 import com.highmobility.value.Bytes
 import com.highmobility.value.BytesWithLength
 import org.bouncycastle.jcajce.provider.asymmetric.ec.BCECPrivateKey
 import org.bouncycastle.jce.spec.ECPrivateKeySpec
-import com.highmobility.cryptok.toBytes
+import com.highmobility.crypto.toBytes
 import java.math.BigInteger
 import java.security.KeyFactory
 import java.security.spec.PKCS8EncodedKeySpec

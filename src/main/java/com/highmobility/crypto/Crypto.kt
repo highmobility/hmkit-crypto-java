@@ -1,9 +1,11 @@
-package com.highmobility.cryptok
+package com.highmobility.crypto
 
-import com.highmobility.cryptok.value.*
-import com.highmobility.cryptok.value.PrivateKey
-import com.highmobility.cryptok.value.PublicKey
-import com.highmobility.cryptok.value.Signature
+import com.highmobility.crypto.value.DeviceSerial
+import com.highmobility.crypto.value.Sha256
+import com.highmobility.crypto.value.PrivateKey
+import com.highmobility.crypto.value.getBytes
+import com.highmobility.crypto.value.PublicKey
+import com.highmobility.crypto.value.Signature
 import com.highmobility.value.Bytes
 import org.bouncycastle.jce.ECNamedCurveTable
 import org.bouncycastle.jce.provider.BouncyCastleProvider

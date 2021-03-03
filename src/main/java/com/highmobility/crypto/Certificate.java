@@ -21,34 +21,57 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.highmobility.cryptok.value;
+package com.highmobility.crypto;
 
+import com.highmobility.crypto.value.Signature;
+import com.highmobility.crypto.value.Signature;
 import com.highmobility.value.Bytes;
-import com.highmobility.value.BytesWithLength;
 
-public class AppIdentifier extends BytesWithLength {
-    /**
-     * @param value The raw bytes.
-     */
-    public AppIdentifier(Bytes value) {
-        super(value);
+/**
+ * Base Certificate class.
+ */
+public class Certificate extends Bytes {
+    Signature signature;
+    Bytes certificateData;
+
+    protected Certificate(int length) {
+        super(length);
     }
 
-    /**
-     * @param value The bytes in hex or Base64.
-     */
-    public AppIdentifier(String value) {
-        super(value);
-    }
-
-    /**
-     * @param bytes The raw bytes.
-     */
-    public AppIdentifier(byte[] bytes) {
+    Certificate(Bytes bytes) {
         super(bytes);
     }
 
-    @Override protected int getExpectedLength() {
-        return 12;
+    Certificate() {
+    }
+
+    /**
+     * @return The certificate data, excluding the signature.
+     */
+    public Bytes getCertificateData() {
+        return certificateData;
+    }
+
+    /**
+     * @return The Certificate Authority's signature for the certificate, 64 bytes.
+     */
+    public Signature getSignature() {
+        return signature;
+    }
+
+    /**
+     * Set a new signature or override the previous one.
+     *
+     * @param signature The new signature.
+     */
+    public void setSignature(Signature signature) {
+        // all of the ivars stay the same, only the last signature bytes of the cert change.
+        if (signature == null) {
+            this.bytes = getCertificateData().getByteArray();
+        } else {
+            this.bytes = Bytes.concat(getCertificateData(), signature).getByteArray();
+        }
+
+        this.signature = signature;
     }
 }

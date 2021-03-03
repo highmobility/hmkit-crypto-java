@@ -25,11 +25,11 @@ package com.highmobility.test;
 
 import com.highmobility.autoapi.Identifier;
 import com.highmobility.autoapi.certificate.PermissionLocation;
-import com.highmobility.cryptok.AccessCertificate;
-import com.highmobility.cryptok.value.Permission;
-import com.highmobility.cryptok.value.Permissions;
-import com.highmobility.cryptok.value.custom.CarRentalBookingIdentifier;
-import com.highmobility.cryptok.value.custom.CarRentalPermissions;
+import com.highmobility.crypto.AccessCertificate;
+import com.highmobility.crypto.value.Permission;
+import com.highmobility.crypto.value.Permissions;
+import com.highmobility.crypto.value.custom.CarRentalBookingIdentifier;
+import com.highmobility.crypto.value.custom.CarRentalPermissions;
 import com.highmobility.value.BitLocation;
 import com.highmobility.value.Bytes;
 

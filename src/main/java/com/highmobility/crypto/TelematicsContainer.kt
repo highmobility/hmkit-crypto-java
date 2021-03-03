@@ -1,8 +1,8 @@
-package com.highmobility.cryptok
+package com.highmobility.crypto
 
-import com.highmobility.cryptok.value.DeviceSerial
-import com.highmobility.cryptok.value.PrivateKey
-import com.highmobility.cryptok.value.PublicKey
+import com.highmobility.crypto.value.DeviceSerial
+import com.highmobility.crypto.value.PrivateKey
+import com.highmobility.crypto.value.PublicKey
 import com.highmobility.value.Bytes
 import java.util.ArrayList
 

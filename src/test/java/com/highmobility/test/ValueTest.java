@@ -23,9 +23,9 @@
  */
 package com.highmobility.test;
 
-import com.highmobility.cryptok.value.DeviceSerial;
-import com.highmobility.cryptok.value.HMCalendar;
-import com.highmobility.cryptok.value.Permissions;
+import com.highmobility.crypto.value.DeviceSerial;
+import com.highmobility.crypto.value.HMCalendar;
+import com.highmobility.crypto.value.Permissions;
 
 import org.junit.Test;
 

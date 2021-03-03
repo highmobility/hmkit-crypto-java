@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.highmobility.cryptok.value;
+package com.highmobility.crypto.value;
 
 import com.highmobility.value.Bytes;
 import com.highmobility.value.BytesWithLength;

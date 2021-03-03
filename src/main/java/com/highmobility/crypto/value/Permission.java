@@ -21,41 +21,50 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.highmobility.cryptok.value.custom;
+package com.highmobility.crypto.value;
 
-import com.highmobility.cryptok.value.Permissions;
-import com.highmobility.utils.ByteUtils;
 import com.highmobility.value.BitLocation;
 
-/**
- * Custom permissions for car rental.
- */
-public class CarRentalPermissions extends Permissions {
-    public CarRentalPermissions() {
-        super(Type.CAR_RENTAL);
+public class Permission {
+    boolean allowed;
+    BitLocation location;
+
+    /**
+     * @return Whether the permission is allowed.
+     */
+    public boolean isAllowed() {
+        return allowed;
     }
 
-    public void allowAutoApiRead(boolean allow) {
-        allow(new BitLocation(2, 0), allow);
+    /**
+     * @return The byte and bit location.
+     */
+    public BitLocation getBitLocation() {
+        return location;
     }
 
-    public void allowAutoApiWrite(boolean allow) {
-        allow(new BitLocation(2, 1), allow);
+    /**
+     * General permissions.
+     */
+
+    /**
+     * @param allowed Whether to allow the permission.
+     * @return The certificates read permission.
+     */
+    public static Permission certificatesReadPermission(boolean allowed) {
+        return new Permission(new BitLocation(1, 0), allowed);
     }
 
-    public void allowDoorLocksWrite(boolean allow) {
-        allow(new BitLocation(2, 2), allow);
+    /**
+     * @param allowed Whether to allow the permission.
+     * @return The certificates write permission.
+     */
+    public static Permission certificatesWritePermission(boolean allowed) {
+        return new Permission(new BitLocation(1, 1), allowed);
     }
 
-    public void allowEngineWrite(boolean allow) {
-        allow(new BitLocation(2, 3), allow);
-    }
-
-    public void allowTheftAlarmWrite(boolean allow) {
-        allow(new BitLocation(2, 4), allow);
-    }
-
-    public void setBookingIdentifier(CarRentalBookingIdentifier bookingIdentifier) {
-        ByteUtils.setBytes(bytes, bookingIdentifier.getByteArray(), 10);
+    public Permission(BitLocation location, boolean allowed) {
+        this.allowed = allowed;
+        this.location = location;
     }
 }

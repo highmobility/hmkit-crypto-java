@@ -21,50 +21,50 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.highmobility.cryptok.value;
+package com.highmobility.crypto;
 
-import com.highmobility.value.BitLocation;
+import com.highmobility.crypto.value.PrivateKey;
+import com.highmobility.crypto.value.PrivateKey;
+import com.highmobility.crypto.value.PublicKey;
 
-public class Permission {
-    boolean allowed;
-    BitLocation location;
+/**
+ * ECC private/public keypair that uses elliptic curve P-256.
+ */
+public class HMKeyPair {
+    private static final long serialVersionUID = 6637283024188232326L;
+    private PrivateKey privateKey;
+    private PublicKey publicKey;
 
     /**
-     * @return Whether the permission is allowed.
+     * Create a ECC Keypair object with private and public key.
+     *
+     * @param privateKey The private key.
+     * @param publicKey  The public key.
+     * @throws IllegalArgumentException When the keys are invalid.
      */
-    public boolean isAllowed() {
-        return allowed;
+    public HMKeyPair(PrivateKey privateKey, PublicKey publicKey) throws IllegalArgumentException {
+        this.privateKey = privateKey;
+        this.publicKey = publicKey;
     }
 
     /**
-     * @return The byte and bit location.
+     * @return The public key.
      */
-    public BitLocation getBitLocation() {
-        return location;
+    public PublicKey getPublicKey() {
+        return publicKey;
     }
 
     /**
-     * General permissions.
+     * @return The private key.
      */
-
-    /**
-     * @param allowed Whether to allow the permission.
-     * @return The certificates read permission.
-     */
-    public static Permission certificatesReadPermission(boolean allowed) {
-        return new Permission(new BitLocation(1, 0), allowed);
+    public PrivateKey getPrivateKey() {
+        return privateKey;
     }
 
-    /**
-     * @param allowed Whether to allow the permission.
-     * @return The certificates write permission.
-     */
-    public static Permission certificatesWritePermission(boolean allowed) {
-        return new Permission(new BitLocation(1, 1), allowed);
-    }
-
-    public Permission(BitLocation location, boolean allowed) {
-        this.allowed = allowed;
-        this.location = location;
+    @Override public String toString() {
+        return "HMKeyPair{" +
+                "privateKey=" + privateKey +
+                ", publicKey=" + publicKey +
+                '}';
     }
 }

@@ -21,49 +21,41 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.highmobility.cryptok;
+package com.highmobility.crypto.value.custom;
 
-import com.highmobility.cryptok.value.PrivateKey;
-import com.highmobility.cryptok.value.PublicKey;
+import com.highmobility.crypto.value.Permissions;
+import com.highmobility.utils.ByteUtils;
+import com.highmobility.value.BitLocation;
 
 /**
- * ECC private/public keypair that uses elliptic curve P-256.
+ * Custom permissions for car rental.
  */
-public class HMKeyPair {
-    private static final long serialVersionUID = 6637283024188232326L;
-    private PrivateKey privateKey;
-    private PublicKey publicKey;
-
-    /**
-     * Create a ECC Keypair object with private and public key.
-     *
-     * @param privateKey The private key.
-     * @param publicKey  The public key.
-     * @throws IllegalArgumentException When the keys are invalid.
-     */
-    public HMKeyPair(PrivateKey privateKey, PublicKey publicKey) throws IllegalArgumentException {
-        this.privateKey = privateKey;
-        this.publicKey = publicKey;
+public class CarRentalPermissions extends Permissions {
+    public CarRentalPermissions() {
+        super(Type.CAR_RENTAL);
     }
 
-    /**
-     * @return The public key.
-     */
-    public PublicKey getPublicKey() {
-        return publicKey;
+    public void allowAutoApiRead(boolean allow) {
+        allow(new BitLocation(2, 0), allow);
     }
 
-    /**
-     * @return The private key.
-     */
-    public PrivateKey getPrivateKey() {
-        return privateKey;
+    public void allowAutoApiWrite(boolean allow) {
+        allow(new BitLocation(2, 1), allow);
     }
 
-    @Override public String toString() {
-        return "HMKeyPair{" +
-                "privateKey=" + privateKey +
-                ", publicKey=" + publicKey +
-                '}';
+    public void allowDoorLocksWrite(boolean allow) {
+        allow(new BitLocation(2, 2), allow);
+    }
+
+    public void allowEngineWrite(boolean allow) {
+        allow(new BitLocation(2, 3), allow);
+    }
+
+    public void allowTheftAlarmWrite(boolean allow) {
+        allow(new BitLocation(2, 4), allow);
+    }
+
+    public void setBookingIdentifier(CarRentalBookingIdentifier bookingIdentifier) {
+        ByteUtils.setBytes(bytes, bookingIdentifier.getByteArray(), 10);
     }
 }

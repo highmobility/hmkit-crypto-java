@@ -1,7 +1,7 @@
-package com.highmobility.cryptok
+package com.highmobility.crypto
 
-import com.highmobility.cryptok.value.DeviceSerial
-import com.highmobility.cryptok.value.PrivateKey
+import com.highmobility.crypto.value.DeviceSerial
+import com.highmobility.crypto.value.PrivateKey
 import com.highmobility.value.Bytes
 import org.junit.Test
 
