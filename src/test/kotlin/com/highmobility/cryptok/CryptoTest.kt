@@ -7,11 +7,11 @@ import org.junit.Test
 import java.util.*
 
 internal class CryptoTest {
-    val cryptoK = Crypto()
+    val crypto = Crypto()
 
     @Test
     fun createKeypair() {
-        val keypair = cryptoK.createKeypair()
+        val keypair = crypto.createKeypair()
 
         assert(keypair.privateKey.size == 32)
         assert(keypair.publicKey.size == 64)
@@ -43,7 +43,7 @@ internal class CryptoTest {
 
     @Test
     fun createSerialNumber() {
-        val serial = cryptoK.createSerialNumber()
+        val serial = crypto.createSerialNumber()
         assert(serial.size == 9)
     }
 
@@ -52,24 +52,24 @@ internal class CryptoTest {
         val lessThan64BytesMessage = Bytes("AABB")
 
         // sign with a generated key. verify with the same generated key
-        val keyPair = cryptoK.createKeypair()
+        val keyPair = crypto.createKeypair()
 
-        val sig = cryptoK.sign(lessThan64BytesMessage, keyPair.privateKey)
+        val sig = crypto.sign(lessThan64BytesMessage, keyPair.privateKey)
         assert(sig.size == 64)
-        assert(cryptoK.verify(lessThan64BytesMessage, sig, keyPair.publicKey))
+        assert(crypto.verify(lessThan64BytesMessage, sig, keyPair.publicKey))
 
         // verify the blocking until 64 method
         val moreThan64BytesMessage = Bytes(ByteArray(79))
-        val sig2 = cryptoK.sign(moreThan64BytesMessage, keyPair.privateKey)
+        val sig2 = crypto.sign(moreThan64BytesMessage, keyPair.privateKey)
         assert(sig.size == 64)
-        assert(cryptoK.verify(moreThan64BytesMessage, sig2, keyPair.publicKey))
+        assert(crypto.verify(moreThan64BytesMessage, sig2, keyPair.publicKey))
     }
 
     @Test
     fun sha256() {
-        val sha1 = cryptoK.sha256(Bytes("AAB1"))
-        val sha2 = cryptoK.sha256(Bytes("AAB1"))
-        val shaDifferent = cryptoK.sha256(Bytes("AAB2"))
+        val sha1 = crypto.sha256(Bytes("AAB1"))
+        val sha2 = crypto.sha256(Bytes("AAB1"))
+        val shaDifferent = crypto.sha256(Bytes("AAB2"))
 
         assert(sha1.size == 32)
         assert(sha1 == sha2)
@@ -83,7 +83,7 @@ internal class CryptoTest {
         val publicKey =
             PublicKey("E759E9D7594504EA36180549F5276B12396B2EE9B8B37C5E452B78CE29D95A97D6A3EC2BDA924FAE15BED2D6FBC263FFB4CBECF27F6BA6CA066DE660DA19D97B")
 
-        val shared = cryptoK.createSharedSecret(privateKey, publicKey)
+        val shared = crypto.createSharedSecret(privateKey, publicKey)
         assert(shared == Bytes("17164A21309671D54484C3E6C3A3FF22E3F008E142E2A78B55124823F50AD77B"))
     }
 
@@ -94,14 +94,14 @@ internal class CryptoTest {
         val shared = Bytes("17164A21309671D54484C3E6C3A3FF22E3F008E142E2A78B55124823F50AD77B")
         val expectedResult =
             Bytes("A8C42FB05152B4FD715CAAAD4C7AAFEE7F3FF17ED6CA77725411542640E953A1")
-        val hmac = cryptoK.hmac(shared, message)
+        val hmac = crypto.hmac(shared, message)
         assert(hmac == expectedResult)
     }
 
     @Test
     fun signJWT() {
-        val private = cryptoK.createKeypair().privateKey
-        val signature = cryptoK.signJWT("asd".toByteArray(), private)
+        val private = crypto.createKeypair().privateKey
+        val signature = crypto.signJWT("asd".toByteArray(), private)
         assert(signature.size == 64)
         // verified with backend
     }
@@ -114,7 +114,7 @@ internal class CryptoTest {
             PublicKey("B9E4DDEC5191947C019A39FC3EFC2E4322119E9425A60A5116244CCB9260F90B34DB78725314167D421EF79865F75C18471671447370F01130B2116E583B4286")
         val expectedSharedKey =
             Bytes("80F2B6AD92E8C0158AD5313E566D492596A7C20E36CB29D3DF0387F6E5F66AFF")
-        assert(cryptoK.createSharedSecret(alicePrivateKey, bobPublicKey) == expectedSharedKey)
+        assert(crypto.createSharedSecret(alicePrivateKey, bobPublicKey) == expectedSharedKey)
     }
 
     @Test
@@ -128,15 +128,15 @@ internal class CryptoTest {
             Bytes("BCF57741E9DD8F53D2FA2E19EE7AAF315FB311C7A0E9542B2D251F6F0D7D45A46C92ECC9E5")
         val nonce = Bytes("000102030405060708")
         val message = Bytes("3601000100")
-        val sessionKey = cryptoK.createSessionKey(bobPrivateKey, alicePublicKey, nonce)
-        val messageWithHmac = message.concat(cryptoK.hmac(sessionKey, message))
+        val sessionKey = crypto.createSessionKey(bobPrivateKey, alicePublicKey, nonce)
+        val messageWithHmac = message.concat(crypto.hmac(sessionKey, message))
         val encryptedMessage =
-            cryptoK.encryptDecrypt(messageWithHmac, bobPrivateKey, alicePublicKey, nonce)
+            crypto.encryptDecrypt(messageWithHmac, bobPrivateKey, alicePublicKey, nonce)
 
         assert(encryptedMessage == expectedEncrypted)
 
         val decryptedMessage =
-            cryptoK.encryptDecrypt(encryptedMessage, bobPrivateKey, alicePublicKey, nonce)
+            crypto.encryptDecrypt(encryptedMessage, bobPrivateKey, alicePublicKey, nonce)
         assert(decryptedMessage == messageWithHmac)
     }
 
@@ -145,19 +145,19 @@ internal class CryptoTest {
         var previousMessage = Bytes(byteArrayOf())
         var previousEncryptedMessage = Bytes(byteArrayOf())
         for (i in 0 until 1000) {
-            val aliceKeys = cryptoK.createKeypair()
-            val bobKeys = cryptoK.createKeypair()
+            val aliceKeys = crypto.createKeypair()
+            val bobKeys = crypto.createKeypair()
             val randomSize = Math.floor(Math.random() * (1000 - 1) + 1)
             val message = Bytes(ByteArray(randomSize.toInt()))
             Random().nextBytes(message.byteArray)
-            val nonce = cryptoK.createSerialNumber()
-            val encryptedMessage = cryptoK.encryptDecrypt(
+            val nonce = crypto.createSerialNumber()
+            val encryptedMessage = crypto.encryptDecrypt(
                 Bytes(message),
                 bobKeys.privateKey,
                 aliceKeys.publicKey,
                 nonce
             )
-            val decryptedMessage = cryptoK.encryptDecrypt(
+            val decryptedMessage = crypto.encryptDecrypt(
                 encryptedMessage,
                 aliceKeys.privateKey,
                 bobKeys.publicKey,
