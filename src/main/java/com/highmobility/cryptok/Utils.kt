@@ -3,7 +3,6 @@ package com.highmobility.cryptok
 import com.highmobility.value.Bytes
 import java.lang.IllegalArgumentException
 import java.math.BigInteger
-import kotlin.experimental.and
 
 fun BigInteger.toBytes(): Bytes {
     var data = this.toByteArray()
@@ -61,6 +60,20 @@ fun Int.toBytes(length: Int): ByteArray {
 
 fun Bytes.toInt(): Int {
     return this.getUnsignedInt(0, size)
+}
+
+fun Boolean.toByte(): Byte {
+    return when (this) {
+        true -> 0x01
+        else -> 0x00
+    }
+}
+
+fun Byte.toBoolean(): Boolean {
+    return when (this) {
+        0x00.toByte() -> false
+        else -> true
+    }
 }
 
 fun Bytes.getUnsignedInt(at: Int, length: Int): Int {

@@ -12,20 +12,21 @@ import java.util.ArrayList
 class TelematicsContainer : Bytes {
     val crypto: Crypto
 
-    val senderPrivateKey: PrivateKey
-    val targetPublicKey: PublicKey
+    // container fields, in order
     val senderSerialNumber: DeviceSerial
     val targetSerialNumber: DeviceSerial
     val nonce: Bytes
-
     val requestId: Bytes
-    val encryptedFlag: Int
+    val encrypted: Boolean
     val contentType: Int
 
-    // Command(payload) is contained in 0x36 container and encrypted with HM custom aes
+    // Command(payload) is encrypted with HM custom aes
     val payload: Bytes
     val hmac: Bytes
 
+    // helper variables
+    val senderPrivateKey: PrivateKey
+    val targetPublicKey: PublicKey
     val sessionKey: Bytes
 
     /**
@@ -40,7 +41,7 @@ class TelematicsContainer : Bytes {
         targetSerialNumber: DeviceSerial,
         nonce: Bytes,
         requestId: Bytes = Bytes(),
-        encryptedFlag: Int = 1,
+        encrypted: Boolean = true,
         contentType: Int = 1
 
     ) {
@@ -51,7 +52,7 @@ class TelematicsContainer : Bytes {
         this.targetSerialNumber = targetSerialNumber
         this.nonce = nonce
         this.requestId = requestId
-        this.encryptedFlag = encryptedFlag
+        this.encrypted = encrypted
         this.contentType = contentType
 
         this.payload = createPayload(
@@ -67,7 +68,7 @@ class TelematicsContainer : Bytes {
         bytes.set(28, requestId.size.toBytes(2))
         bytes.set(30, requestId)
         var position = 30 + requestId.size
-        bytes.set(position, 1)
+        bytes.set(position, encrypted.toByte())
         position += 1
         bytes.set(position, contentType.toByte())
         position += 1
@@ -80,7 +81,7 @@ class TelematicsContainer : Bytes {
         this.hmac = crypto.hmac(sessionKey, bytes)
 
         val completeBytes = bytes.concat(hmac)
-        this.bytes = completeBytes.escapeAndAddStartEndBytes().byteArray
+        this.bytes = completeBytes.byteArray
     }
 
     constructor(
@@ -89,9 +90,8 @@ class TelematicsContainer : Bytes {
         senderPrivateKey: PrivateKey,
         targetPublicKey: PublicKey,
     ) {
-        this.bytes = unescapeAndRemoveStartEndBytes().byteArray
+        this.bytes = escapedBytes.unescapeAndRemoveStartEndBytes().byteArray
         this.crypto = crypto
-        this.bytes = escapedBytes.byteArray
         this.senderPrivateKey = senderPrivateKey
         this.targetPublicKey = targetPublicKey
 
@@ -112,14 +112,14 @@ class TelematicsContainer : Bytes {
         this.requestId = getRange(position, position + requestIdSize)
         position += requestIdSize
 
-        this.encryptedFlag = bytes[position].toInt()
+        this.encrypted = bytes[position].toBoolean()
         position += 1
 
         this.contentType = bytes[position].toInt()
         position += 1
 
-        val payLoadSize = getRange(position, position + 2).toInt()
-        position += 2
+        val payLoadSize = getRange(position, position + 4).toInt()
+        position += 4
 
         this.payload = getRange(position, position + payLoadSize)
         position += payLoadSize
@@ -133,14 +133,14 @@ class TelematicsContainer : Bytes {
     }
 
     /**
-     * The raw command in the payload portion, unencrypted and without 0x36 container.
+     * The unencrypted raw command in the payload portion
      *
      * @return The unenncrypted command
      */
-    fun getUnecryptedPayload(): Bytes {
-        return if (encryptedFlag == 1) {
+    fun getUnencryptedPayload(): Bytes {
+        return if (encrypted) {
             val decrypted = crypto.encryptDecrypt(payload, senderPrivateKey, targetPublicKey, nonce)
-            decrypted.getRange(4, decrypted.size)
+            decrypted.getRange(0, decrypted.size)
         } else {
             this.payload
         }
@@ -151,7 +151,7 @@ class TelematicsContainer : Bytes {
     }
 
     /**
-     * HM Custom binary command container (0x36), encrypted by HM custom AES (create a secure command
+     * Message will be encrypted by HM custom AES (create a secure command
      * container: https://highmobility.atlassian.net/wiki/spaces/HC/pages/551321631/Telematics+Container+pseudocodes)
      *
      * @return The Telematics command payload part
@@ -162,21 +162,12 @@ class TelematicsContainer : Bytes {
         targetPublicKey: PublicKey,
         nonce: Bytes
     ): Bytes {
-        // Builds the container by concatenating <<0x036, 0x01, size of command>> and command
-        val commandData = Bytes(4 + message.size)
-        commandData.set(0, 0x36)
-        commandData.set(1, 0x01)
-        commandData.set(2, message.size.toBytes(2))
-        commandData.set(4, message)
-
-        val encryptedContainer =
-            crypto.encryptDecrypt(
-                commandData,
-                senderPrivateKey,
-                targetPublicKey,
-                nonce
-            )
-        return encryptedContainer
+        return crypto.encryptDecrypt(
+            message,
+            senderPrivateKey,
+            targetPublicKey,
+            nonce
+        )
     }
 
     /**
@@ -188,7 +179,7 @@ class TelematicsContainer : Bytes {
 
         result.add(0x00)
 
-        for (i in 0..this.size) {
+        for (i in 0 until this.size) {
             if (this[i] == 0x00.toByte() ||
                 this[i] == 0xfe.toByte() ||
                 this[i] == 0xff.toByte()
@@ -205,13 +196,11 @@ class TelematicsContainer : Bytes {
     }
 
     /**
-     * escape the 0x00 bytes and add start/end byte
+     * Unescape the 0x00 bytes and add start/end byte
      *
      * @return The escaped bytes
      */
     private fun Bytes.unescapeAndRemoveStartEndBytes(): Bytes {
-        val result = ArrayList<Byte>()
-
         if (this[0] != 0x00.toByte()) {
             throw IllegalArgumentException("Invalid start byte")
         }
@@ -220,10 +209,16 @@ class TelematicsContainer : Bytes {
             throw IllegalArgumentException("Invalid end byte")
         }
 
-        for (i in 1 until this.size) {
-            if (this[i] != 0xFE.toByte()) {
+        val result = ArrayList<Byte>()
+        var i = 1
+        while (i < this.size - 1) {
+            if (this[i] == 0xFE.toByte()) {
+                i++
+                result.add(this[i])
+            } else {
                 result.add(this[i])
             }
+            i++
         }
 
         return Bytes(result.toByteArray())

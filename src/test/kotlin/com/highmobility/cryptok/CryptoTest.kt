@@ -1,12 +1,12 @@
 package com.highmobility.cryptok
 
-import com.highmobility.cryptok.value.DeviceSerial
 import com.highmobility.cryptok.value.PrivateKey
 import com.highmobility.cryptok.value.PublicKey
 import com.highmobility.cryptok.value.Signature
 import com.highmobility.hmkit.HMKit
 import com.highmobility.value.Bytes
 import org.junit.Test
+import java.util.*
 
 typealias CorePublicKey = com.highmobility.crypto.value.PublicKey
 typealias CorePrivateKey = com.highmobility.crypto.value.PrivateKey
@@ -134,7 +134,7 @@ internal class CryptoTest {
         // shared key from DH ^^ method
         val shared = Bytes("17164A21309671D54484C3E6C3A3FF22E3F008E142E2A78B55124823F50AD77B")
         val expectedResult =
-            Bytes("3573DF5D8EE68A67EFEEFE1544A0F90D46C204134FAD44EC14C7BCE3EA6DC736")
+            Bytes("A8C42FB05152B4FD715CAAAD4C7AAFEE7F3FF17ED6CA77725411542640E953A1")
         val hmac = cryptoK.hmac(shared, message)
         assert(hmac == expectedResult)
     }
@@ -144,45 +144,72 @@ internal class CryptoTest {
         val private = cryptoK.createKeypair().privateKey
         val signature = cryptoK.signJWT("asd".toByteArray(), private)
         assert(signature.size == 64)
-        // // TODO: 19/2/21 verify with fleet
+        // verified with backend
     }
 
     @Test
-    fun jwt() {
-        val privateKey =
-            PrivateKey("7FEE7D0CBBADFD4BF99AA8CECFF7036A0D767CACC6AA27BD5AB9E400805BC184")
-        val message = Bytes("AABB")
-        cryptoK.signJWT(message.byteArray, privateKey)
-        // cannot test the signature, it is different every time
+    fun computeSecret() {
+        val alicePrivateKey =
+            PrivateKey("F4915A98F534485DF9CB77384CEB757EB3706A665441C5120F976F38EBBBC69C")
+        val bobPublicKey =
+            PublicKey("B9E4DDEC5191947C019A39FC3EFC2E4322119E9425A60A5116244CCB9260F90B34DB78725314167D421EF79865F75C18471671447370F01130B2116E583B4286")
+        val expectedSharedKey =
+            Bytes("80F2B6AD92E8C0158AD5313E566D492596A7C20E36CB29D3DF0387F6E5F66AFF")
+        assert(cryptoK.createSharedSecret(alicePrivateKey, bobPublicKey) == expectedSharedKey)
     }
 
     @Test
-    fun encryptAndDecrypt() {
-        val vehiclePrivateKey = PrivateKey(
-            "468A685967EF57ADC7FB6C51B12045722C74277C45EDD8EC005D1FF4197D6006"
-        )
-        val vehicleCertificate = AccessCertificate(
-            "01746D63730908070605040302010102030405060708096A94B494B0BD287E9C98014CECC1E3E19F30C002B74116BB727B93FB422DBDC12172A3FD24C36EB2ABEC57AA94D74A53A393D7B0AE30E6131B1EEDBCA3A17530110101010111020201010301020310937CB737CD8EA3E5E510830A54D2945F5BD8C54A1486489D7E8B911B06ABC1CE12B1D1B4E9994D99987106C63730919E5630FFBD755CF00AD62ABA1AC53983"
-        )
-        val nonce = Bytes("AABBCCDDEEFF000000")
-        val vehicleSerial = DeviceSerial("090807060504030201")
-        val command = Bytes("AABB")
+    fun encryptDecrypt() {
+        // values are from node
+        val bobPrivateKey =
+            PrivateKey("F4915A98F534485DF9CB77384CEB757EB3706A665441C5120F976F38EBBBC69C")
+        val alicePublicKey =
+            PublicKey("9E99B4483DD47A42492D34BC9EEE5304A52672A0F08E895AA355201A7B5782CE61C5D6485EEEFBBA9F7A229C0A508C835568ED6A6670C9AAA4E8019D0C2F5201")
+        val expectedEncrypted =
+            Bytes("BCF57741E9DD8F53D2FA2E19EE7AAF315FB311C7A0E9542B2D251F6F0D7D45A46C92ECC9E5")
+        val nonce = Bytes("000102030405060708")
+        val message = Bytes("3601000100")
+        val sessionKey = cryptoK.createSessionKey(bobPrivateKey, alicePublicKey, nonce)
+        val messageWithHmac = message.concat(cryptoK.hmac(sessionKey, message))
+        val encryptedMessage =
+            cryptoK.encryptDecrypt(messageWithHmac, bobPrivateKey, alicePublicKey, nonce)
 
-        val encryptedCommand = cryptoK.encryptDecrypt(
-            command,
-            vehiclePrivateKey,
-            vehicleCertificate.gainerPublicKey,
-            nonce
-        )
+        assert(encryptedMessage == expectedEncrypted)
 
-        val decryptedCommand = cryptoK.encryptDecrypt(
-            encryptedCommand,
-            vehiclePrivateKey,
-            vehicleCertificate.gainerPublicKey,
-            nonce
-        )
+        val decryptedMessage =
+            cryptoK.encryptDecrypt(encryptedMessage, bobPrivateKey, alicePublicKey, nonce)
+        assert(decryptedMessage == messageWithHmac)
+    }
 
-        assert(encryptedCommand != command)
-        assert(decryptedCommand == command)
+    @Test
+    fun encryptDecrypt1000TimesWithRandomValues() {
+        var previousMessage = Bytes(byteArrayOf())
+        var previousEncryptedMessage = Bytes(byteArrayOf())
+        for (i in 0 until 1000) {
+            val aliceKeys = cryptoK.createKeypair()
+            val bobKeys = cryptoK.createKeypair()
+            val randomSize = Math.floor(Math.random() * (1000 - 1) + 1)
+            val message = Bytes(ByteArray(randomSize.toInt()))
+            Random().nextBytes(message.byteArray)
+            val nonce = cryptoK.createSerialNumber()
+            val encryptedMessage = cryptoK.encryptDecrypt(
+                Bytes(message),
+                bobKeys.privateKey,
+                aliceKeys.publicKey,
+                nonce
+            )
+            val decryptedMessage = cryptoK.encryptDecrypt(
+                encryptedMessage,
+                aliceKeys.privateKey,
+                bobKeys.publicKey,
+                nonce
+            )
+
+            assert(decryptedMessage == message)
+            assert(message != previousMessage)
+            assert(encryptedMessage != previousEncryptedMessage)
+            previousEncryptedMessage = encryptedMessage
+            previousMessage = message
+        }
     }
 }

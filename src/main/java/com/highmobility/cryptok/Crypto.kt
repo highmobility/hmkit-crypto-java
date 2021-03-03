@@ -5,7 +5,6 @@ import com.highmobility.cryptok.value.PrivateKey
 import com.highmobility.cryptok.value.PublicKey
 import com.highmobility.cryptok.value.Signature
 import com.highmobility.value.Bytes
-import org.bouncycastle.crypto.params.ECDomainParameters
 import org.bouncycastle.jce.ECNamedCurveTable
 import org.bouncycastle.jce.provider.BouncyCastleProvider
 import org.bouncycastle.jce.spec.ECNamedCurveParameterSpec
@@ -13,11 +12,11 @@ import org.bouncycastle.jce.spec.ECParameterSpec
 import org.bouncycastle.pqc.math.linearalgebra.ByteUtils.xor
 import java.security.*
 import java.util.*
+import javax.crypto.Cipher
 import javax.crypto.KeyAgreement
 import javax.crypto.Mac
 import javax.crypto.SecretKey
 import javax.crypto.spec.SecretKeySpec
-import javax.crypto.Cipher
 
 typealias JavaSignature = java.security.Signature
 typealias JavaPrivateKey = java.security.PrivateKey
@@ -34,7 +33,6 @@ var SIGN_ALGORITHM = "SHA256withPLAIN-ECDSA"
 
 val CURVE_NAME = "secp256r1" // this is 1.3.132.0.prime256v1
 val params = ECNamedCurveTable.getParameterSpec(CURVE_NAME)
-val CURVE = ECDomainParameters(params.curve, params.g, params.n, params.h)
 val CURVE_SPEC = ECParameterSpec(params.curve, params.g, params.n, params.h)
 
 class Crypto {
@@ -69,7 +67,7 @@ class Crypto {
         return HMKeyPair(privateKey, publicKey)
     }
 
-    fun createJavaKeypair(): KeyPair {
+    private fun createJavaKeypair(): KeyPair {
         val ecSpec: ECNamedCurveParameterSpec = ECNamedCurveTable.getParameterSpec(CURVE_NAME)
         val g = KeyPairGenerator.getInstance(KEY_GEN_ALGORITHM, "BC")
         g.initialize(ecSpec, SecureRandom())
@@ -77,20 +75,10 @@ class Crypto {
         return javaKeyPair
     }
 
-    fun verify(message: Bytes, signature: Signature, publicKey: JavaPublicKey): Boolean {
-        val formattedMessage = message.fillWith0sUntil(64)
-
-        val ecdsaVerify = JavaSignature.getInstance("SHA256withPLAIN-ECDSA", "BC")
-        ecdsaVerify.initVerify(publicKey)
-        ecdsaVerify.update(formattedMessage.byteArray)
-        val result = ecdsaVerify.verify(signature.byteArray)
-        return result
-    }
-
     /**
      * Sign data.
      *
-     * @param message      The message that will be signed.
+     * @param message The message that will be signed.
      * @param privateKey The private key that will be used for signing.
      * @return The signature.
      */
@@ -108,7 +96,7 @@ class Crypto {
     /**
      * Sign data.
      *
-     * @param message      The message that will be signed.
+     * @param message The message that will be signed.
      * @param privateKey The private key that will be used for signing.
      * @return The signature.
      */
@@ -119,7 +107,25 @@ class Crypto {
     /**
      * Verify a signature.
      *
-     * @param message      The message that was signed.
+     * @param message The message that was signed.
+     * @param signature The signature.
+     * @param publicKey The public key that is used for verifying.
+     * @return The verification result.
+     */
+    fun verify(message: Bytes, signature: Signature, publicKey: JavaPublicKey): Boolean {
+        val formattedMessage = message.fillWith0sUntil(64)
+
+        val ecdsaVerify = JavaSignature.getInstance("SHA256withPLAIN-ECDSA", "BC")
+        ecdsaVerify.initVerify(publicKey)
+        ecdsaVerify.update(formattedMessage.byteArray)
+        val result = ecdsaVerify.verify(signature.byteArray)
+        return result
+    }
+
+    /**
+     * Verify a signature.
+     *
+     * @param message The message that was signed.
      * @param signature The signature.
      * @param publicKey The public key that is used for verifying.
      * @return The verification result.
@@ -131,7 +137,7 @@ class Crypto {
     /**
      * Verify a signature.
      *
-     * @param data      The data that was signed.
+     * @param data The data that was signed.
      * @param signature The signature.
      * @param publicKey The public key that is used for verifying.
      * @return The verification result.
@@ -177,12 +183,22 @@ class Crypto {
 
     // MARK: Telematics
 
+    /**
+     * Create telematics container for the given command. This can then be forwarded to HM server
+     *
+     * @param command The command
+     * @param privateKey Sender private key
+     * @param serial Target serial number
+     * @param accessCertificate Access Certificate
+     * @param nonce Nonce
+     * @return The container bytes
+     */
     fun createTelematicsContainer(
         command: Bytes,
         privateKey: PrivateKey,
         serial: DeviceSerial,
         accessCertificate: AccessCertificate,
-        nonce: Bytes,
+        nonce: Bytes
     ): Bytes {
         val container = TelematicsContainer(
             this,
@@ -194,14 +210,23 @@ class Crypto {
             accessCertificate.gainerSerial,
             nonce
         )
+
         return container.getEscapedAndWithStartEndBytes()
     }
 
-    // This can throw IllegalArgumentException
+    /**
+     * Decrypt the command from telematics container.
+     *
+     * @param container The full container bytes
+     * @param privateKey The sender private key
+     * @param accessCertificate The Access Certificate
+     * @return The decrypted command
+     * @throws IllegalArgumentException When parsing fails for some reason
+     */
     fun getCommandFromTelematicsContainer(
         container: Bytes,
         privateKey: PrivateKey,
-        accessCertificate: AccessCertificate,
+        accessCertificate: AccessCertificate
     ): Bytes {
         val container = TelematicsContainer(
             this,
@@ -210,7 +235,7 @@ class Crypto {
             accessCertificate.gainerPublicKey
         )
 
-        return container.getUnecryptedPayload()
+        return container.getUnencryptedPayload()
     }
 
     internal fun encryptDecrypt(
@@ -219,18 +244,16 @@ class Crypto {
         publicKey: PublicKey,
         nonce: Bytes
     ): Bytes {
-        // Uses private_key and access_certificate to compute key
-        // Creates session_key(hmac) using compute_key as key and nonce as message
+        // Uses privateKey and publicKey to compute key
+        // Creates sessionKey using hmac for createSharedSecret as key and nonce as message
         val sessionKey = createSessionKey(privateKey, publicKey, nonce)
-        // Creates signature using session_key
         val encryptionKey = sessionKey.getRange(0, 16)
+
         // expand nonce because it should be 16 bytes long
         val iv = nonce.getRange(0, 7).concat(nonce)
         // Creates signature using session_key
-        val cipher = aes(iv, encryptionKey)
-
-        // Expand cipher binary(repeat it) until the container length
-
+        val cipher = aes(encryptionKey, iv)
+        // Expand cipher(repeat it) until the container length
         var cipherExpanded = cipher
         while (cipherExpanded.size < message.size) {
             cipherExpanded = cipherExpanded.concat(cipherExpanded)
@@ -253,7 +276,7 @@ class Crypto {
         val key: SecretKey = SecretKeySpec(sharedSecret.byteArray, "HmacSHA256")
         val mac: Mac = Mac.getInstance("HmacSHA256", "BC")
         mac.init(key)
-        val hmac = mac.doFinal(message.fillWith0sUntil(256).byteArray)
+        val hmac = mac.doFinal(message.fillWith0sUntil(64).byteArray)
         return Bytes(hmac)
     }
 
@@ -266,16 +289,11 @@ class Crypto {
         return Bytes(secret)
     }
 
-    internal fun aes(key: Bytes, message: Bytes): Bytes {
-        val cipher = Cipher.getInstance("AES/ECB/PKCS7Padding", "BC")
+    private fun aes(key: Bytes, message: Bytes): Bytes {
+        val cipher = Cipher.getInstance("AES/ECB/NoPadding", "BC")
         val key = SecretKeySpec(key.byteArray, "AES")
-
-        // Encrypt
         cipher.init(Cipher.ENCRYPT_MODE, key)
-        val cipherText = ByteArray(cipher.getOutputSize(message.length))
-        var ctLength = cipher.update(message.byteArray, 0, message.length, cipherText, 0)
-        ctLength += cipher.doFinal(cipherText, ctLength)
-
-        return Bytes(cipherText)
+        val result = cipher.doFinal(message.byteArray)
+        return Bytes(result)
     }
 }
