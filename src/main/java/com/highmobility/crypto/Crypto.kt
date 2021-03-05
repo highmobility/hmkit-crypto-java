@@ -217,7 +217,7 @@ class Crypto {
     }
 
     /**
-     * Decrypt the command from telematics container.
+     * Decrypt the payload from the telematics container.
      *
      * @param container The full container bytes
      * @param privateKey The sender private key
@@ -225,7 +225,7 @@ class Crypto {
      * @return The decrypted command
      * @throws IllegalArgumentException When parsing fails for some reason
      */
-    fun getCommandFromTelematicsContainer(
+    fun getPayloadFromTelematicsContainer(
         container: Bytes,
         privateKey: PrivateKey,
         accessCertificate: AccessCertificate
