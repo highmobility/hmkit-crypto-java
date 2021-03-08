@@ -73,7 +73,7 @@ class PrivateKey : BytesWithLength {
     companion object {
         fun fromPKCS8(serviceAccountApiPrivateKey: String): PrivateKey {
             var encodedKeyString = serviceAccountApiPrivateKey
-            // TODO: 19/2/21 try to use BC PKCS8 methods to not remove these strings manually
+            // NOTE: 19/2/21 there are BC PKCS8 convert methods that remove these strings also
             encodedKeyString = encodedKeyString.replace("-----BEGIN PRIVATE KEY----", "")
             encodedKeyString = encodedKeyString.replace("-----END PRIVATE KEY-----", "")
             val decodedPrivateKey = Base64.decode(encodedKeyString)
