@@ -1,3 +1,4 @@
 rootProject.name = "hmkit-crypto"
 
-include ':hmkit-utils-java'
+include ':hmkit-utils'
+project(':hmkit-utils').projectDir = new File('hmkit-utils-java')
