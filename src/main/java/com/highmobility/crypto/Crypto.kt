@@ -219,20 +219,20 @@ class Crypto {
     /**
      * Decrypt the payload from the telematics container.
      *
-     * @param container The full container bytes
+     * @param containerBytes The full container bytes
      * @param privateKey The sender private key
      * @param accessCertificate The Access Certificate
      * @return The decrypted command
      * @throws IllegalArgumentException When parsing fails for some reason
      */
     fun getPayloadFromTelematicsContainer(
-        container: Bytes,
+        containerBytes: Bytes,
         privateKey: PrivateKey,
         accessCertificate: AccessCertificate
     ): Bytes {
         val container = TelematicsContainer(
             this,
-            container,
+            containerBytes,
             privateKey,
             accessCertificate.gainerPublicKey
         )
@@ -291,9 +291,9 @@ class Crypto {
         return Bytes(secret)
     }
 
-    private fun aes(key: Bytes, message: Bytes): Bytes {
+    private fun aes(keyBytes: Bytes, message: Bytes): Bytes {
         val cipher = Cipher.getInstance("AES/ECB/NoPadding", "BC")
-        val key = SecretKeySpec(key.byteArray, "AES")
+        val key = SecretKeySpec(keyBytes.byteArray, "AES")
         cipher.init(Cipher.ENCRYPT_MODE, key)
         val result = cipher.doFinal(message.byteArray)
         return Bytes(result)
