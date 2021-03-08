@@ -104,7 +104,7 @@ SignJWT
 fun signJWT(message: ByteArray, privateKey: PrivateKey): Signature
 ```
 
-Get telematics container payload
+Get the telematics container payload
 
 ```kotlin
 fun getPayloadFromTelematicsContainer(
@@ -114,7 +114,7 @@ fun getPayloadFromTelematicsContainer(
 ): Bytes
 ```
 
-Create telematics container
+Create the telematics container
 
 ```kotlin
 fun createTelematicsContainer(
