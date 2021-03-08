@@ -1,7 +1,7 @@
 # HMKit Crypto Telematics
 
-High-Mobility Telematics container, Certificate classes and public Crypto methods(sign, keygen).
-It is implemented in pure Java, using BouncyCastle provider.
+High-Mobility Telematics container, Certificate classes and public Crypto methods(sign, keygen). It
+is implemented in pure Java, using BouncyCastle provider.
 
 ### Dependencies
 
@@ -126,5 +126,7 @@ fun createTelematicsContainer(
 ): Bytes
 ```
 
+### Tag name
 
-
+t- is prependended for crypto-telematics commit tags. This is to not confuse them with normal core
+releases. 
