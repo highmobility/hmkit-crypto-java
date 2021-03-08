@@ -1,44 +1,43 @@
-tests require osx/linux platform to verify crypto with core
+# HMKit Crypto Telematics
 
-
-# HMKit Crypto
-
-This repository contains the Certificate classes and public Crypto methods(sign, keygen).
+High-Mobility Telematics container, Certificate classes and public Crypto methods(sign, keygen).
+It is implemented in pure Java, using BouncyCastle provider.
 
 ### Dependencies
 
 * hmkit-utils
+* bouncycastle security provider: bcprov-jdk15on
 
 ### Setup
 
-* Follow the setup process in either HMKit Android or HMKit OEM projects.
+* clone the repo
+* `./gradlew test`
 
 ### Install
 
-Releases are pushed to jcenter. To include hmkit-crypto in your project, add to build.gradle:
+Releases are pushed to mavenCentral(). To include hmkit-crypto in your project, add to build.gradle:
 
 ```
 repositories {
-  jcenter()
+  mavenCentral()
 }
 
 dependencies {
-  // Depending on your environment, use hmkit-oem or hmkit-android to get the transitive crypto
-  // dependency 
-  // implementation 'com.highmobility:hmkit-oem:2.0.0'
-  // or
-  // implementation 'com.highmobility:hmkit-android:2.0.3@aar' { transitive = true }
+  implementation 'com.highmobility:hmkit-crypto-telematics:0.0.1'
 }
 ```
 
-Find the latest version names in https://bintray.com/high-mobility/maven/
+Find the latest version names in mavenCentral.
 
 ## Certificates
 
-Access Certificate and Device Certificate are represented in this library. The certificates will 
-always be converted to raw bytes that are accessible with `Bytes getBytes()` method. You can always 
-add a signature later with `setSignature(Signature)`. You can get the certificate data without
-the signature with getCertificateData().
+Access Certificate and Device Certificate are represented in this library. The certificates will
+always be converted to raw bytes that are accessible with `Bytes getBytes()` method. You can always
+add a signature later with `setSignature(Signature)`. You can get the certificate data without the
+signature with getCertificateData().
+
+All the Certificate fields(Issuer, DeviceSerial) also inherit from Bytes class whose methods can be
+used for general initialisation, comparison and description.
 
 ### AccessCertificate
 
@@ -46,12 +45,12 @@ Use one of the designated initialisers to create the object. For example:
 
 ```java
 public public AccessCertificate(Issuer issuer,
-                                DeviceSerial providingSerial,
-                                DeviceSerial gainerSerial,
-                                PublicKey gainingPublicKey,
-                                HMCalendar startDate,
-                                HMCalendar endDate,
-                                Permissions permissions)
+        DeviceSerial providingSerial,
+        DeviceSerial gainerSerial,
+        PublicKey gainingPublicKey,
+        HMCalendar startDate,
+        HMCalendar endDate,
+        Permissions permissions)
 ```
 
 See public getters for certificate info, for example
@@ -61,13 +60,14 @@ public Issuer getIssuer()
 ```
 
 ### DeviceCertificate
+
 Use one of the designated initialisers to create the object. For example:
 
 ```java
 public DeviceCertificate(Issuer issuer,
-                         AppIdentifier appIdentifier,
-                         DeviceSerial serial,
-                         PublicKey publicKey)
+        AppIdentifier appIdentifier,
+        DeviceSerial serial,
+        PublicKey publicKey)
 ```
 
 See public getters for certificate info, for example
@@ -77,23 +77,54 @@ public PublicKey getPublicKey()
 ```
 
 ## Crypto ##
-Use Crypto.java static methods to
 
-create a key pair
-```java
-public static HMKeyPair createKeypair()
-```
+Use Crypto.kt methods to
 
-create a random serial number
-```java
-public static DeviceSerial createSerialNumber()
-```
-
-sign
+Create a key pair
 
 ```java
-public static Signature sign(Bytes bytes, PrivateKey privateKey)
+public HMKeyPair createKeypair()
 ```
 
-Note that all of the Certificate fields(Issuer, DeviceSerial) inherit from custom Bytes class whose
-methods can be used for general initialisation, comparison and description.
+Create a random serial number
+
+```java
+public DeviceSerial createSerialNumber()
+```
+
+Sign
+
+```java
+public Signature sign(Bytes bytes,PrivateKey privateKey)
+```
+
+SignJWT
+
+```kotlin
+fun signJWT(message: ByteArray, privateKey: PrivateKey): Signature
+```
+
+Get telematics container payload
+
+```kotlin
+fun getPayloadFromTelematicsContainer(
+    container: Bytes,
+    privateKey: PrivateKey,
+    accessCertificate: AccessCertificate
+): Bytes
+```
+
+Create telematics container
+
+```kotlin
+fun createTelematicsContainer(
+    command: Bytes,
+    privateKey: PrivateKey,
+    serial: DeviceSerial,
+    accessCertificate: AccessCertificate,
+    nonce: Bytes
+): Bytes
+```
+
+
+
