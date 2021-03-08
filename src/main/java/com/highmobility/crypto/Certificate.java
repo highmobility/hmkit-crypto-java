@@ -24,7 +24,6 @@
 package com.highmobility.crypto;
 
 import com.highmobility.crypto.value.Signature;
-import com.highmobility.crypto.value.Signature;
 import com.highmobility.value.Bytes;
 
 /**

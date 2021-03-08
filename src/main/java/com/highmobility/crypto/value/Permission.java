@@ -43,9 +43,7 @@ public class Permission {
         return location;
     }
 
-    /**
-     * General permissions.
-     */
+    // MARK: General permissions
 
     /**
      * @param allowed Whether to allow the permission.

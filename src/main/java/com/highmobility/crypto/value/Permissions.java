@@ -149,9 +149,7 @@ public class Permissions extends BytesWithLength {
         allow(permission.getBitLocation(), permission.allowed);
     }
 
-    /**
-     * General permissions.
-     */
+    // MARK General permissions
 
     /**
      * Set the permission to allow the reading of the list of stored certificates (trusted

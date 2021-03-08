@@ -1,3 +1,26 @@
+/*
+ * The MIT License
+ *
+ * Copyright (c) 2014- High-Mobility GmbH (https://high-mobility.com)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
 package com.highmobility.crypto
 
 import com.highmobility.crypto.value.DeviceSerial
@@ -30,10 +53,10 @@ Signature for downloading access certificates: ECDSA, SHA256
 JWT signature For signing Service Account API requests: ES256
  */
 
-val KEY_GEN_ALGORITHM = "ECDH" // EC and ECDSA can be used with same algorithm
+const val KEY_GEN_ALGORITHM = "ECDH" // EC and ECDSA can be used with same algorithm
 var SIGN_ALGORITHM = "SHA256withPLAIN-ECDSA"
 
-val CURVE_NAME = "secp256r1" // this is 1.3.132.0.prime256v1
+const val CURVE_NAME = "secp256r1" // this is 1.3.132.0.prime256v1
 val params = ECNamedCurveTable.getParameterSpec(CURVE_NAME)
 val CURVE_SPEC = ECParameterSpec(params.curve, params.g, params.n, params.h)
 
@@ -286,7 +309,7 @@ class Crypto {
     internal fun createSharedSecret(privateKey: PrivateKey, publicKey: PublicKey): Bytes {
         val ka = KeyAgreement.getInstance(KEY_GEN_ALGORITHM, "BC")
         ka.init(privateKey.toJavaKey())
-        ka.doPhase(publicKey.toJavaKey(), true);
+        ka.doPhase(publicKey.toJavaKey(), true)
         val secret = ka.generateSecret() // 32 bytes
         return Bytes(secret)
     }

@@ -24,7 +24,6 @@
 package com.highmobility.crypto;
 
 import com.highmobility.crypto.value.PrivateKey;
-import com.highmobility.crypto.value.PrivateKey;
 import com.highmobility.crypto.value.PublicKey;
 
 /**
@@ -32,8 +31,8 @@ import com.highmobility.crypto.value.PublicKey;
  */
 public class HMKeyPair {
     private static final long serialVersionUID = 6637283024188232326L;
-    private PrivateKey privateKey;
-    private PublicKey publicKey;
+    private final PrivateKey privateKey;
+    private final PublicKey publicKey;
 
     /**
      * Create a ECC Keypair object with private and public key.

@@ -43,17 +43,17 @@ class PrivateKey : BytesWithLength {
     /**
      * @param value The raw bytes.
      */
-    constructor(value: Bytes?) : super(value) {}
+    constructor(value: Bytes?) : super(value)
 
     /**
      * @param value The bytes in hex or Base64.
      */
-    constructor(value: String?) : super(value) {}
+    constructor(value: String?) : super(value)
 
     /**
      * @param bytes The raw bytes.
      */
-    constructor(bytes: ByteArray?) : super(bytes) {}
+    constructor(bytes: ByteArray?) : super(bytes)
 
     constructor(javaKey: ECPrivateKey) {
         this.bytes = javaKey.getBytes().byteArray

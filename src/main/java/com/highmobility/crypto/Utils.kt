@@ -1,3 +1,26 @@
+/*
+ * The MIT License
+ *
+ * Copyright (c) 2014- High-Mobility GmbH (https://high-mobility.com)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
 package com.highmobility.crypto
 
 import com.highmobility.value.Bytes
@@ -19,7 +42,7 @@ fun BigInteger.toBytes(numBytes: Int): Bytes {
     val bytes = ByteArray(numBytes)
     val biBytes = this.toByteArray()
     val start = if (biBytes.size == numBytes + 1) 1 else 0
-    val length = Math.min(biBytes.size, numBytes)
+    val length = biBytes.size.coerceAtMost(numBytes)
     System.arraycopy(biBytes, start, bytes, numBytes - length, length)
     return Bytes(bytes)
 }
@@ -37,7 +60,6 @@ fun Bytes.fillWith0sUntil(blockSize: Int): Bytes {
 /**
  * This works for both negative and positive ints.
  *
- * @param value  the valueBytes converted to byte[]
  * @param length the returned byte[] length
  * @return the allBytes representing the valueBytes
  */
