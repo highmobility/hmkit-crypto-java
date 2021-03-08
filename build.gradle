@@ -16,10 +16,10 @@ repositories {
 
 // these are not release numbers. release numbers are in deploy.settings files.
 ext.ver = [
-        "hmkit-crypto"  : "1.4.6",
-        "hmkit-utils"   : "1.4.5",
-        "hmkit-auto-api": "3.12.0",
-        compileSdk      : 28
+        "hmkit-crypto-telematics": "0.0.1",
+        "hmkit-utils"            : "1.4.5",
+        "hmkit-auto-api"         : "3.12.0",
+        "compileSdk"             : 28
 ]
 
 ext.deps = [
@@ -50,7 +50,7 @@ sourceCompatibility = 1.8
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
-    implementation "org.bouncycastle:bcpkix-jdk15on:1.68"
+    implementation "org.bouncycastle:bcprov-jdk15on:1.68"
 
     if (project.hasProperty('depLocation') == false || project.depLocation > 0) {
         api deps.utils

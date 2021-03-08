@@ -4,5 +4,5 @@ ext.deploy = [
         "groupId"           : "com.highmobility",
         "licenseName"       : "MIT",
         "licenseUrl"        : "https ://opensource.org/licenses/MIT",
-        "id"                : "hmkit-crypto"
+        "id"                : "hmkit-crypto-telematics"
 ]
