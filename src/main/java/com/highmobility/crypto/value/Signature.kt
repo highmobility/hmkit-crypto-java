@@ -58,14 +58,6 @@ class Signature : BytesWithLength {
         return 64
     }
 
-//    fun getR(): Bytes {
-//        return Bytes(subList(0, 32).toByteArray())
-//    }
-//
-//    fun getS(): Bytes {
-//        return Bytes(subList(32, 64).toByteArray())
-//    }
-
     fun getR(): BigInteger {
         return BigInteger(1, subList(0, 32).toByteArray())
     }
