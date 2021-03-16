@@ -23,14 +23,11 @@
  */
 package com.highmobility.crypto.value
 
-import com.highmobility.crypto.CURVE_SPEC
-import com.highmobility.crypto.JavaPrivateKey
-import com.highmobility.crypto.KEY_GEN_ALGORITHM
+import com.highmobility.crypto.*
 import com.highmobility.utils.Base64
 import com.highmobility.value.Bytes
 import com.highmobility.value.BytesWithLength
 import org.bouncycastle.jce.spec.ECPrivateKeySpec
-import com.highmobility.crypto.toBytes
 import java.math.BigInteger
 import java.security.KeyFactory
 import java.security.interfaces.ECPrivateKey
@@ -46,9 +43,10 @@ class PrivateKey : BytesWithLength {
     constructor(value: Bytes?) : super(value)
 
     /**
-     * @param value The bytes in hex or Base64.
+     * @param value The private key value
+     * @param format The value format. For raw, it is 32 bytes in hex or base64
      */
-    constructor(value: String?) : super(value)
+    constructor(value: String, format: Format = Format.RAW) : super(resolve(value, format))
 
     /**
      * @param bytes The raw bytes.
@@ -60,6 +58,7 @@ class PrivateKey : BytesWithLength {
     }
 
     fun toJavaKey(): ECPrivateKey {
+        Crypto.setProvider()
         val keyFactory = KeyFactory.getInstance(KEY_GEN_ALGORITHM, "BC")
         val d = BigInteger(1, byteArray)
         val privateKeySpec = ECPrivateKeySpec(d, CURVE_SPEC)
@@ -71,8 +70,17 @@ class PrivateKey : BytesWithLength {
     }
 
     companion object {
-        fun fromPKCS8(serviceAccountApiPrivateKey: String): PrivateKey {
-            var encodedKeyString = serviceAccountApiPrivateKey
+        private fun resolve(value: String, format: Format = Format.RAW): Bytes {
+            return if (format == Format.RAW) {
+                Bytes(value)
+            } else {
+                fromPKCS8(value).getBytes()
+            }
+        }
+
+        private fun fromPKCS8(privateKey: String): ECPrivateKey {
+            Crypto.setProvider()
+            var encodedKeyString = privateKey
             // NOTE: 19/2/21 there are BC PKCS8 convert methods that remove these strings also
             encodedKeyString = encodedKeyString.replace("-----BEGIN PRIVATE KEY----", "")
             encodedKeyString = encodedKeyString.replace("-----END PRIVATE KEY-----", "")
@@ -80,9 +88,11 @@ class PrivateKey : BytesWithLength {
             val keySpec = PKCS8EncodedKeySpec(decodedPrivateKey)
             // how to convert PKCS#8 to EC private key https://stackoverflow.com/a/52301461/599743
             val kf = KeyFactory.getInstance(KEY_GEN_ALGORITHM, "BC")
-            return PrivateKey(kf.generatePrivate(keySpec) as ECPrivateKey)
+            return kf.generatePrivate(keySpec) as ECPrivateKey
         }
     }
+
+    enum class Format { RAW, PKCS8 }
 }
 
 fun JavaPrivateKey.getBytes(): Bytes {

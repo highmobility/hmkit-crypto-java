@@ -26,12 +26,21 @@ package com.highmobility.crypto
 import com.highmobility.crypto.value.PrivateKey
 import com.highmobility.crypto.value.PublicKey
 import com.highmobility.value.Bytes
+import org.bouncycastle.jce.provider.BouncyCastleProvider
+import org.junit.After
 import org.junit.Test
+import java.security.Security
 import java.util.*
 import kotlin.math.floor
 
 internal class CryptoTest {
-    val crypto = Crypto()
+    val crypto get() = Crypto()
+
+    @After
+    fun after() {
+        // clean the provider, so tests can fail if it is not set
+        Security.removeProvider(BouncyCastleProvider.PROVIDER_NAME)
+    }
 
     @Test
     fun createKeypair() {
@@ -63,6 +72,17 @@ internal class CryptoTest {
         val javaKey = privateKey.toJavaKey()
         val fromJava = PrivateKey(javaKey)
         assert(privateKey == fromJava)
+    }
+
+    @Test
+    fun privateFromPKCS8() {
+        val privateKey =
+            PrivateKey(
+                "-----BEGIN PRIVATE KEY-----\nMIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQggKWv9w+MRxJeHFqp\n0NR0xMwnygzM14qskgZkBGxkmfyhRANCAAQRemzHPrKYDIIzQVXGcnJ3w5dh5Na4\nCIU4D94a9hR46VsM7z7FyGUdBM4sXBohoKEDsH+uDZCrC0i1YNn0je2v\n-----END PRIVATE KEY-----",
+                PrivateKey.Format.PKCS8
+            )
+
+        assert(privateKey.size == 32)
     }
 
     @Test

@@ -57,13 +57,12 @@ const val KEY_GEN_ALGORITHM = "ECDH" // EC and ECDSA can be used with same algor
 var SIGN_ALGORITHM = "SHA256withPLAIN-ECDSA"
 
 const val CURVE_NAME = "secp256r1" // this is 1.3.132.0.prime256v1
-val params = ECNamedCurveTable.getParameterSpec(CURVE_NAME)
+val params: ECNamedCurveParameterSpec = ECNamedCurveTable.getParameterSpec(CURVE_NAME)
 val CURVE_SPEC = ECParameterSpec(params.curve, params.g, params.n, params.h)
 
 class Crypto {
-
     init {
-        Security.addProvider(BouncyCastleProvider())
+        setProvider()
     }
 
     /**
@@ -320,5 +319,17 @@ class Crypto {
         cipher.init(Cipher.ENCRYPT_MODE, key)
         val result = cipher.doFinal(message.byteArray)
         return Bytes(result)
+    }
+
+    companion object {
+        /**
+         * Some functions, eg [PrivateKey.fromPKCS8], could be called before a Crypto object is
+         * initialised and security provider is added.
+         */
+        internal fun setProvider() {
+            if (Security.getProvider(BouncyCastleProvider.PROVIDER_NAME) == null) {
+                Security.addProvider(BouncyCastleProvider())
+            }
+        }
     }
 }
