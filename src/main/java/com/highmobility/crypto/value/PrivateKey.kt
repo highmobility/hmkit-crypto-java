@@ -97,5 +97,5 @@ class PrivateKey : BytesWithLength {
 
 fun JavaPrivateKey.getBytes(): Bytes {
     val d = (this as ECPrivateKey).s
-    return Bytes(d.toBytes(32))
+    return d.toBytes(32)
 }
