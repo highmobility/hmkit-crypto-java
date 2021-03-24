@@ -1,8 +1,8 @@
 ext.deploy = [
-        "siteUrl"           : "https ://github.com/highmobility/hmkit-crypto-java",
-        "gitUrl"            : "https ://github.com/highmobility/hmkit-crypto-java",
-        "groupId"           : "com.highmobility",
-        "licenseName"       : "MIT",
-        "licenseUrl"        : "https ://opensource.org/licenses/MIT",
-        "id"                : "hmkit-crypto-telematics"
+        "siteUrl"    : "https://github.com/highmobility/hmkit-crypto-java",
+        "gitUrl"     : "https://github.com/highmobility/hmkit-crypto-java",
+        "groupId"    : "com.high-mobility",
+        "licenseName": "MIT",
+        "licenseUrl" : "https://opensource.org/licenses/MIT",
+        "id"         : "hmkit-crypto-telematics"
 ]

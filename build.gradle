@@ -15,35 +15,22 @@ repositories {
 
 // these are not release numbers. release numbers are in deploy.settings files.
 ext.ver = [
-        "hmkit-crypto-telematics": "0.1.0",
+        "hmkit-crypto-telematics": "0.1",
         "hmkit-utils"            : "1.4.5",
-        "hmkit-auto-api"         : "3.12.0",
+        "hmkit-auto-api"         : "3.12.1",
         "compileSdk"             : 28
 ]
 
 ext.deps = [
-        "utils"  : "com.highmobility:hmkit-utils:${ver."hmkit-utils"}",
-        "autoApi": "com.highmobility:hmkit-auto-api:${ver."hmkit-auto-api"}",
+        "utils"  : "com.high-mobility:hmkit-utils:${ver."hmkit-utils"}",
+        "autoApi": "com.high-mobility:hmkit-auto-api:${ver."hmkit-auto-api"}",
 ]
 
 apply plugin: "java-library"
 apply plugin: 'kotlin'
 apply from: "deploy.gradle"
-apply from: "https://raw.githubusercontent.com/tonisives/tools/master/gradle/deploy-java-v2.gradle"
+apply from: "https://raw.githubusercontent.com/tonisives/tools/master/gradle/deploy-java-mavenCentral.gradle"
 apply from: "https://raw.githubusercontent.com/tonisives/tools/master/gradle/test-shell-logging.gradle"
-
-repositories {
-    jcenter()
-    if (project.hasProperty('devReadUser')) {
-        maven {
-            url "http://jfrog.high-mobility.com/artifactory/gradle-dev-local/"
-            credentials {
-                username devReadUser
-                password devReadPassword
-            }
-        }
-    }
-}
 
 compileJava {
     sourceCompatibility = '1.8'

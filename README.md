@@ -23,7 +23,7 @@ repositories {
 }
 
 dependencies {
-  implementation 'com.highmobility:hmkit-crypto-telematics:0.1.0'
+  implementation 'com.high-mobility:hmkit-crypto-telematics:0.1.0'
 }
 ```
 
