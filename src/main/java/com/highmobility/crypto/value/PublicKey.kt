@@ -34,7 +34,7 @@ import java.security.KeyFactory
 import java.security.interfaces.ECPublicKey
 
 /**
- * Raw 32 byte x and y coordinates of the [CURVE_NAME] curve
+ * Raw 32 byte x and y public key coordinates on the [CURVE_NAME] curve
  *
  */
 class PublicKey : BytesWithLength {
