@@ -59,7 +59,7 @@ class PrivateKey : BytesWithLength {
 
     fun toJavaKey(): ECPrivateKey {
         Crypto.setProvider()
-        val keyFactory = KeyFactory.getInstance(KEY_GEN_ALGORITHM, "BC")
+        val keyFactory = KeyFactory.getInstance(KEY_GEN_ALGORITHM)
         val d = BigInteger(1, byteArray)
         val privateKeySpec = ECPrivateKeySpec(d, CURVE_SPEC)
         return keyFactory.generatePrivate(privateKeySpec) as ECPrivateKey
@@ -87,7 +87,7 @@ class PrivateKey : BytesWithLength {
             val decodedPrivateKey = Base64.decode(encodedKeyString)
             val keySpec = PKCS8EncodedKeySpec(decodedPrivateKey)
             // how to convert PKCS#8 to EC private key https://stackoverflow.com/a/52301461/599743
-            val kf = KeyFactory.getInstance(KEY_GEN_ALGORITHM, "BC")
+            val kf = KeyFactory.getInstance(KEY_GEN_ALGORITHM)
             return kf.generatePrivate(keySpec) as ECPrivateKey
         }
     }

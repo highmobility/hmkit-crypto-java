@@ -70,7 +70,7 @@ class PublicKey : BytesWithLength {
         val params = ECNamedCurveTable.getParameterSpec(CURVE_NAME)
         val keySpec = ECPublicKeySpec(params.curve.decodePoint(rawKeyEncoded.byteArray), params)
 
-        val keyFactory = KeyFactory.getInstance(KEY_GEN_ALGORITHM, "BC")
+        val keyFactory = KeyFactory.getInstance(KEY_GEN_ALGORITHM)
         return keyFactory.generatePublic(keySpec) as ECPublicKey
     }
 }

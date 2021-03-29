@@ -93,7 +93,7 @@ class Crypto {
 
     private fun createJavaKeypair(): KeyPair {
         val ecSpec: ECNamedCurveParameterSpec = ECNamedCurveTable.getParameterSpec(CURVE_NAME)
-        val g = KeyPairGenerator.getInstance(KEY_GEN_ALGORITHM, "BC")
+        val g = KeyPairGenerator.getInstance(KEY_GEN_ALGORITHM)
         g.initialize(ecSpec, SecureRandom())
         val javaKeyPair = g.generateKeyPair()
         return javaKeyPair
@@ -110,7 +110,7 @@ class Crypto {
         val formattedMessage = message.fillWith0sUntil(64)
         // https://stackoverflow.com/questions/34063694/fixed-length-64-bytes-ec-p-256-signature-with-jce
         // there are also withCVC-ECDSA, withECDSA
-        val signature = JavaSignature.getInstance(SIGN_ALGORITHM, "BC")
+        val signature = JavaSignature.getInstance(SIGN_ALGORITHM)
         signature.initSign(privateKey.toJavaKey())
         signature.update(formattedMessage.byteArray)
         val sigBytes = signature.sign()
@@ -139,7 +139,7 @@ class Crypto {
     fun verify(message: Bytes, signature: Signature, publicKey: JavaPublicKey): Boolean {
         val formattedMessage = message.fillWith0sUntil(64)
 
-        val ecdsaVerify = JavaSignature.getInstance("SHA256withPLAIN-ECDSA", "BC")
+        val ecdsaVerify = JavaSignature.getInstance("SHA256withPLAIN-ECDSA")
         ecdsaVerify.initVerify(publicKey)
         ecdsaVerify.update(formattedMessage.byteArray)
         val result = ecdsaVerify.verify(signature.byteArray)
@@ -171,7 +171,7 @@ class Crypto {
     }
 
     fun sha256(bytes: ByteArray): Sha256 {
-        val digest = MessageDigest.getInstance("SHA-256", "BC")
+        val digest = MessageDigest.getInstance("SHA-256")
         return Sha256(digest.digest(bytes))
     }
 
@@ -187,7 +187,7 @@ class Crypto {
      * @return The signature
      */
     fun signJWT(message: ByteArray, privateKey: PrivateKey): Signature {
-        val signature = JavaSignature.getInstance(SIGN_ALGORITHM, "BC")
+        val signature = JavaSignature.getInstance(SIGN_ALGORITHM)
         signature.initSign(privateKey.toJavaKey())
         signature.update(message)
         val sigBytes = signature.sign()
@@ -298,7 +298,7 @@ class Crypto {
 
     internal fun hmac(sharedSecret: Bytes, message: Bytes): Bytes {
         val key: SecretKey = SecretKeySpec(sharedSecret.byteArray, "HmacSHA256")
-        val mac: Mac = Mac.getInstance("HmacSHA256", "BC")
+        val mac: Mac = Mac.getInstance("HmacSHA256")
         mac.init(key)
         val hmac = mac.doFinal(message.fillWith0sUntil(64).byteArray)
         return Bytes(hmac)
@@ -306,7 +306,7 @@ class Crypto {
 
     // Shared Diffie-Helman key from my private and other public
     internal fun createSharedSecret(privateKey: PrivateKey, publicKey: PublicKey): Bytes {
-        val ka = KeyAgreement.getInstance(KEY_GEN_ALGORITHM, "BC")
+        val ka = KeyAgreement.getInstance(KEY_GEN_ALGORITHM)
         ka.init(privateKey.toJavaKey())
         ka.doPhase(publicKey.toJavaKey(), true)
         val secret = ka.generateSecret() // 32 bytes
@@ -314,7 +314,7 @@ class Crypto {
     }
 
     private fun aes(keyBytes: Bytes, message: Bytes): Bytes {
-        val cipher = Cipher.getInstance("AES/ECB/NoPadding", "BC")
+        val cipher = Cipher.getInstance("AES/ECB/NoPadding")
         val key = SecretKeySpec(keyBytes.byteArray, "AES")
         cipher.init(Cipher.ENCRYPT_MODE, key)
         val result = cipher.doFinal(message.byteArray)
