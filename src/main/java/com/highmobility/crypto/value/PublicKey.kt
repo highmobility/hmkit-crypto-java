@@ -24,6 +24,7 @@
 package com.highmobility.crypto.value
 
 import com.highmobility.crypto.*
+import com.highmobility.crypto.Crypto.Companion.BC
 import com.highmobility.value.Bytes
 import com.highmobility.value.BytesWithLength
 import org.bouncycastle.crypto.params.ECPublicKeyParameters
@@ -70,7 +71,7 @@ class PublicKey : BytesWithLength {
         val params = ECNamedCurveTable.getParameterSpec(CURVE_NAME)
         val keySpec = ECPublicKeySpec(params.curve.decodePoint(rawKeyEncoded.byteArray), params)
 
-        val keyFactory = KeyFactory.getInstance(KEY_GEN_ALGORITHM, "BC")
+        val keyFactory = KeyFactory.getInstance(KEY_GEN_ALGORITHM, BC)
         return keyFactory.generatePublic(keySpec) as ECPublicKey
     }
 }
