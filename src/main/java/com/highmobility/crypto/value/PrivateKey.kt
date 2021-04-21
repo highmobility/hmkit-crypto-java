@@ -47,6 +47,7 @@ class PrivateKey : BytesWithLength {
      * @param value The private key value
      * @param format The value format. For raw, it is 32 bytes in hex or base64
      */
+    @JvmOverloads
     constructor(value: String, format: Format = Format.RAW) : super(resolve(value, format))
 
     /**
