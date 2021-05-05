@@ -1,17 +1,8 @@
-buildscript {
-    repositories {
-        jcenter()
-    }
-    dependencies {
-        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.5'
-    }
-}
-
 apply plugin: "java-library"
 apply from: "deploy.gradle"
 
 repositories {
-    jcenter()
+    mavenCentral()
     if (project.hasProperty('devReadUser')) {
         maven {
             url "http://jfrog.high-mobility.com/artifactory/gradle-dev-local/"
