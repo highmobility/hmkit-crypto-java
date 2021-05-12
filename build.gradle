@@ -1,19 +1,10 @@
-buildscript {
-    repositories {
-        jcenter()
-    }
-    dependencies {
-        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.5'
-    }
-}
-
 apply plugin: "java-library"
 apply from: "deploy.gradle"
-apply from: "https://raw.githubusercontent.com/tonisives/tools/master/gradle/deploy-java-v2.gradle"
+apply from: "https://raw.githubusercontent.com/tonisives/tools/master/gradle/deploy-java-mavenCentral.gradle"
 apply from: "https://raw.githubusercontent.com/tonisives/tools/master/gradle/test-shell-logging.gradle"
 
 repositories {
-    jcenter()
+    mavenCentral()
     if (project.hasProperty('devReadUser')) {
         maven {
             url "http://jfrog.high-mobility.com/artifactory/gradle-dev-local/"
@@ -24,6 +15,7 @@ repositories {
         }
     }
 }
+
 
 sourceCompatibility = 1.8
 
@@ -37,9 +29,9 @@ ext.ver = [
 ]
 
 ext.deps = [
-        "utils"   : "com.highmobility:hmkit-utils:${ver."hmkit-utils"}",
-        "corejni" : "com.highmobility:hmkit-core-jni:${ver."hmkit-core-jni"}",
-        "autoApi" : "com.highmobility:hmkit-auto-api:${ver."hmkit-auto-api"}",
+        "utils"   : "com.high-mobility:hmkit-utils:${ver."hmkit-utils"}",
+        "corejni" : "com.high-mobility:hmkit-core-jni:${ver."hmkit-core-jni"}",
+        "autoApi" : "com.high-mobility:hmkit-auto-api:${ver."hmkit-auto-api"}",
         "timber"  : "com.jakewharton.timber:timber:4.7.1",
 ]
 

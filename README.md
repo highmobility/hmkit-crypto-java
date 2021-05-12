@@ -17,11 +17,11 @@ It cannot be used independently because it doesn't include the core.
 
 ### Install
 
-Releases are pushed to jcenter. To include hmkit-crypto in your project, add to build.gradle:
+Releases are pushed to mavenCentral. To include hmkit-crypto in your project, add to build.gradle:
 
 ```
 repositories {
-  jcenter()
+  mavenCentral()
 }
 
 dependencies {
@@ -33,7 +33,7 @@ dependencies {
 }
 ```
 
-Find the latest version names in https://bintray.com/high-mobility/maven/
+Find the latest version names in [mavenCentral](https://search.maven.org/search?q=g:com.high-mobility)
 
 ## Certificates
 
