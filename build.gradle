@@ -29,9 +29,9 @@ ext.ver = [
 ]
 
 ext.deps = [
-        "utils"   : "com.highmobility:hmkit-utils:${ver."hmkit-utils"}",
-        "corejni" : "com.highmobility:hmkit-core-jni:${ver."hmkit-core-jni"}",
-        "autoApi" : "com.highmobility:hmkit-auto-api:${ver."hmkit-auto-api"}",
+        "utils"   : "com.high-mobility:hmkit-utils:${ver."hmkit-utils"}",
+        "corejni" : "com.high-mobility:hmkit-core-jni:${ver."hmkit-core-jni"}",
+        "autoApi" : "com.high-mobility:hmkit-auto-api:${ver."hmkit-auto-api"}",
         "timber"  : "com.jakewharton.timber:timber:4.7.1",
 ]
 
