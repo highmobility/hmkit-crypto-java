@@ -17,7 +17,7 @@ repositories {
 ext.ver = [
         "hmkit-crypto-telematics": "0.1",
         "hmkit-utils"            : "1.4.5",
-        "hmkit-auto-api"         : "3.12.1",
+        "hmkit-auto-api"         : "13.1.1",
         "compileSdk"             : 28
 ]
 
