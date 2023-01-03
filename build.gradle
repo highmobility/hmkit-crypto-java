@@ -5,15 +5,6 @@ apply from: "https://raw.githubusercontent.com/tonisives/tools/master/gradle/tes
 
 repositories {
     mavenCentral()
-    if (project.hasProperty('devReadUser')) {
-        maven {
-            url "http://jfrog.high-mobility.com/artifactory/gradle-dev-local/"
-            credentials {
-                username devReadUser
-                password devReadPassword
-            }
-        }
-    }
 }
 
 
