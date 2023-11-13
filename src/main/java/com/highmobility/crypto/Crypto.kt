@@ -34,7 +34,6 @@ import org.bouncycastle.jce.ECNamedCurveTable
 import org.bouncycastle.jce.provider.BouncyCastleProvider
 import org.bouncycastle.jce.spec.ECNamedCurveParameterSpec
 import org.bouncycastle.jce.spec.ECParameterSpec
-import org.bouncycastle.pqc.math.linearalgebra.ByteUtils.xor
 import java.security.*
 import java.util.*
 import javax.crypto.Cipher
@@ -42,6 +41,7 @@ import javax.crypto.KeyAgreement
 import javax.crypto.Mac
 import javax.crypto.SecretKey
 import javax.crypto.spec.SecretKeySpec
+import kotlin.experimental.xor
 
 typealias JavaSignature = java.security.Signature
 typealias JavaPrivateKey = java.security.PrivateKey
@@ -286,6 +286,14 @@ class Crypto {
         // XOR the expanded cipher and container
         val result = xor(cipherExpanded.byteArray, message.byteArray)
         return Bytes(result)
+    }
+
+    private fun xor(a: ByteArray, b: ByteArray): ByteArray {
+        val result = ByteArray(a.size)
+        for (i in a.indices) {
+            result[i] = a[i] xor b[i]
+        }
+        return result
     }
 
     internal fun createSessionKey(
